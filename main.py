@@ -1,255 +1,140 @@
 import pygame
-import math
-#
+
 WHITE = (255,255,255)
 BLACK =(0,0,0)
 RED = (255,0,0)
 
 FPS = 60
 
+
 #Surface/Screen size (this shoudl be scaleable)
+
 WIDTH, HEIGHT= 900, 500
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("HEX")
 
-#add width to the hexagon so there can be a "neutral"   
-class Hexagon:
-    def __init__(self,player,pos,radius,color,surface):
-        self.player = player
-        self.pos = pos
-        self.radius = radius
-        self.color = color
-        self.fill = None
-        self.posArr = None
-        # board pos needs to be coded
-        self.boardPos = None
-        self.surface = surface
+hexagon_neutral_img = pygame.image.load("Hex-Game/assets/tile_0.png").convert_alpha()
+hexagon_player1_img = pygame.image.load("Hex-Game/assets/tile_1.png").convert_alpha()
+hexagon_player2_img = pygame.image.load("Hex-Game/assets/tile_2.png").convert_alpha()
 
+
+class Button():
+    def __init__(self,x,y,image,scale, unit):
+        self.image = image  # Store original image
+        self.scale = scale
+        self.player = None
+        self.width = int(self.image.get_width() * self.scale)
+        self.height = int(self.image.get_height() * self.scale)
+        self.image = pygame.transform.scale(self.image, (self.width, self.height))
+        # self.image = pygame.transform.scale(image, (int(width*scale), int(height*scale)))
+        #for more precise clicking collision look into masks and sprites.
+        # self.mask = pygame.mask.from_surface(self.image)
+        self.unit = unit
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x,y)
+        self.clicked = False
+    
     def __str__(self):
-        return (f'HEXOBJ=player: {self.player}, pos:{self.pos}, color:{self.color}, posArr{self.posArr}')
-    #the underscore infront indicates that these are private attributes they are not necessary
-    def get_player(self):
-        return self.player
+        return (f'BUTTONOBJ= x,y: {self.rect.topleft}, image:{self.image}, scale:{self.scale}, unit:{self.unit}')
 
-    def set_player(self, player):
-        self.player = player
-        
-    def get_pos(self):
-        return self.pos
-
-    def set_pos(self, pos):
-        self.pos = pos
-
-    def get_radius(self):
-        return self.radius
-
-    def set_radius(self, radius):
-        self.radius = radius
-
-    def get_color(self):
-        return self.color
-
-    def set_color(self, color):
-        self.color = color
-
-    def get_fill(self):
-        return self.fill
-
-    def set_fill(self, fill):
-        self.fill = fill
-
-    def get_screen(self):
-        return self.surface
-
-    def set_screen(self, surface):
-        self.surface = surface
-
-    def get_posArr(self):
-        return self.posArr
-
-    #is this even necessary
-    def set_posArr(self, posArr):
-        self.posArr = posArr
-
+    #draw and check for mouseover/clicked
     def draw(self):
-        posArr = list()
-        pygame.draw.polygon(self.surface, self.color, [
-        (self.pos[0] + self.radius * math.sin(2 * math.pi * i / 6), self.pos[1] + self.radius * math.cos(2 * math.pi * i / 6))
-        for i in range(6)
-        ], 0)
-        for i in range(6):
-            posArr.append((self.pos[0] + self.radius * math.sin(2 * math.pi * i / 6), self.pos[1] + self.radius * math.cos(2 * math.pi * i / 6)))
+        #getting mouse pos
+        mouse_pos = pygame.mouse.get_pos()
 
-        self.set_posArr(posArr)
+        # checking colision and cliked
+        if self.rect.collidepoint(mouse_pos):
+            # print('hover:' + str(self.unit))
+            #Checking if we are leftclicking a button that has not been clicked, then changing the image
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                print("clicked")
+                board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
+                self.clicked = True
 
-class Board:
-    def __init__(self,hexagon,coords, dimensions,surface):
+            
+        #display the image on screen
+        screen.blit(self.image, self.rect)
+
+
+    def set_image(self,image):
+        self.image = image
+        self.image = pygame.transform.scale(self.image, (self.width, self.height))
+        
+
+    def get_hex_pos(self):
+        print('position:' + str(self.rect.topleft)+ "unit" + str(self.unit))
+        pass
+
+class Board():
+    def __init__(self, hexagon, size, surface):
         self.hexagon = hexagon
-        self.coords = coords
-        self.dimensions = dimensions
+        self.size = size
         self.surface = surface
         self.grid = None
-        self.selected_hexagon = None
 
-    def __str__(self):
-        return (f'BOARDOBJ=hexagon:{self.hexagon}, coords:{self.coords}, grid{self.grid}, selected_hexagon:{self.selected_hexagon}')
-
-    def generate_hexagon_grid(self):
-        hex_width = self.hexagon.get_radius() * 1.75
-        hex_height = (3 ** 0.5) / 2 * hex_width
-
+    def make_grid(self):
+        x_offset = self.hexagon.image.get_width()*self.hexagon.scale
+        y_offset = self.hexagon.image.get_height()*self.hexagon.scale
         hex_grid = []
-
-        for i in range(self.dimensions):
+        for i in range(self.size):
             row = []
-            for j in range(self.dimensions):
-                hex_x = hex_width * j + hex_width / 2 * (i % 2) + self.coords[0]
-                hex_y = hex_height * i + self.coords[1]
-                hex_position = (hex_x, hex_y)
-
-                hexagon = Hexagon(0, hex_position, self.hexagon.get_radius(), self.hexagon.get_color(), self.surface)
-                # Set the hexagon board pos
-                # hexagon.set_boardPos
+            for j in range(self.size):
+                # Offset for odd rows
+                hex_x = (j + i * 0.5)* x_offset
+                hex_y = i * y_offset * 0.74
+                hexagon = Button(hex_x, hex_y, self.hexagon.image, self.hexagon.scale, (i, j))
                 hexagon.draw()
                 row.append(hexagon)
-
             hex_grid.append(row)
-
         self.grid = hex_grid
         return hex_grid
 
     def get_grid(self):
         return self.grid
 
-    def set_grid(self, hex_grid):
-        self.grid = hex_grid
-
-        for row in hex_grid:
-            for hexagon in row:
+    
+    def draw_grid(self):
+        for row in (self.grid):
+            for hexagon in (row):
                 hexagon.draw()
 
-    def get_hexagon_at_cursor(self, pixel):
-        """
-        Returns the hexagon at the specified pixel coordinate, or None if no hexagon exists at that coordinate.
-        """
-        hex_width = self.hexagon.get_radius() * 1.75
-        hex_height = (3 ** 0.5) / 2 * hex_width
-
-        # Determine the row and column of the hexagon that contains the specified pixel coordinate
-        col = int((pixel[0] - self.coords[0]) / hex_width)
-        row = int((pixel[1] - self.coords[1] - (col % 2) * hex_height / 2) / hex_height)
-
-        # Check if the row and column are valid
-        if row < 0 or row >= self.dimensions or col < 0 or col >= self.dimensions:
-            return None
-
-        # Check if the specified pixel coordinate is within the hexagon
-        hex_x = hex_width * col + hex_width / 2 * (row % 2) + self.coords[0]
-        hex_y = hex_height * row + self.coords[1]
-        distance = math.sqrt((hex_x - pixel[0]) ** 2 + (hex_y - pixel[1]) ** 2)
-        if distance > self.hexagon.get_radius():
-            return None
-
-        # Return the hexagon object at the specified row and column
-        print("HEXAGON POS:"+str(self.grid[row][col]))
-        return self.grid[row][col]
+                
 
 
 
-class Game:
-    def __init__(self, board, turn):
-        self.board = board
-        self.turn = turn
 
-    def __str__(self):
-        return(f'GAMEOBJ=board: {self.board}, turn:{self.turn}')
-    def run(self):
-        # Initialize Pygame and create a window
-        pygame.init()
-        pygame.display.set_caption("Hex")
-        clock = pygame.time.Clock()
-        
-        # Draw the board
-        WIN.fill(WHITE)
-        self.board.generate_hexagon_grid()
+#button inits
+hexagon1 = Button(0,0, hexagon_player1_img,0.5, (0,0))
+hexagon2 = Button(hexagon_neutral_img.get_width()*0.5,0,hexagon_neutral_img,0.5,(0,1))
 
-        # Main game loop
-        running = True
-        #clicks is away to distinguish between players
-        clicks = 0
-        while running:
-            # Handle events
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    clicks +=1
-                    # Check if the mouse is over a hexagon
-                    mouse_pos = pygame.mouse.get_pos()
-                    #testing
-                    # print("mousepos:"+ str(mouse_pos))
-                    grid = self.board.get_grid()
-                    # print(grid[0][1].get_pos())
-                    # print("grid:"+ str(self.board.get_hexagon_at_cursor(mouse_pos)))
-                    hexagon = self.board.get_hexagon_at_cursor(mouse_pos)
-                    # print('test hexagon'+str(hexagon))
-                    #Testing stop
-                    hexagon = self.board.get_hexagon_at_cursor(mouse_pos)
-                    if hexagon is not None:
-                        self.selected_hexagon = hexagon
-                        self.selected_hexagon.set_color((255, 0, 0))
-                        self.board.set_grid(self.board.get_grid())
+hexagon_player1 = Button(96, 0, hexagon_player1_img, 0.5, (1, 1))
+
+board1 = Board(hexagon1,11,screen)
+screen.fill(WHITE)
+board1.make_grid()
 
 
-            # Update the display
-            pygame.display.update()
 
-        # Clean up
-        pygame.quit()
+# Main game loop
+running = True
+#clicks is away to distinguish between players
+while running:
+    # Handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    board1.grid[0][0].set_image(hexagon_player2_img)
+    board1.draw_grid()
+    
+    
+    # board1.grid[1][1] = hexagon_player1
+    # board1.grid[1][1].draw
+    # hexagon1.set_image(hexagon_player1_img)
+    # hexagon1.draw()
+    
     
 
-
-#Makes a surface (screen we are printing on)
-class Surface:
-    def __init__(self,width, height, theme, fps):
-        self.width = width
-        self.height = height
-        self.theme = theme
-        self.fps = fps
-
-
-def main():
-    # clock = pygame.time.Clock()
-    # is_running = True
-    # WIN.fill(WHITE)
-    # hex1 = Hexagon(0,(40,40),20,BLACK,WIN)
-    # board1 = Board(hex1,(40,40),11,WIN)
-    # board1.generate_hexagon_grid()
-    # grid = board1.get_grid()
-    # grid[0][1].set_color((255,0,0))
-    # grid[0][2].set_color((0,255,0))
-    # board1.set_grid(grid)
-    # pygame.display.update()
-
-    # while is_running:
-    #     clock.tick(FPS)
-    #     for event in pygame.event.get():
-    #         if event.type == pygame.QUIT:
-    #             is_running = False
-
-    hex1 = Hexagon(0,(40,40),40,BLACK,WIN)
-    board1 = Board(hex1,(40,40),11,WIN)
-    board1.generate_hexagon_grid()
-    game1 = Game(board1,None)
-    game1.run()
-    
-
-if __name__ == '__main__':
-    main()
-
-
-# trapez form
-
-
-
+    # pygame.draw.line(screen, RED, (0,56),(600,56))
+    pygame.display.update()
 
