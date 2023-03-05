@@ -61,7 +61,12 @@ class Button():
             #Checking if we are leftclicking a button that has not been clicked, then changing the image
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
                 print("clicked")
-                board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
+                if game1.get_turn() % 2 == 1:
+                    board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
+                else:
+                    board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
+                
+                game1.turn_count()
                 self.clicked = True
                 action = True
             
@@ -127,18 +132,6 @@ class EventHandler():
     def __init__(self,event):
         self.event = event
 
-
-#button inits
-hexagon1 = Button(0,0, hexagon_player1_img,0.5, (0,0))
-hexagon2 = Button(hexagon_neutral_img.get_width()*0.5,0,hexagon_neutral_img,0.5,(0,1))
-
-hexagon_player1 = Button(96, 0, hexagon_player1_img, 0.5, (1, 1))
-
-board1 = Board(hexagon1,11,game_surface)
-game_surface.fill(WHITE)
-board1.make_grid()
-running = True
-
 def menu(game_menu):
     while game_menu:
         menu_surface.fill(WHITE)
@@ -149,27 +142,73 @@ def menu(game_menu):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     game_menu = False
+    
+class Game():
+    def __init__(self, surface, board, turn):
+        self.surface = surface
+        self.turn = turn
+        self.board = board
+        self.running = True
+    
+    def play(self):
+        game_surface.fill(WHITE)
+        self.board.make_grid()
+        while self.running:
+            
+            self.board.draw_grid()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        game_menu = True
+                        menu(game_menu)
+            pygame.display.update()
+
+    def get_turn(self):
+        return self.turn
+    
+    def turn_count(self):
+        self.turn += 1
+
+            
+#button inits
+hexagon1 = Button(0,0, hexagon_neutral_img,0.5, (0,0))
+hexagon2 = Button(hexagon_neutral_img.get_width()*0.5,0,hexagon_neutral_img,0.5,(0,1))
+
+hexagon_player1 = Button(96, 0, hexagon_player1_img, 0.5, (1, 1))
+
+board1 = Board(hexagon1,11,game_surface)
+game1 = Game(game_surface,board1,0)
+game1.play()
+
+
+
+# running = True
+# while running:
+#     board1.make_grid()
+#     board1.draw_grid()
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             running = False
+#         if event.type == pygame.KEYDOWN:
+#             if event.key == pygame.K_ESCAPE:
+#                 game_menu = True
+#                 menu(game_menu)
 
     
 
 # Main game loop
 
 #clicks is away to distinguish between players
-while running:
+
     # Handle events
-    board1.draw_grid()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                game_menu = True
-                menu(game_menu)
+    
 
     
 
     
     
     # pygame.draw.line(screen, RED, (0,56),(600,56))
-    pygame.display.update()
+    # pygame.display.update()
 
