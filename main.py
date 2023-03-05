@@ -104,6 +104,10 @@ class Board():
                 # Offset for odd rows
                 hex_x = (j + i * 0.5)* x_offset
                 hex_y = i * y_offset * 0.74
+                # if i == 0:
+                #     hexagon = Button(hex_x, hex_y, self.hexagon.image, self.hexagon.scale, (i, j))
+                #     hexagon.set_image(hexagon_player1_img)
+                # else:
                 hexagon = Button(hex_x, hex_y, self.hexagon.image, self.hexagon.scale, (i, j))
                 hexagon.draw(self.surface)
                 row.append(hexagon)
