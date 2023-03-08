@@ -1,6 +1,6 @@
 import numpy as np
 
-board_size = 5
+board_size = 11
 
 board = np.zeros((board_size, board_size), dtype=int)
 
