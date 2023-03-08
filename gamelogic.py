@@ -1,6 +1,6 @@
 import numpy as np
 
-board_size = 11
+board_size = 5
 
 board = np.zeros((board_size, board_size), dtype=int)
 
@@ -45,7 +45,7 @@ def find_neighbours(pos, value=-1):
     return nset
 
 
-# assumes that player is either number 1 or 2
+# assumes that player is either number 1 or 2.
 def has_player_won(playerno):
     path_found = False
     r, c = (0, 0)
@@ -55,22 +55,31 @@ def has_player_won(playerno):
         raise Exception("Invalid index for has_player_won: Player must be either 1 or 2")
 
     while r < board_size and c < board_size and not path_found:
+        # first the function looks for one of the player's tiles along an edge (leftmost for player 1, topmost for
+        # player 2)
         if board[r, c] == playerno:
+            # any tile found is added to the set containing the possible path
             possible_path.add((r, c))
+            # In this loop, the neighbours of our path candidates are included into the possible path.
+            # We also keep track of already explored candidates, so we won't end in an infinite loop.
             while len(possible_path - visited_set) > 0:
                 for elem in possible_path - visited_set:
                     (x, y) = elem
                     possible_path = possible_path | find_neighbours((x, y), value=playerno)
                     visited_set.add(elem)
+            # If a tile on the rightmost edge (for player 1) or the bottom edge (for player 2) is in the possible path
+            # set, this must mean a path was found. Afterall, it could only have been added if all successive neighbours
+            # on the path were added
             for i in range(0, board_size):
                 if playerno == 1:
-                    if (i, 10) in possible_path:
+                    if (i, board_size - 1) in possible_path:
                         path_found = True
                         break
                 elif playerno == 2:
-                    if (10, i) in possible_path:
+                    if (10, board_size - 1) in possible_path:
                         path_found = True
                         break
+        # this progresses the loop that searches for tiles on the initial edges
         if playerno == 1:
             r = r + 1
         elif playerno == 2:
