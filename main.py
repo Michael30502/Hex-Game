@@ -1,11 +1,15 @@
 import pygame
 import button
 import board
+import tiles
+import game
 
 
 #create display window
 SCREEN_HEIGHT = 800
 SCREEN_WIDTH = 800
+
+FPS = 60
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT),)
 pygame.display.set_caption('Hex')
@@ -25,6 +29,10 @@ Pause_Game_img = pygame.image.load('assets/Pause_Game.png').convert_alpha()
 Settings_img = pygame.image.load('assets/Settings.png').convert_alpha()
 Two_Player_img = pygame.image.load('assets/Two_Player.png').convert_alpha()
 Go_Back_img = pygame.image.load('assets/Go_Back.png').convert_alpha()
+hexagon_neutral_img = pygame.image.load('assets/tile_0.png').convert_alpha()
+hexagon_player1_img = pygame.image.load("assets/tile_1.png").convert_alpha()
+hexagon_player2_img = pygame.image.load("assets/tile_2.png").convert_alpha()
+
 
 
 #create button instances
@@ -41,6 +49,10 @@ export_game_button = button.Button(300, 100, Export_Game_img, 2)
 import_game_button = button.Button(300, 100, Import_Game_img, 2)
 pause_game_button = button.Button(600, 600, Pause_Game_img, 1)
 go_back_button = button.Button(600, 600, Go_Back_img, 1)
+hexagon1 = tiles.Tiles(0,0, hexagon_neutral_img,0.5, (0,0))
+hexagon2 = tiles.Tiles(hexagon_neutral_img.get_width()*0.5,0,hexagon_neutral_img,0.5,(0,1))
+hexagon_player1 = tiles.Tiles(96, 0, hexagon_player1_img, 0.5, (1, 1))
+
 
 #game loop
 run = True
@@ -80,7 +92,9 @@ while run:
 			second_menu = False
 	
 	if game_running == True:
-			board.draw_hexagon_field(screen)
+			board1 = board.Board(hexagon1,11,screen,game1,board1,hexagon_player1_img,hexagon_player2_img)
+			game1 = game.Game(screen,board1,0)
+			game1.play(screen)
 
 	
 	if setting_menu == True:
