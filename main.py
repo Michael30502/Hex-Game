@@ -48,6 +48,12 @@ class Button():
     def __str__(self):
         return (f'BUTTONOBJ= x,y: {self.rect.topleft}, image:{self.image}, scale:{self.scale}, unit:{self.unit}')
 
+    def set_player(self, player):
+        self.player = player
+
+    def get_player(self):
+        return self.player
+
     #draw and check for mouseover/clicked
     def draw(self,surface):
         #the action allows us to check if a button has been pressed
@@ -61,12 +67,14 @@ class Button():
             #Checking if we are leftclicking a button that has not been clicked, then changing the image
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
                 print("clicked")
-                if game1.get_turn() % 2 == 1:
+                if game1.get_turn() % 2 == 1 and board1.grid[self.unit[0]][self.unit[1]].get_player()==None:
                     board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
-                else:
+                    board1.grid[self.unit[0]][self.unit[1]].set_player(1)
+                    game1.turn_count()
+                if not (game1.get_turn() % 2 == 1) and board1.grid[self.unit[0]][self.unit[1]].get_player()==None:
                     board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
-                
-                game1.turn_count()
+                    board1.grid[self.unit[0]][self.unit[1]].set_player(2)
+                    game1.turn_count()
                 self.clicked = True
                 action = True
             
@@ -167,6 +175,7 @@ class Game():
                     if event.key == pygame.K_ESCAPE:
                         game_menu = True
                         menu(game_menu)
+
             pygame.display.update()
 
     def get_turn(self):
