@@ -22,6 +22,7 @@ hexagon_player2_img = pygame.image.load("assets/tile_2.png").convert_alpha()
 game_pause = False
 
 game_menu = False
+action= False
 
 
 class Button:
@@ -51,8 +52,8 @@ class Button:
 
     # draw and check for mouseover/clicked
     def draw(self, surface):
-        # the action allows us to check if a button has been pressed
-        action = False
+        global action
+
         # getting mouse pos
         mouse_pos = pygame.mouse.get_pos()
 
@@ -61,16 +62,15 @@ class Button:
         elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
             board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
 
-
         # checking colision and clicked
         if self.rect.collidepoint(mouse_pos):
             # print('hover:' + str(self.unit))
             # Checking if we are leftclicking a button that has not been clicked, then changing the image
-            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
-                print("clicked")
+
+            pygame.event.get()
+            if pygame.mouse.get_pressed()[0] == 1 and not action:
+                action = True
                 gamelogic.make_move(self.unit)
-
-
 
                 # if game1.get_turn() % 2 == 1 and board1.grid[self.unit[0]][self.unit[1]].get_player() == None:
                 #     board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
@@ -80,15 +80,13 @@ class Button:
                 #     board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
                 #     board1.grid[self.unit[0]][self.unit[1]].set_player(2)
                 #     game1.turn_count()
-                self.clicked = True
-                action = True
+
 
             if pygame.mouse.get_pressed()[0] == 0:
-                self.clicked = False
+                action = False
 
         # display the image on screen
         surface.blit(self.image, self.rect)
-        return action
 
     def set_image(self, image):
         self.image = image
