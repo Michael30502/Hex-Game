@@ -56,17 +56,21 @@ class Button:
         # getting mouse pos
         mouse_pos = pygame.mouse.get_pos()
 
-        # checking colision and cliked
+        if gamelogic.board[self.unit[0]][self.unit[1]] == 1:
+            board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
+        elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
+            board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
+
+
+        # checking colision and clicked
         if self.rect.collidepoint(mouse_pos):
             # print('hover:' + str(self.unit))
             # Checking if we are leftclicking a button that has not been clicked, then changing the image
             if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 print("clicked")
                 gamelogic.make_move(self.unit)
-                if gamelogic.board[self.unit[0]][self.unit[1]] == 1:
-                    board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
-                elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
-                    board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
+
+
 
                 # if game1.get_turn() % 2 == 1 and board1.grid[self.unit[0]][self.unit[1]].get_player() == None:
                 #     board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
@@ -166,7 +170,10 @@ class Game:
         self.board.make_grid()
         while self.running:
 
-            self.board.draw_grid()
+            if gamelogic.player_no == gamelogic.cpu:
+                self.unit = gamelogic.make_cpu_move()
+            else:
+                self.board.draw_grid()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False

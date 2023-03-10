@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 
 board_size = 11
@@ -5,7 +7,7 @@ board_size = 11
 board = np.zeros((board_size, board_size), dtype=int)
 
 player_no = 0
-
+cpu = 1
 
 def is_empty(pos):
     return board[pos] == 0
@@ -13,14 +15,43 @@ def is_empty(pos):
 
 def make_move(pos):
     global player_no
+    print(board[pos])
     if is_empty(pos):
+        print(pos)
         board[pos] = player_no + 1
         # print find_neighbours(pos)
         if has_player_won(player_no+1):
-            print "Player {p} won!".format(p=player_no+1)
+            print( "Player {p} won!".format(p=player_no+1))
         player_no = (player_no + 1) % 2
     else:
         print("Illegal move")
+
+def make_cpu_move():
+    global player_no
+    random_number = get_random_empty_pos()
+    if random_number != -1:
+        board[random_number] = player_no+1
+    player_no = (player_no + 1) % 2
+
+
+def get_random_empty_pos():
+    random_pos = -1
+    x = 0
+    y = 0
+    pos_list = []
+    print(board)
+    for hex in board:
+        for hex2 in hex:
+            if hex2 == 0:
+                pos_list.append((y, x))
+            x += 1
+        x = 0
+        y += 1
+    if len(pos_list)>=1:
+        random_pos = pos_list[random.randrange(0, len(pos_list)-1)]
+
+    return random_pos
+
 
 
 # if a nonnegative value is specified when calling, only neighbours of that value are returned
