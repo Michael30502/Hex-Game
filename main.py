@@ -39,7 +39,8 @@ class Button():
         self.image = pygame.transform.scale(self.image, (self.width, self.height))
         # self.image = pygame.transform.scale(image, (int(width*scale), int(height*scale)))
         #for more precise clicking collision look into masks and sprites.
-        # self.mask = pygame.mask.from_surface(self.image)
+        self.mask = pygame.mask.from_surface(self.image)
+        # https://stackoverflow.com/questions/52843879/detect-mouse-event-on-masked-image-pygame
         self.unit = unit
         self.rect = self.image.get_rect()
         self.rect.topleft = (x,y)
@@ -69,11 +70,11 @@ class Button():
                 print("clicked")
                 if game1.get_turn() % 2 == 1 and board1.grid[self.unit[0]][self.unit[1]].get_player()==None:
                     board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
-                    board1.grid[self.unit[0]][self.unit[1]].set_player(1)
+                    board1.grid[self.unit[0]][self.unit[1]].set_player(0)
                     game1.turn_count()
                 if not (game1.get_turn() % 2 == 1) and board1.grid[self.unit[0]][self.unit[1]].get_player()==None:
                     board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
-                    board1.grid[self.unit[0]][self.unit[1]].set_player(2)
+                    board1.grid[self.unit[0]][self.unit[1]].set_player(1)
                     game1.turn_count()
                 self.clicked = True
                 action = True
@@ -188,9 +189,12 @@ class Game():
 #button inits
 hexagon1 = Button(0,0, hexagon_neutral_img,0.5, (0,0))
 hexagon2 = Button(hexagon_neutral_img.get_width()*0.5,0,hexagon_neutral_img,0.5,(0,1))
+# hexagon_neutral_img = pygame.image.load("Hex-Game/assets/tile_0.png").convert_alpha()
+hexagon_neutral_img_mask = pygame.mask.from_surface(hexagon_neutral_img)
+# hexagon3 = Button(0,0, hexagon_neutral_img_mask,0.5, (0,0))
 
 hexagon_player1 = Button(96, 0, hexagon_player1_img, 0.5, (1, 1))
-
+pygame
 board1 = Board(hexagon1,11,game_surface)
 game1 = Game(game_surface,board1,0)
 game1.play()
@@ -225,3 +229,6 @@ game1.play()
     # pygame.draw.line(screen, RED, (0,56),(600,56))
     # pygame.display.update()
 
+
+#adjacent 
+#[(i+1,j), (i+1,j-1), (i, j+1), (i,j-1), (i-1,j), (i-1,j+1)]
