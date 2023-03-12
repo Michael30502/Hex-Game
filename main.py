@@ -11,17 +11,14 @@ FPS = 60
 
 WIDTH, HEIGHT = 900, 500
 game_surface = pygame.display.set_mode((WIDTH, HEIGHT))
-menu_surface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("HEX")
 
-hexagon_neutral_img = pygame.image.load("assets/tile_0.png").convert_alpha()
-hexagon_player1_img = pygame.image.load("assets/tile_1.png").convert_alpha()
-hexagon_player2_img = pygame.image.load("assets/tile_2.png").convert_alpha()
+start_button_img =  pygame.image.load("Hex-Game/assets/start_button_img.png").convert_alpha()
+hexagon_neutral_img = pygame.image.load("Hex-Game/assets/tile_0.png").convert_alpha()
+hexagon_player1_img = pygame.image.load("Hex-Game/assets/tile_1.png").convert_alpha()
+hexagon_player2_img = pygame.image.load("Hex-Game/assets/tile_2.png").convert_alpha()
 
 # game variables
-game_pause = False
-
-game_menu = False
 action= False
 
 
@@ -67,11 +64,13 @@ class Button:
         if self.rect.collidepoint(mouse_pos):
             # print('hover:' + str(self.unit))
             # Checking if we are leftclicking a button that has not been clicked, then changing the image
-
+            
             pygame.event.get()
             if pygame.mouse.get_pressed()[0] == 1 and not action:
                 action = True
+                self.clicked = True
                 gamelogic.make_move(self.unit)
+
 
                 # if game1.get_turn() % 2 == 1 and board1.grid[self.unit[0]][self.unit[1]].get_player() == None:
                 #     board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
@@ -88,6 +87,34 @@ class Button:
 
         # display the image on screen
         surface.blit(self.image, self.rect)
+
+    #DRAW AT CENTER FUNCTION FOR THE MENU NOT HEXAGONS
+    def draw_at_center(self, surface, dest):
+        global action
+
+        # getting mouse pos
+        mouse_pos = pygame.mouse.get_pos()
+
+        if gamelogic.board[self.unit[0]][self.unit[1]] == 1:
+            board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
+        elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
+            board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
+
+        # checking colision and clicked
+        if self.rect.collidepoint(mouse_pos):
+            pygame.event.get()
+            if pygame.mouse.get_pressed()[0] == 1 and not action:
+                action = True
+                self.clicked = True
+                gamelogic.make_move(self.unit)
+
+            if pygame.mouse.get_pressed()[0] == 0:
+                action = False
+
+        # display the image on screen
+        rect = self.rect
+        rect.center = (dest[0],dest[1]) 
+        surface.blit(self.image, rect)
 
     def set_image(self, image):
         self.image = image
@@ -135,26 +162,11 @@ class Board:
                 hexagon.draw(self.surface)
 
 
-class Menu:
-    def __init__(self, surface):
-        self.surface = surface
-
-
 class EventHandler:
     def __init__(self, event):
         self.event = event
 
 
-def menu(gamemenu):
-    while gamemenu:
-        menu_surface.fill(WHITE)
-        pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                gamemenu = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    gamemenu = False
 
 
 class Game:
@@ -163,12 +175,41 @@ class Game:
         self.turn = turn
         self.board = board
         self.running = True
+        self.game_menu = False
+
+    def menu(self):
+        height = game_surface.get_height()
+        width = game_surface.get_width()
+        game_surface.fill(WHITE)
+        start_button = Button(-300, -300, start_button_img, 0.5, (1, 1))
+        # start_button.set_image(start_button.get_image())
+        
+        while self.game_menu:
+            start_button.draw_at_center(game_surface,(width/2, height/4))
+            pygame.display.flip()
+            print(start_button.clicked)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.game_menu = False
+                    self.running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        game_surface.fill(WHITE)
+                        self.game_menu = False
+            #if startbutton is pressed, makes new board which it gives to the play function
+            if start_button.clicked == True:
+                size = 3
+                custom_board = Board(hexagon1,size,self.surface)
+                game_surface.fill(WHITE)
+                self.game_menu = False
+                gamelogic.player_no = 0
+                custom_board.make_grid()
+                self.set_board(custom_board)
 
     def play(self):
         game_surface.fill(WHITE)
         self.board.make_grid()
         while self.running:
-
             if gamelogic.player_no == gamelogic.cpu:
                 self.unit = gamelogic.make_cpu_move()
             else:
@@ -178,13 +219,17 @@ class Game:
                     self.running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        gamemenu = True
-                        menu(gamemenu)
+                        self.game_menu = True
+                        self.menu()
 
-            pygame.display.update()
+            pygame.display.flip()
 
     def get_turn(self):
         return self.turn
+    
+    def set_board(self, board):
+
+        self.board = board
 
     def turn_count(self):
         self.turn += 1
