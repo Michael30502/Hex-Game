@@ -2,16 +2,14 @@ import random
 
 import numpy as np
 
-board_size = 3
+board_size = 11
 
 board = np.zeros((board_size, board_size), dtype=int)
 
 player_no = 0
-cpu = 1
 
 def is_empty(pos):
     return board[pos] == 0
-
 
 def make_move(pos):
     global player_no

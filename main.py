@@ -7,6 +7,8 @@ RED = (255, 0, 0)
 
 FPS = 60
 
+cpu = 2
+
 run = True
 first_menu = True
 setting_menu = False
@@ -19,6 +21,7 @@ game_finished = False
 WIDTH, HEIGHT = 800, 800
 game_surface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("HEX")
+
 
 
 #load button images
@@ -197,41 +200,40 @@ class Game:
         self.game_menu = False
         self.run = True
 
-    def menu(self):
-        height = game_surface.get_height()
-        width = game_surface.get_width()
-        game_surface.fill(WHITE)
-        start_button = Button(-300, -300, start_button_img, 0.5, (1, 1))
-        # start_button.set_image(start_button.get_image())
-        
-        while self.game_menu:
-            start_button.draw_at_center(game_surface,(width/2, height/4))
-            pygame.display.flip()
-            print(start_button.clicked)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.game_menu = False
-                    self.running = False
-                    self.run = False
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        game_surface.fill(WHITE)
-                        self.game_menu = False
-            #if startbutton is pressed, makes new board which it gives to the play function
-            if start_button.clicked == True:
-                size = 3
-                custom_board = Board(hexagon1,size,self.surface)
-                game_surface.fill(WHITE)
-                self.game_menu = False
-                gamelogic.player_no = 0
-                custom_board.make_grid()
-                self.set_board(custom_board)
-
+#    def menu(self):
+#        height = game_surface.get_height()
+#        width = game_surface.get_width()
+#        game_surface.fill(WHITE)
+#        start_button = Button(-300, -300, start_button_img, 0.5, (1, 1))
+#        # start_button.set_image(start_button.get_image())
+#        
+#        while self.game_menu:
+#            start_button.draw_at_center(game_surface,(width/2, height/4))
+#            pygame.display.flip()
+#            print(start_button.clicked)
+#            for event in pygame.event.get():
+#               if event.type == pygame.QUIT:
+#                    self.game_menu = False
+#                    self.running = False
+#                    self.run = False
+#                if event.type == pygame.KEYDOWN:
+#                    if event.key == pygame.K_ESCAPE:
+#                        game_surface.fill(WHITE)
+#                        self.game_menu = False
+#            #if startbutton is pressed, makes new board which it gives to the play function
+#            if start_button.clicked == True:
+#                size = 3
+#                custom_board = Board(hexagon1,size,self.surface)
+#                self.game_menu = False
+#                gamelogic.player_no = 0
+#                custom_board.make_grid()
+#                self.set_board(custom_board)
+#
     def play(self):
         game_surface.fill(WHITE)
         self.board.make_grid()
         while self.running:
-            if gamelogic.player_no == gamelogic.cpu:
+            if gamelogic.player_no == cpu:
                 self.unit = gamelogic.make_cpu_move()
             else:
                 self.board.draw_grid()
@@ -284,7 +286,7 @@ class MenuButton():
 		return action
 
 #create button instances
-start_game_button = MenuButton(0, 0, start_game_img, 2)
+start_game_button = MenuButton(100, 100, start_game_img, 2)
 play_online_button = MenuButton(300, 200, Play_Online_img, 2)
 ai_2_button = MenuButton(300, 400, AI_2_img, 2)
 two_player_button = MenuButton(300, 100, Two_Player_img, 2)
@@ -308,7 +310,6 @@ hexagon_player1 = Button(96, 0, hexagon_player1_img, 0.5, (1, 1))
 
 while run:
     game_surface.fill((200, 200, 255))
-    hexagon1.draw(game_surface)
 
     if first_menu == True:
         if start_game_button.drawMenu(game_surface):
@@ -321,11 +322,14 @@ while run:
             
     if second_menu == True:
         if two_player_button.drawMenu(game_surface):
-                print('2 player')
                 game_running = True
                 second_menu = False	
         if ai_1_button.drawMenu(game_surface):
-                print('playing against bot 1')
+                print(cpu)
+                cpu = 1
+                game_running = True
+                second_menu = False
+                print(cpu)
         if ai_2_button.drawMenu(game_surface):
                 print('playing against bot 1')
         if ai_3_button.drawMenu(game_surface):
@@ -354,29 +358,5 @@ while run:
 		    #quit game
             if event.type == pygame.QUIT:
                 run = False
-    pygame.display.update()
-
+    pygame.display.flip()
 pygame.quit()
-
-# running = True
-# while running:
-#     board1.make_grid()
-#     board1.draw_grid()
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             running = False
-#         if event.type == pygame.KEYDOWN:
-#             if event.key == pygame.K_ESCAPE:
-#                 game_menu = True
-#                 menu(game_menu)
-
-
-# Main game loop
-
-# clicks is away to distinguish between players
-
-# Handle events
-
-
-# pygame.draw.line(screen, RED, (0,56),(600,56))
-# pygame.display.update()
