@@ -1,5 +1,9 @@
+import numpy as np
 import pygame
+
 import gamelogic
+pygame.init()
+font = pygame.font.SysFont("Arial", 36)
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -8,6 +12,8 @@ RED = (255, 0, 0)
 FPS = 60
 
 cpu = 2
+board_size_list = [3, 5, 7, 9, 11]
+board_size = len(board_size_list)-1
 
 run = True
 first_menu = True
@@ -17,11 +23,11 @@ game_running = False
 game_paused = False
 game_finished = False
 
+
 # Surface/Screen size (this shoudl be scaleable
 WIDTH, HEIGHT = 800, 800
 game_surface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("HEX")
-
 
 
 #load button images
@@ -45,7 +51,7 @@ hexagon_player1_img = pygame.image.load("assets/tile_1.png").convert_alpha()
 hexagon_player2_img = pygame.image.load("assets/tile_2.png").convert_alpha()
 
 # game variables
-action= False
+action = False
 
 class Button:
     def __init__(self, x, y, image, scale, unit):
@@ -79,11 +85,12 @@ class Button:
 
         # getting mouse pos
         mouse_pos = pygame.mouse.get_pos()
-
-        if gamelogic.board[self.unit[0]][self.unit[1]] == 1:
-            board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
-        elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
-            board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
+        if board1.grid is not None:
+            if gamelogic.board[self.unit[0]][self.unit[1]] == 1:
+                print(board1.grid)
+                board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
+            elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
+                board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
 
         # checking colision and clicked
         if self.rect.collidepoint(mouse_pos):
@@ -232,11 +239,30 @@ class Game:
     def play(self):
         game_surface.fill(WHITE)
         self.board.make_grid()
+        print("check")
         while self.running:
             if gamelogic.player_no == cpu:
                 self.unit = gamelogic.make_cpu_move()
             else:
                 self.board.draw_grid()
+                if gamelogic.has_player_won(1) or gamelogic.has_player_won(2):
+                    text2 = font.render(("Player "+str(gamelogic.player_no)+" has won"), True, BLACK)
+                    textRect2 = text2.get_rect()
+                    textRect2.center = (100, 100)
+                    game_surface.blit(text2, [300, 500])
+                    if back_to_menu.drawMenu(game_surface):
+                        game_surface.fill(WHITE)
+                        gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
+                        self.board.make_grid()
+                        self.running = False
+                    if restart_button.drawMenu(game_surface):
+                        game_surface.fill(WHITE)
+                        gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
+                        self.board.make_grid()
+
+
+
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -294,6 +320,8 @@ ai_1_button = MenuButton(300, 300, AI_1_img, 2)
 ai_3_button = MenuButton(300, 500, AI_3_img, 2)
 change_board_size_button = MenuButton(300, 200, Change_Board_Size_img, 2)
 settings_button = MenuButton(100, 200, Settings_img, 2)
+restart_button = MenuButton(400, 600, Continue_img, 2)
+back_to_menu = MenuButton(100, 600, Go_Back_img, 2)
 continue_button = MenuButton(300, 200, Continue_img, 2)
 export_game_button = MenuButton(300, 100, Export_Game_img, 2)
 import_game_button = MenuButton(300, 100, Import_Game_img, 2)
@@ -310,6 +338,7 @@ hexagon_player1 = Button(96, 0, hexagon_player1_img, 0.5, (1, 1))
 
 while run:
     game_surface.fill((200, 200, 255))
+
 
     if first_menu == True:
         if start_game_button.drawMenu(game_surface):
@@ -341,13 +370,28 @@ while run:
                 second_menu = False
 
     if game_running == True:
+
         board1 = Board(hexagon1, gamelogic.board_size, game_surface)
         game1 = Game(game_surface, board1, 0)
         game1.play()
+        game_running = False
+        first_menu = True
 
     if setting_menu == True:
+            text = font.render(str(gamelogic.board_size), True, WHITE)
+            textRect = text.get_rect()
+            textRect.center = (100, 100)
+            game_surface.blit(text, [220, 225])
             if change_board_size_button.drawMenu(game_surface):
-                print('change board size')
+
+                board_size += 1
+                if board_size >= len(board_size_list):
+                    board_size = 0
+                if board_size < 0:
+                    board_size = len(board_size_list)
+                gamelogic.board_size = board_size_list[board_size]
+
+
             if import_game_button.drawMenu(game_surface):
                 print('import saved game')
             if go_back_button.drawMenu(game_surface):
