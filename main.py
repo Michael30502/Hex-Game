@@ -1,5 +1,6 @@
 import pygame
 import gamelogic
+import numpy
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -16,7 +17,7 @@ pygame.init()
 WIDTH, HEIGHT = 800, 800
 game_surface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("HEX")
-
+clock = pygame.time.Clock()
 
 # load button images
 start_game_img = pygame.image.load("assets/Start_Game.png").convert_alpha()
@@ -49,6 +50,7 @@ game_running = False
 game_paused = False
 game_finished = False
 action = False
+import_game = False
 
 
 class Button:
@@ -87,10 +89,8 @@ class Button:
 
         if gamelogic.board[self.unit[0]][self.unit[1]] == 1:
             board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
-            print("image set to 1")
         elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
             board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
-            print("image set to 2")
 
         # checking colision and clicked
         if self.rect.collidepoint(mouse_pos):
@@ -238,6 +238,9 @@ class Board:
             for hexagon in row:
                 hexagon.draw(self.surface)
 
+    def set_board(self):
+        # TODO set board in gamelogic with import string
+
         # stringify object
         def __str__(self):
             return f"BoardOBJ= hexgaon: {self.hexagon}, size:{self.size}, surface:{self.surface}"
@@ -341,13 +344,58 @@ hexagon_player1 = Button(96, 0, hexagon_player1_img, 0.5, (1, 1))
 board1 = Board(hexagon1, 11, game_surface)
 board1.make_grid()
 
-# game loop
+
+# takes gamelogic board and changes it
+# better name may be needed TODO
+def import_game_setter(game_arr_str):
+    gamelogic.board = game_arr_str
+    print("board set")
+    print(gamelogic.board)
+    print(type(gamelogic.board))
+    return gamelogic.board
+
+
+def array_to_string(array):
+    # (this will be a list of integers sep by ' ')
+    return " ".join(str(elem) for elem in array.flat)
+
+
+# the line bellow makes it so that the array_to_string function is used when printing the array or getting string version. Was used while testing
+# np.set_string_function(array_to_string, repr=False)
+
+
+def string_to_square_numpy_array(string):
+    # Split the string into integers and convert them to a numpy array
+    flat_array = np.array([int(elem) for elem in string.split()])
+
+    # assumes that the  array is square
+    # TODO if we are moving into none-square arrays another method will be needed
+    array_size = int(np.sqrt(flat_array.size))
+
+    # Reshape the flat array into a square array
+    array = flat_array.reshape((array_size, array_size))
+
+    return array
+
+
+# gameloop
 def Menu(run):
+    # import stuff
+    # user input
+    base_font = pygame.font.Font(None, 32)
+    user_text = ""
+    # rect for input
+    input_rect = pygame.Rect(0, 600, 200, 800)
+    color_active = pygame.Color("lightskyblue3")
+    color_passive = pygame.Color("chartreuse4")
+    color = color_passive
+    input_active = False
 
     first_menu = True
     setting_menu = False
     second_menu = False
     game_running = False
+    import_game = False
     # game_paused = False
     # game_finished = False
     while run:
@@ -356,6 +404,7 @@ def Menu(run):
         if first_menu == True:
             if start_game_button.drawMenuButton(game_surface):
                 print("first menu")
+                print(gamelogic.board)
                 second_menu = True
                 first_menu = False
             if settings_button.drawMenuButton(game_surface):
@@ -378,6 +427,7 @@ def Menu(run):
             if play_online_button.drawMenuButton(game_surface):
                 print("playing against bot 1")
             if go_back_button.drawMenuButton(game_surface):
+                print("go back pressed")
                 first_menu = True
                 second_menu = False
 
@@ -392,68 +442,88 @@ def Menu(run):
                 print("change board size")
 
             if import_game_button.drawMenuButton(game_surface):
-                game_surface.fill((200, 200, 255))
-                pygame.display.flip()
-                # user input
-                base_font = pygame.font.Font(None, 32)
-                user_text = ""
-                # rect for input
-                input_rect = pygame.Rect(100, 700, 150, 750)
-                color_active = pygame.Color("lightskyblue3")
-                color_passive = pygame.Color("chartreuse4")
+                import_game = True
+
+        if import_game:
+
+            game_surface.fill((200, 200, 255))
+            pygame.draw.rect(game_surface, (255, 255, 255), input_rect)
+
+            text_surface = base_font.render(user_text, True, (255, 255, 255))
+
+            # render at position stated in arguments
+            game_surface.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
+
+            # set width of textfield so that text cannot get
+            # outside of user's text input
+            input_rect.w = max(100, text_surface.get_width() + 10)
+
+            # display.flip() will update only a portion of the
+            # screen to updated, not full area
+            pygame.display.flip()
+            clock.tick(60)
+            if input_active:
+                color = color_active
+            else:
                 color = color_passive
-                input_active = False
-                print("import saved game")
-                for event in pygame.event.get():
-                    # quit game
-                    if event.type == pygame.QUIT:
-                        run = False
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        if input_rect.collidepoint(event.pos):
-                            input_active = True
-                        else:
-                            input_active = False
-                    # Source https://www.geeksforgeeks.org/how-to-create-a-text-input-box-with-pygame/
-                    if event.type == pygame.KEYDOWN:
-                        # Check for backspace
-                        if event.key == pygame.K_BACKSPACE:
 
-                            # get text input from 0 to -1 i.e. end.
-                            user_text = user_text[:-1]
+            # import game
+            # board1 = Board(hexagon1, 11, game_surface)
+            # board1.make_grid()
+            # game1 = Game(game_surface, board1, 0)
+            # game1.play()
 
-                        # Unicode standard is used for string
-                        # formation
-                        else:
-                            user_text += event.unicode
-
-                pygame.draw.rect(game_surface, (255, 255, 255), input_rect)
-
-                text_surface = base_font.render(user_text, True, (255, 255, 255))
-
-                # render at position stated in arguments
-                game_surface.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
-
-                # set width of textfield so that text cannot get
-                # outside of user's text input
-                input_rect.w = max(100, text_surface.get_width() + 10)
-
-                # display.flip() will update only a portion of the
-                # screen to updated, not full area
-                pygame.display.flip()
-                print("gameSurface change")
-                if input_active:
-                    color = color_active
-                else:
-                    color = color_passive
-
-            if go_back_button.drawMenuButton(game_surface):
-                setting_menu = False
-                first_menu = True
+        if go_back_button.drawMenuButton(game_surface):
+            setting_menu = False
+            first_menu = True
 
         for event in pygame.event.get():
             # quit game
             if event.type == pygame.QUIT:
                 run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_rect.collidepoint(event.pos):
+                    input_active = True
+                else:
+                    input_active = False
+            # Source https://www.geeksforgeeks.org/how-to-create-a-text-input-box-with-pygame/
+            if event.type == pygame.KEYDOWN:
+                # check for escape
+                if event.key == pygame.K_ESCAPE:
+                    print("ESC clicked, starting menu")
+                    Menu(run)
+                # check for enter/return only checking in import
+                if (
+                    event.key == pygame.K_KP_ENTER
+                    or event.key == pygame.K_RETURN
+                    and import_game == True
+                ):
+                    # TODO find a way to import game using stanard paste string method. current idea is to save the game when players presses export
+                    # and loading set variable
+                    print("Enter importing game")
+                    print(type(gamelogic.board))
+                    print(user_text)
+                    gamelogic.board[(5, 5)] = 5
+                    test = str(gamelogic.board)
+                    print(gamelogic.board)
+                    # import_game_setter(test)
+                    # import_game = False
+                    # board1 = Board(hexagon1, 11, game_surface)
+                    # board1.make_grid()
+                    # game1 = Game(game_surface, board1, 0)
+                    # game1.play()
+
+                # Check for backspace
+                if event.key == pygame.K_BACKSPACE:
+
+                    # get text input from 0 to -1 i.e. end.
+                    user_text = user_text[:-1]
+
+                # Unicode standard is used for string
+                # formation
+                else:
+                    user_text += event.unicode
+                    print(user_text)
         pygame.display.flip()
     pygame.quit()
 
