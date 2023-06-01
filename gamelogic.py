@@ -20,7 +20,7 @@ def make_move(pos):
     global player_no
     # print(board[pos])
     if is_empty(pos):
-        print(pos)
+        # print(pos)
         board[pos] = player_no + 1
         # print find_neighbours(pos)
         if has_player_won(player_no+1):
@@ -111,7 +111,7 @@ def has_player_won(playerno):
                         path_found = True
                         break
                 elif playerno == 2:
-                    if (10, board_size - 1) in possible_path:
+                    if (board_size - 1, i) in possible_path:
                         path_found = True
                         break
         # this progresses the loop that searches for tiles on the initial edges

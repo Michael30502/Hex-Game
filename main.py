@@ -87,7 +87,7 @@ class Button:
         mouse_pos = pygame.mouse.get_pos()
         if board1.grid is not None:
             if gamelogic.board[self.unit[0]][self.unit[1]] == 1:
-                print(board1.grid)
+                #print(board1.grid)
                 board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
             elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
                 board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
@@ -246,7 +246,7 @@ class Game:
             else:
                 self.board.draw_grid()
                 if gamelogic.has_player_won(1) or gamelogic.has_player_won(2):
-                    text2 = font.render(("Player "+str(gamelogic.player_no)+" has won"), True, BLACK)
+                    text2 = font.render(("Player "+str(gamelogic.player_no+1)+" has won"), True, BLACK)
                     textRect2 = text2.get_rect()
                     textRect2.center = (100, 100)
                     game_surface.blit(text2, [300, 500])
@@ -345,29 +345,39 @@ while run:
             print('first menu')
             second_menu = True
             first_menu = False
-        if settings_button.drawMenu(game_surface):
+            action = True
+        if settings_button.drawMenu(game_surface) :
             first_menu = False
             setting_menu = True
+            action = True
             
     if second_menu == True:
-        if two_player_button.drawMenu(game_surface):
+        if two_player_button.drawMenu(game_surface) and not action:
                 game_running = True
-                second_menu = False	
-        if ai_1_button.drawMenu(game_surface):
+                second_menu = False
+                action = True
+        if ai_1_button.drawMenu(game_surface) and not action:
                 print(cpu)
                 cpu = 1
                 game_running = True
                 second_menu = False
                 print(cpu)
-        if ai_2_button.drawMenu(game_surface):
+                action = True
+        if ai_2_button.drawMenu(game_surface) and not action:
                 print('playing against bot 1')
-        if ai_3_button.drawMenu(game_surface):
+                action = True
+        if ai_3_button.drawMenu(game_surface) and not action:
                 print('playing against bot 1')
-        if play_online_button.drawMenu(game_surface):
+                action = True
+        if play_online_button.drawMenu(game_surface) and not action:
                 print('playing against bot 1')
-        if go_back_button.drawMenu(game_surface):
+                action = True
+        if go_back_button.drawMenu(game_surface) and not action:
                 first_menu = True
                 second_menu = False
+                action = True
+
+
 
     if game_running == True:
 
@@ -382,7 +392,7 @@ while run:
             textRect = text.get_rect()
             textRect.center = (100, 100)
             game_surface.blit(text, [220, 225])
-            if change_board_size_button.drawMenu(game_surface):
+            if change_board_size_button.drawMenu(game_surface) and not action:
 
                 board_size += 1
                 if board_size >= len(board_size_list):
@@ -396,8 +406,9 @@ while run:
                 print('import saved game')
             if go_back_button.drawMenu(game_surface):
                 setting_menu = False
-                first_menu = True  
-
+                first_menu = True
+    if pygame.mouse.get_pressed()[0] == 0:
+        action = False
     for event in pygame.event.get():
 		    #quit game
             if event.type == pygame.QUIT:
