@@ -15,6 +15,7 @@ player_won = False
 def is_empty(pos):
     return board[pos] == 0
 
+
 def make_move(pos):
     global player_no
     global player_won
@@ -30,11 +31,12 @@ def make_move(pos):
     # else:
     #     print("Illegal move")
 
+
 def make_cpu_move():
     global player_no
     random_number = get_random_empty_pos()
     if random_number != -1:
-        board[random_number] = player_no+1
+        board[random_number] = player_no + 1
     player_no = (player_no + 1) % 2
 
 
@@ -43,7 +45,7 @@ def get_random_empty_pos():
     x = 0
     y = 0
     pos_list = []
-    #Makes a list of all empty positions on the board
+    # Makes a list of all empty positions on the board
     for hex in board:
         for hex2 in hex:
             if hex2 == 0:
@@ -51,12 +53,11 @@ def get_random_empty_pos():
             x += 1
         x = 0
         y += 1
-    #Chooses a random position from the list, if there is any
-    if len(pos_list)>=1:
+    # Chooses a random position from the list, if there is any
+    if len(pos_list) >= 1:
         random_pos = pos_list[random.randrange(0, len(pos_list))]
 
     return random_pos
-
 
 
 # if a nonnegative value is specified when calling, only neighbours of that value are returned
@@ -74,7 +75,7 @@ def find_neighbours(pos, value=-1):
                 continue
             # here we only extract neighbours of a specific value, if a nonnegative value is specified
             if value >= 0:
-                if value == board[r+i, c+j]:
+                if value == board[r + i, c + j]:
                     nset.add((r + i, c + j))
             else:
                 nset.add((r + i, c + j))
@@ -88,7 +89,9 @@ def has_player_won(playerno):
     visited_set = set()
     possible_path = set()
     if playerno < 1 or playerno > 2:
-        raise Exception("Invalid index for has_player_won: Player must be either 1 or 2")
+        raise Exception(
+            "Invalid index for has_player_won: Player must be either 1 or 2"
+        )
 
     while r < board_size and c < board_size and not path_found:
         # first the function looks for one of the player's tiles along an edge (leftmost for player 1, topmost for
@@ -101,7 +104,9 @@ def has_player_won(playerno):
             while len(possible_path - visited_set) > 0:
                 for elem in possible_path - visited_set:
                     (x, y) = elem
-                    possible_path = possible_path | find_neighbours((x, y), value=playerno)
+                    possible_path = possible_path | find_neighbours(
+                        (x, y), value=playerno
+                    )
                     visited_set.add(elem)
             # If a tile on the rightmost edge (for player 1) or the bottom edge (for player 2) is in the possible path
             # set, this must mean a path was found. Afterall, it could only have been added if all successive neighbours
@@ -121,6 +126,3 @@ def has_player_won(playerno):
         elif playerno == 2:
             c = c + 1
     return path_found
-
-
-
