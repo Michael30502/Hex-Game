@@ -503,52 +503,53 @@ def Menu(run):
     if pygame.mouse.get_pressed()[0] == 0:
         action = False
     for event in pygame.event.get():
-		    #quit game
-            if event.type == pygame.QUIT:
-                run = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if input_rect.collidepoint(event.pos):
-                    input_active = True
-                else:
-                    input_active = False
-            # Source https://www.geeksforgeeks.org/how-to-create-a-text-input-box-with-pygame/
-            if event.type == pygame.KEYDOWN:
-                # check for escape
-                if event.key == pygame.K_ESCAPE:
-                    print("ESC clicked, starting menu")
-                    Menu(run)
-                # check for enter/return only checking in import
-                if (
-                    event.key == pygame.K_KP_ENTER
-                    or event.key == pygame.K_RETURN
-                    and import_game == True
-                ):
-                    # TODO find a way to import game using stanard paste string method. current idea is to save the game when players presses export
-                    # and loading set variable
-                    print("Enter importing game")
-                    print(type(gamelogic.board))
-                    print(user_text)
-                    gamelogic.board[(5, 5)] = 5
-                    test = str(gamelogic.board)
-                    print(gamelogic.board)
-                    # import_game_setter(test)
-                    # import_game = False
-                    # board1 = Board(hexagon1, 11, game_surface)
-                    # board1.make_grid()
-                    # game1 = Game(game_surface, board1, 0)
-                    # game1.play()
+        #quit game
+        if event.type == pygame.QUIT:
+            run = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if input_rect.collidepoint(event.pos):
+                input_active = True
+            else:
+                input_active = False
+        # Source https://www.geeksforgeeks.org/how-to-create-a-text-input-box-with-pygame/
+        if event.type == pygame.KEYDOWN:
+            # check for escape
+            if event.key == pygame.K_ESCAPE:
+                print("ESC clicked, starting menu")
+                Menu(run)
+            # check for enter/return only checking in import
+            if (
+                event.key == pygame.K_KP_ENTER
+                or event.key == pygame.K_RETURN
+                and import_game == True
+            ):
+                # TODO find a way to import game using stanard paste string method. current idea is to save the game when players presses export
+                # and loading set variable
+                print("Enter importing game")
+                print(type(gamelogic.board))
+                print(user_text)
+                gamelogic.board[(5, 5)] = 5
+                test = str(gamelogic.board)
+                print(gamelogic.board)
+                # import_game_setter(test)
+                # import_game = False
+                # board1 = Board(hexagon1, 11, game_surface)
+                # board1.make_grid()
+                # game1 = Game(game_surface, board1, 0)
+                # game1.play()
 
-                # Check for backspace
-                if event.key == pygame.K_BACKSPACE:
-                    # get text input from 0 to -1 i.e. end.
-                    user_text = user_text[:-1]
+            # Check for backspace
+            if event.key == pygame.K_BACKSPACE:
+                # get text input from 0 to -1 i.e. end.
+                user_text = user_text[:-1]
 
-                # Unicode standard is used for string
-                # formation
-                else:
-                    user_text += event.unicode
-                    print(user_text)
-            pygame.display.flip()
+            # Unicode standard is used for string
+            # formation
+            else:
+                user_text += event.unicode
+                print(user_text)
+        pygame.display.flip()
+        
     pygame.quit()
 
 
