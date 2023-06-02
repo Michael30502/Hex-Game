@@ -2,13 +2,14 @@ import random
 
 import numpy as np
 
-board_size = 17
+board_size = 11
+
 
 
 board = np.zeros((board_size, board_size), dtype=int)
 
 player_no = 0
-player_won = False
+
 
 
 
@@ -18,15 +19,13 @@ def is_empty(pos):
 
 def make_move(pos):
     global player_no
-    global player_won
     # print(board[pos])
-    if is_empty(pos) and player_won==False:
+    if is_empty(pos):
         # print(pos)
         board[pos] = player_no + 1
         # print find_neighbours(pos)
-        if has_player_won(player_no+1) :
+        if has_player_won(player_no+1):
             print("Player {p} won!".format(p=player_no+1))
-            player_won = True
         player_no = (player_no + 1) % 2
     # else:
     #     print("Illegal move")
