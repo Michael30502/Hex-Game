@@ -2,7 +2,7 @@ import numpy as np
 import pygame
 
 import gamelogic
-import numpy
+
 pygame.init()
 font = pygame.font.SysFont("Arial", 36)
 
