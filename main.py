@@ -356,7 +356,7 @@ def import_game_setter(game_arr_str):
 
 
 def array_to_string(array):
-    # (this will be a list of integers sep by ' ')
+    # (this will be a list of integers sepperated by ' ')
     return " ".join(str(elem) for elem in array.flat)
 
 
@@ -445,7 +445,7 @@ def Menu(run):
                 import_game = True
 
         if import_game:
-
+            #TODO stop the flickering of the go back button
             game_surface.fill((200, 200, 255))
             pygame.draw.rect(game_surface, (255, 255, 255), input_rect)
 
@@ -515,7 +515,6 @@ def Menu(run):
 
                 # Check for backspace
                 if event.key == pygame.K_BACKSPACE:
-
                     # get text input from 0 to -1 i.e. end.
                     user_text = user_text[:-1]
 
