@@ -241,7 +241,7 @@ class Game:
         self.board.make_grid()
         print("check")
         while self.running:
-            if gamelogic.player_no == cpu:
+            if gamelogic.player_no == cpu and gamelogic.player_won == False:
                 self.unit = gamelogic.make_cpu_move()
             else:
                 self.board.draw_grid()
@@ -253,11 +253,13 @@ class Game:
                     if back_to_menu.drawMenu(game_surface):
                         game_surface.fill(WHITE)
                         gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
+                        gamelogic.player_won = False
                         self.board.make_grid()
                         self.running = False
                     if restart_button.drawMenu(game_surface):
                         game_surface.fill(WHITE)
                         gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
+                        gamelogic.player_won = False
                         self.board.make_grid()
 
 
@@ -346,6 +348,7 @@ while run:
             second_menu = True
             first_menu = False
             action = True
+            gamelogic.player_won = False
         if settings_button.drawMenu(game_surface) :
             first_menu = False
             setting_menu = True
@@ -400,6 +403,7 @@ while run:
                 if board_size < 0:
                     board_size = len(board_size_list)
                 gamelogic.board_size = board_size_list[board_size]
+                gamelogic.board = np.zeros((board_size_list[board_size], board_size_list[board_size]), dtype=int)
 
 
             if import_game_button.drawMenu(game_surface):
