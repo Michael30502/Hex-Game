@@ -1,9 +1,14 @@
 import gamelogic
 import numpy as np
-import queue as queue
-
+import sys
+try:
+    import Queue as queue
+except ImportError:
+    import queue
 
 cut_off_depth = 2
+
+state_counter = 0
 
 
 class State:
@@ -29,6 +34,9 @@ def actions_available(board):
 
 
 def result_state(state, action):
+    # global state_counter
+    # state_counter += 1
+    # print(state_counter)
     next_player = gamelogic.opponent(state.player_turn)
     new_board = gamelogic.make_sim_move(action, state.board_config, next_player)
     return State(new_board, next_player)
@@ -183,7 +191,9 @@ def min_value(state, depth, alpha, beta):
     v = float('inf')
     move = None
 
-    for a in actions_available(state.board_config):
+    tiles_on_a_shortest_path = identify_tiles_on_path(state.board_config, state.player_turn)
+
+    for a in set(actions_available(state.board_config)).intersection(tiles_on_a_shortest_path):
         new_state = result_state(state, a)
         if new_state.is_terminal_state():
             return v, a

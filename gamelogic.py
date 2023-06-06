@@ -110,14 +110,14 @@ def find_neighbours(pos, board_in, value=-1):
 
 
 def has_player_won(playerno, board_in):
+    # player cannot have won if there are too few tiles to form a path
+    if np.count_nonzero(board_in == player_no) < board_size:
+        return False
+
     path_found = False
     r, c = (0, 0)
     visited_set = set()
     possible_path = set()
-    if playerno < 1 or playerno > 2:
-        raise Exception(
-            "Invalid index for has_player_won: Player must be either 1 or 2"
-        )
 
     while r < board_size and c < board_size and not path_found:
         # first the function looks for one of the player's tiles along an edge (leftmost for player 1, topmost for
@@ -153,4 +153,7 @@ def has_player_won(playerno, board_in):
 
 
 def has_any_won(board_in):
+    # player cannot have won if there are too few tiles to form a path
+    if np.count_nonzero(board_in) < board_size + board_size - 1:
+        return False
     return has_player_won(1, board_in) or has_player_won(2, board_in)
