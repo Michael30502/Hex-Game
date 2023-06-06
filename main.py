@@ -391,13 +391,34 @@ def string_to_square_numpy_array(string):
 
 #Checking the elements in arr are either 0,1,2 and that ther is only a difference of 1 in the ammount of player elements
 def is_board_legal(arr):
-    values, counts = np.unique(arr, return_counts=True)
-    print(values)
-    print(counts)
+    # values, counts = np.unique(arr, return_counts=True)
+    # print(values)
+    # print(counts)
     #TODO This doesnt work if one of the players hasnt made a move.
     
     pass
     #TODO check size restraints
+
+def calculate_player_turn(board):
+    values, counts = np.unique(board, return_counts=True)
+    print(values)
+    print(counts)
+    # print(type(values[1]))
+
+    #if there is only 1 element in values assuming the only element present is 0 #TODO
+    if len(values) < 2:
+        return 1
+    #if there are 2 elements present in our array and 1 of them is 1 assuming rest is 0 then it must be player 2's turn
+    elif len(values) < 3 and gamelogic.board.__containts__(1):
+        return 2
+    elif len(values) < 3 and gamelogic.board.__containts__(2):
+        return 1
+    
+    elif values[1] <= values[2]:
+        return 1
+
+    return 1
+    
 
 #import end -----------------------------------------------------------------------------------------
 
@@ -490,23 +511,23 @@ while run:
                         elif event.key == pygame.K_RETURN:
                             
                             print("enter has been pressed")
-                            print(gamelogic.board)
                             print(array_to_string(gamelogic.board))
                             #TODO check if the board is leagal (size constraint, values in array, equal player moves)
-
+                            import_game = False
                             #error handling
-                            if is_board_legal(string_to_square_numpy_array(user_text)):
-                                try:
-                                    gamelogic.board = string_to_square_numpy_array(user_text)
-                                except ValueError:
-                                    print("wrong format")
-                                    user_text = ""
-                                except:
-                                    print("something else")
-                                print(gamelogic.board)
-                                import_game = False
-                            else:
-                                print("is_board_legal = FALSE")
+                            try:
+                                gamelogic.board = string_to_square_numpy_array(user_text)
+                            except ValueError:
+                                print("wrong format")
+                                user_text = ""
+                            except:
+                                print("something else")
+                            import_game = False
+                            print(gamelogic.board)
+                            gamelogic.board = string_to_square_numpy_array(user_text)
+                            print("gameBoard set hard coded")
+                            print(gamelogic.board)
+                            print(calculate_player_turn(gamelogic.board))
                         # Unicode standard is used for string
                         else:
                             user_text += event.unicode
