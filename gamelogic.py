@@ -2,33 +2,38 @@ import random
 
 import numpy as np
 
-board_size = 17
+board_size = 11
 
 
 board = np.zeros((board_size, board_size), dtype=int)
 
 player_no = 0
+client_no = 0
 player_won = False
-
-
+multiplayer = False
+move_list = list()
 
 def is_empty(pos):
     return board[pos] == 0
+
 
 def make_move(pos):
     global player_no
     global player_won
     # print(board[pos])
-    if is_empty(pos) and player_won==False:
-        # print(pos)
+    if is_empty(pos) and player_won is False and (multiplayer is False or player_no == client_no):
+        #print("multiplayer: {} {}".format(multiplayer, client_no))
         board[pos] = player_no + 1
+        if multiplayer:
+            move_list.append(pos)
         # print find_neighbours(pos)
-        if has_player_won(player_no+1) :
+        if has_player_won(player_no+1):
             print("Player {p} won!".format(p=player_no+1))
             player_won = True
         player_no = (player_no + 1) % 2
     # else:
     #     print("Illegal move")
+
 
 def make_cpu_move():
     global player_no
@@ -52,7 +57,7 @@ def get_random_empty_pos():
         x = 0
         y += 1
     #Chooses a random position from the list, if there is any
-    if len(pos_list)>=1:
+    if len(pos_list) >= 1:
         random_pos = pos_list[random.randrange(0, len(pos_list))]
 
     return random_pos
