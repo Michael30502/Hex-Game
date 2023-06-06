@@ -25,6 +25,11 @@ def is_empty_default(pos):
 def is_empty(pos, board_in):
     return board_in[pos] == 0
 
+def findplayercolor(player):
+    if player==1:
+        return "blue"
+    if player ==2:
+        return "red"
     # for quickly and conveniently finding the player number of the opponent
 def opponent(player):
     if player == 1:
@@ -44,7 +49,7 @@ def make_actual_move(pos):
             move_list.append(pos)
         # print find_neighbours(pos)
         if has_player_won(player_no , gamelogic.board):
-            print("Player {p} won!".format(p=player_no))
+            print("Player {p} won!".format(p=gamelogic.findplayercolor(player_no)))
             player_won = True
         player_no = (player_no % 2 )+1
     # else:
@@ -70,7 +75,7 @@ def make_cpu_move(random_move=False):
         print(board)
         board[move] = player_no
         if has_player_won(player_no, board):
-            print("Player {p} won!".format(p=player_no))
+            print("Player {p} won!".format(p=gamelogic.findplayercolor(player_no)))
     player_no = opponent(player_no)
 
 

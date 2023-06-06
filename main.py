@@ -522,7 +522,7 @@ while run:
             action = True
         if ai_1_button.drawMenu(game_surface) and not action:
             print(cpu)
-            cpu = 0
+            cpu = 1
             game_running = True
             second_menu = False
             print(cpu)
@@ -548,7 +548,8 @@ while run:
             receive_thread_client = threading.Thread(target=receive_wait, args=(2,))
             gamelogic.client_no = 2
             try:
-                connection.connect("10.209.175.124", 25565)
+                #ipv4
+                connection.connect("10.209.209.76", 25565)
                 game_running = True
                 second_menu = False
             except:
