@@ -24,8 +24,7 @@ class GameSocket:
         while totalsent < max_msg_len:
             sent = self.sock.send(msg[totalsent:])
             if sent == 0:
-                break
-            #     raise RuntimeError("socket connection broken")
+                raise RuntimeError("socket connection broken")
             totalsent = totalsent + sent
 
     def receive(self):
