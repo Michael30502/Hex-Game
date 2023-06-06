@@ -426,6 +426,72 @@ hexagon2 = Button(hexagon_neutral_img.get_width() * 0.5, 0, hexagon_neutral_img,
 hexagon_neutral_img_mask = pygame.mask.from_surface(hexagon_neutral_img)
 hexagon_player1 = Button(96, 0, hexagon_player1_img, 0.5, (1, 1))
 
+#import -----------------------------------------------------------------------------------------
+clock = pygame.time.Clock()
+  
+# it will display on screen
+  
+# basic font for user typed
+base_font = pygame.font.Font(None, 32)
+user_text = ''
+  
+# create rectangle
+input_rect = pygame.Rect(200,600,400,50)
+  
+# color_active stores color(lightskyblue3) which
+# gets active when input box is clicked by user
+color_active = pygame.Color('lightskyblue3')
+  
+# color_passive store color(chartreuse4) which is
+# color of input box.
+color_passive = pygame.Color('chartreuse4')
+color = color_passive
+  
+active = False
+# takes gamelogic board and changes it
+# better name may be needed TODO
+def import_game_setter(game_arr_str):
+    gamelogic.board = game_arr_str
+    print("board set")
+    print(gamelogic.board)
+    print(type(gamelogic.board))
+    return gamelogic.board
+
+
+def array_to_string(array):
+    # (this will be a list of integers sepperated by ' ')
+    return " ".join(str(elem) for elem in array.flat)
+
+
+# the line bellow makes it so that the array_to_string function is used when printing the array or getting string version. Was used while testing
+# np.set_string_function(array_to_string, repr=False)
+
+
+def string_to_square_numpy_array(string):
+    # Split the string into integers and convert them to a numpy array
+    flat_array = np.array([int(elem) for elem in string.split()])
+
+    # assumes that the  array is square
+    # TODO if we are moving into none-square arrays another method will be needed
+    array_size = int(np.sqrt(flat_array.size))
+
+    # Reshape the flat array into a square array
+    array = flat_array.reshape((array_size, array_size))
+
+    return array
+
+#Checking the elements in arr are either 0,1,2 and that ther is only a difference of 1 in the ammount of player elements
+def is_board_legal(arr):
+    values, counts = np.unique(arr, return_counts=True)
+    print(values)
+    print(counts)
+    #TODO This doesnt work if one of the players hasnt made a move.
+    
+    pass
+    #TODO check size restraints
+
+#import end -----------------------------------------------------------------------------------------
+
 # game loop
 def server_thread():
     global receive_thread_client
@@ -517,7 +583,58 @@ while run:
             gamelogic.board = np.zeros((board_size_list[board_size], board_size_list[board_size]), dtype=int)
 
         if import_game_button.drawMenu(game_surface):
-            print('import saved game')
+
+            import_game = True
+            while(import_game):                
+                for event in pygame.event.get():
+                    #quit game
+                    #TODO make the other settings buttons work in this loop
+                    if event.type == pygame.QUIT:
+                        import_game = False
+                        user_text = ""
+                        input_rect = pygame.Rect(200,600,400,50)
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if input_rect.collidepoint(event.pos):
+                            active = True
+                        else:   
+                            active = False
+                    if event.type == pygame.KEYDOWN:
+                        #TODO add arrow keys in order to changes parts of an exported string
+                        if event.key == pygame.K_BACKSPACE:
+                            #delete character from string
+                            user_text = user_text[:-1]
+                        elif event.key == pygame.K_RETURN:
+                            
+                            print("enter has been pressed")
+                            print(gamelogic.board)
+                            print(array_to_string(gamelogic.board))
+                            #TODO check if the board is leagal (size constraint, values in array, equal player moves)
+
+                            #error handling
+                            if is_board_legal(string_to_square_numpy_array(user_text)):
+                                try:
+                                    gamelogic.board = string_to_square_numpy_array(user_text)
+                                except ValueError:
+                                    print("wrong format")
+                                    user_text = ""
+                                except:
+                                    print("something else")
+                                print(gamelogic.board)
+                                import_game = False
+                            else:
+                                print("is_board_legal = FALSE")
+                        # Unicode standard is used for string
+                        else:
+                            user_text += event.unicode
+
+                pygame.draw.rect(game_surface, color, input_rect)
+                text_surface = base_font.render(user_text, True, (255, 255, 255))
+                
+                # render at position stated in arguments
+                game_surface.blit(text_surface, (input_rect.x+5, input_rect.y+5))
+
+                pygame.display.flip()
+                clock.tick(60)
         if go_back_button.drawMenu(game_surface):
             setting_menu = False
             first_menu = True
@@ -527,5 +644,9 @@ while run:
         # quit game
         if event.type == pygame.QUIT:
             run = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_c:
+                #exporting game as a string to load
+                user_text = array_to_string(gamelogic.board)
     pygame.display.flip()
 pygame.quit()

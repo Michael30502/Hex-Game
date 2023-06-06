@@ -1,6 +1,6 @@
 import gamelogic
 import numpy as np
-import Queue as queue
+import queue as queue
 
 
 cut_off_depth = 2
