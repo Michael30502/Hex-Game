@@ -2,26 +2,33 @@ import random
 import numpy as np
 import ai1
 
-board_size = 3
+board_size = 5
 
 board = np.zeros((board_size, board_size), dtype=int)
 
-player_no = 0
+player_no = 1
 
 
 def is_empty(pos, board_in):
     return board_in[pos] == 0
 
 
+# for quickly and conveniently finding the player number of the opponent
+def opponent(player):
+    if player == 1:
+        return 2
+    return 1
+
+
 def make_actual_move(pos):
     global player_no
     # print(board[pos])
     if is_empty(pos, board):
-        print(pos)
-        board[pos] = player_no + 1
-        if has_player_won(player_no + 1, board):
-            print("Player {p} won!".format(p=player_no + 1))
-        player_no = (player_no + 1) % 2
+        board[pos] = player_no
+        if has_player_won(player_no, board):
+            print("Player {p} won!".format(p=player_no))
+        player_no = opponent(player_no)
+        print(player_no)
     else:
         print("Illegal move")
 
@@ -29,7 +36,7 @@ def make_actual_move(pos):
 def make_sim_move(pos, board_in, player):
     board_out = np.copy(board_in)
     if is_empty(pos, board_in):
-        board_out[pos] = player + 1
+        board_out[pos] = player
     return board_out
 
 
@@ -38,15 +45,15 @@ def make_cpu_move(random_move=False):
     if random_move:
         random_number = get_random_empty_pos()
         if random_number != -1:
-            board[random_number] = player_no + 1
+            board[random_number] = player_no
     else:
         print(board)
         move = ai1.minimax_search(ai1.State(board, player_no))
         print(board)
-        board[move] = player_no + 1
-        if has_player_won(player_no + 1, board):
-            print("Player {p} won!".format(p=player_no + 1))
-    player_no = (player_no + 1) % 2
+        board[move] = player_no
+        if has_player_won(player_no, board):
+            print("Player {p} won!".format(p=player_no))
+    player_no = opponent(player_no)
 
 
 def get_random_empty_pos():
@@ -80,7 +87,7 @@ def find_neighbours(pos, board_in, value=-1):
             if i == j:
                 continue
             # this handles the edge cases:
-            if r + i < 0 or r + i >= board_size or c + j < 0 or c + j >= board_size:
+            if r + i < 0 or r + i >= board_in.shape[0] or c + j < 0 or c + j >= board_in.shape[0]:
                 continue
             # here we only extract neighbours of a specific value, if a nonnegative value is specified
             if value >= 0:
@@ -91,7 +98,6 @@ def find_neighbours(pos, board_in, value=-1):
     return nset
 
 
-# assumes that player is either number 1 or 2.
 def has_player_won(playerno, board_in):
     path_found = False
     r, c = (0, 0)
