@@ -57,8 +57,8 @@ def make_cpu_move(random_move=False):
 
 
 def make_ai1_move():
-    if board[board.shape[0] / 2, board.shape[0] / 2] == 0:
-        make_actual_move((board.shape[0] / 2, board.shape[0] / 2))
+    if board[board.shape[0] // 2, board.shape[0] // 2] == 0:
+        make_actual_move((board.shape[0] // 2, board.shape[0] // 2))
         return
     # move = ai1.pick_action_most_wins(ai1.State(board, player))
     move = ai1.minimax_search(ai1.State(board, player_no))
