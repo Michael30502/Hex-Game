@@ -1,10 +1,8 @@
 import gamelogic
 import numpy as np
 import sys
-try:
-    import Queue as queue
-except ImportError:
-    import queue
+from collections import deque
+
 
 cut_off_depth = 2
 
@@ -81,7 +79,7 @@ def shortest_path(board, player):
     # initialise the matrix containing all lenghts found so far
     lengths_found = np.full(board.shape, float('inf'))
     # make sets to keep track of what is already explored and what is next to explore
-    frontier = queue.Queue()
+    frontier = deque()
     visited = set()
     # the first column can be immediatly set
     # Empty tiles have cost 1, own tiles are free and enemy tiles are obstacles
@@ -89,36 +87,37 @@ def shortest_path(board, player):
         for i in range(0, board.shape[0]):
             lengths_found[i, 0] = weight(board[i, 0], player)
             if board[i, 0] != gamelogic.opponent(player):
-                frontier.put((i, 0))
+                frontier.append((i, 0))
     elif player == 2:
         for i in range(0, board.shape[0]):
             lengths_found[0, i] = weight(board[0, i], player)
             if board[0, i] != gamelogic.opponent(player):
-                frontier.put((0, i))
+                frontier.append((0, i))
 
     # while there are still tiles to explore:
-    while not frontier.empty():
-        pos = frontier.get()
+    while len(frontier) > 0:
+        pos = frontier.popleft()
         visited.add(pos)
         if board[pos] == gamelogic.opponent(player):
             continue
         neighs = gamelogic.find_neighbours(pos, board)
         neighs = neighs.difference(visited)
         for n in neighs:
-            frontier.put(n)
+            frontier.append(n)
             if lengths_found[n] > lengths_found[pos] + weight(board[n], player):
                 lengths_found[n] = lengths_found[pos] + weight(board[n], player)
     return lengths_found
 
 
 # returns a tuple with the minimal path length found for each player
-def minimal_length_values(board):
+def minimal_length_values(board, player):
     board_size = board.shape[0]
-    lengths_found_1 = shortest_path(board, 1)
-    lengths_found_2 = shortest_path(board, 2)
-    min_for_player_1 = min(lengths_found_1[:, board_size - 1])
-    min_for_player_2 = min(lengths_found_2[board_size - 1, :])
-    return min_for_player_1, min_for_player_2
+    if player == 1:
+        lengths_found = shortest_path(board, 1)
+        return min(lengths_found[:, board_size - 1])
+    else:
+        lengths_found = shortest_path(board, 2)
+        return min(lengths_found[board_size - 1, :])
 
 
 def weight(elem, player):
@@ -134,7 +133,8 @@ def weight(elem, player):
 # hopefully this can save a lot of computation time
 def identify_tiles_on_path(board, player):
     lengths_found = shortest_path(board, player)
-    min_length_1, min_length_2 = minimal_length_values(board)
+    min_length_1 = minimal_length_values(board, 1)
+    min_length_2 = minimal_length_values(board, 2)
     board_size = board.shape[0]
     path_found = set()
     visited = set()
@@ -161,7 +161,8 @@ def identify_tiles_on_path(board, player):
 # the heuristic should be: heuristic_score = remaining_opponent_hexes - remaining_cpu_hexes
 # currently assumes that AI is player 1
 def heuristic(state):
-    min_for_player_1, min_for_player_2 = minimal_length_values(state.board_config)
+    min_for_player_1 = minimal_length_values(state.board_config, 2)
+    min_for_player_2 = minimal_length_values(state.board_config, 2)
     return min_for_player_1 - min_for_player_2
 
 

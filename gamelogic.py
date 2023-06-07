@@ -1,21 +1,18 @@
 import random
 import numpy as np
 import ai1
-import gamelogic
 
-board_size = 11
+board_size = 7
 
 board = np.zeros((board_size, board_size), dtype=int)
 
-player_no = 0
+cpu = 1
+
+player_no = 1
 client_no = 0
 player_won = False
 multiplayer = False
 move_list = list()
-
-board = np.zeros((board_size, board_size), dtype=int)
-
-player_no = 1
 
 
 def is_empty_default(pos):
@@ -25,7 +22,8 @@ def is_empty_default(pos):
 def is_empty(pos, board_in):
     return board_in[pos] == 0
 
-    # for quickly and conveniently finding the player number of the opponent
+
+# for quickly and conveniently finding the player number of the opponent
 def opponent(player):
     if player == 1:
         return 2
@@ -37,16 +35,16 @@ def make_actual_move(pos):
     global player_won
 
     # print(board[pos])
-    if is_empty(pos, gamelogic.board) and player_won is False and (multiplayer is False or player_no == client_no):
+    if is_empty(pos, board) and player_won is False and (multiplayer is False or player_no == client_no):
         # print("multiplayer: {} {}".format(multiplayer, client_no))
         board[pos] = player_no
         if multiplayer:
             move_list.append(pos)
         # print find_neighbours(pos)
-        if has_player_won(player_no , gamelogic.board):
+        if has_player_won(player_no, board):
             print("Player {p} won!".format(p=player_no))
             player_won = True
-        player_no = (player_no % 2 )+1
+        player_no = (player_no % 2)+1
     # else:
     #     print("Illegal move")
 
@@ -130,7 +128,7 @@ def find_neighbours(pos, board_in, value=-1):
 
 def has_player_won(playerno, board_in):
     # player cannot have won if there are too few tiles to form a path
-    if np.count_nonzero(board_in == player_no) < board_size:
+    if np.count_nonzero(board_in == player_no) < board_size - 1:
         return False
 
     path_found = False
