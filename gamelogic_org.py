@@ -28,8 +28,8 @@ def make_actual_move(pos):
         # print(pos)
         board[pos] = player_no
         # print find_neighbours(pos)
-        if has_player_won(player_no+1, board):
-            print("Player {p} won!".format(p=player_no+1))
+        if has_player_won(player_no, board):
+            print("Player {p} won!".format(p=player_no))
         player_no = (player_no % 2 )+1
     # else:
     #     print("Illegal move")
