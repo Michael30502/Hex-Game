@@ -522,13 +522,14 @@ def is_board_legal(board):
         return True   
     
     #we can now check if the ammount of player tiles is correct
-    
+    #TODO solve problem where a full board fucks up becuase len(values) no longer contains 0 so the difference between
+    #player tiles is calculated out of index
 
 
 
 
 def calculate_player_turn(board):
-    values, counts = np.unique(board, return_counts=True)
+    values = np.unique(board)
     #absolute difference between player tiles (must not exceed 1)
     
     #if there is only 1 element in values assuming the only element present is 0 #TODO
