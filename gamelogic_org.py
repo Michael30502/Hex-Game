@@ -26,11 +26,11 @@ def make_actual_move(pos):
     # print(board[pos])
     if is_empty(pos):
         # print(pos)
-        board[pos] = player_no + 1
+        board[pos] = player_no
         # print find_neighbours(pos)
         if has_player_won(player_no+1, board):
             print("Player {p} won!".format(p=player_no+1))
-        player_no = (player_no + 1) % 2
+        player_no = (player_no % 2 )+1
     # else:
     #     print("Illegal move")
 
@@ -39,8 +39,8 @@ def make_cpu_move():
     global player_no
     random_number = get_random_empty_pos()
     if random_number != -1:
-        board[random_number] = player_no + 1
-    player_no = (player_no + 1) % 2
+        board[random_number] = player_no
+    player_no = (player_no % 2) + 1
 
 
 def get_random_empty_pos():

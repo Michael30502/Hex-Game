@@ -1,19 +1,31 @@
 import random
 import numpy as np
 import ai1
+import gamelogic
 
-board_size = 5
+board_size = 11
+
+board = np.zeros((board_size, board_size), dtype=int)
+
+player_no = 0
+client_no = 0
+player_won = False
+multiplayer = False
+move_list = list()
 
 board = np.zeros((board_size, board_size), dtype=int)
 
 player_no = 1
 
 
+def is_empty_default(pos):
+    return board[pos] == 0
+
+
 def is_empty(pos, board_in):
     return board_in[pos] == 0
 
-
-# for quickly and conveniently finding the player number of the opponent
+    # for quickly and conveniently finding the player number of the opponent
 def opponent(player):
     if player == 1:
         return 2
@@ -22,15 +34,21 @@ def opponent(player):
 
 def make_actual_move(pos):
     global player_no
+    global player_won
+
     # print(board[pos])
-    if is_empty(pos, board):
+    if is_empty(pos, gamelogic.board) and player_won is False and (multiplayer is False or player_no == client_no):
+        # print("multiplayer: {} {}".format(multiplayer, client_no))
         board[pos] = player_no
-        if has_player_won(player_no, board):
+        if multiplayer:
+            move_list.append(pos)
+        # print find_neighbours(pos)
+        if has_player_won(player_no , gamelogic.board):
             print("Player {p} won!".format(p=player_no))
-        player_no = opponent(player_no)
-        print(player_no)
-    else:
-        print("Illegal move")
+            player_won = True
+        player_no = (player_no % 2 )+1
+    # else:
+    #     print("Illegal move")
 
 
 def make_sim_move(pos, board_in, player):
@@ -80,6 +98,7 @@ def get_random_empty_pos():
             x += 1
         x = 0
         y += 1
+
     # Chooses a random position from the list, if there is any
     if len(pos_list) >= 1:
         random_pos = pos_list[random.randrange(0, len(pos_list))]
