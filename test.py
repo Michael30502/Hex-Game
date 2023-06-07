@@ -47,4 +47,5 @@ def foo():
             res = tuple(map(int, string_move.split(', ')))
             gamelogic.make_actual_move(res)
 
-# cProfile.run('foo()')
+
+cProfile.run('foo()')

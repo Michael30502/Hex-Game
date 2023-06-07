@@ -22,12 +22,15 @@ def is_empty_default(pos):
 def is_empty(pos, board_in):
     return board_in[pos] == 0
 
+
 def findplayercolor(player):
-    if player==1:
+    if player == 1:
         return "blue"
-    if player ==2:
+    if player == 2:
         return "red"
-    # for quickly and conveniently finding the player number of the opponent
+
+
+# for quickly and conveniently finding the player number of the opponent
 def opponent(player):
     if player == 1:
         return 2
@@ -45,8 +48,8 @@ def make_actual_move(pos):
         if multiplayer:
             move_list.append(pos)
         # print find_neighbours(pos)
-        if has_player_won(player_no , gamelogic.board):
-            print("Player {p} won!".format(p=gamelogic.findplayercolor(player_no)))
+        if has_player_won(player_no , board):
+            print("Player {p} won!".format(p=findplayercolor(player_no)))
             player_won = True
         player_no = (player_no % 2)+1
     # else:
@@ -72,7 +75,7 @@ def make_cpu_move(random_move=False):
         print(board)
         board[move] = player_no
         if has_player_won(player_no, board):
-            print("Player {p} won!".format(p=gamelogic.findplayercolor(player_no)))
+            print("Player {p} won!".format(p=findplayercolor(player_no)))
     player_no = opponent(player_no)
 
 
@@ -119,14 +122,15 @@ def find_neighbours(pos, board_in, value=-1):
             if i == j:
                 continue
             # this handles the edge cases:
-            if r + i < 0 or r + i >= board_in.shape[0] or c + j < 0 or c + j >= board_in.shape[0]:
-                continue
-            # here we only extract neighbours of a specific value, if a nonnegative value is specified
-            if value >= 0:
-                if value == board_in[r + i, c + j]:
+            try:
+                # here we only extract neighbours of a specific value, if a nonnegative value is specified
+                if value >= 0:
+                    if value == board_in[r + i, c + j]:
+                        nset.add((r + i, c + j))
+                else:
                     nset.add((r + i, c + j))
-            else:
-                nset.add((r + i, c + j))
+            except IndexError:
+                pass
     return nset
 
 
