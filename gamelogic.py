@@ -25,6 +25,11 @@ def is_empty_default(pos):
 def is_empty(pos, board_in):
     return board_in[pos] == 0
 
+def findplayercolor(player):
+    if player==1:
+        return "blue"
+    if player ==2:
+        return "red"
     # for quickly and conveniently finding the player number of the opponent
 def opponent(player):
     if player == 1:
@@ -44,7 +49,7 @@ def make_actual_move(pos):
             move_list.append(pos)
         # print find_neighbours(pos)
         if has_player_won(player_no , gamelogic.board):
-            print("Player {p} won!".format(p=player_no))
+            print("Player {p} won!".format(p=gamelogic.findplayercolor(player_no)))
             player_won = True
         player_no = (player_no % 2 )+1
     # else:
@@ -70,7 +75,7 @@ def make_cpu_move(random_move=False):
         print(board)
         board[move] = player_no
         if has_player_won(player_no, board):
-            print("Player {p} won!".format(p=player_no))
+            print("Player {p} won!".format(p=gamelogic.findplayercolor(player_no)))
     player_no = opponent(player_no)
 
 
@@ -129,14 +134,14 @@ def find_neighbours(pos, board_in, value=-1):
 
 
 def has_player_won(playerno, board_in):
+    # player cannot have won if there are too few tiles to form a path
+    if np.count_nonzero(board_in == player_no) < board_size:
+        return False
+
     path_found = False
     r, c = (0, 0)
     visited_set = set()
     possible_path = set()
-    if playerno < 1 or playerno > 2:
-        raise Exception(
-            "Invalid index for has_player_won: Player must be either 1 or 2"
-        )
 
     while r < board_size and c < board_size and not path_found:
         # first the function looks for one of the player's tiles along an edge (leftmost for player 1, topmost for
@@ -172,4 +177,7 @@ def has_player_won(playerno, board_in):
 
 
 def has_any_won(board_in):
+    # player cannot have won if there are too few tiles to form a path
+    if np.count_nonzero(board_in) < board_size + board_size - 1:
+        return False
     return has_player_won(1, board_in) or has_player_won(2, board_in)
