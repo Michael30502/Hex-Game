@@ -4,6 +4,7 @@ import threading
 import numpy as np
 import pygame
 import math
+import string
 
 import gamelogic
 import onlinelogic
@@ -460,10 +461,8 @@ def array_to_string(array):
     # (this will be a list of integers sepperated by ' ')
     return " ".join(str(elem) for elem in array.flat)
 
-
 # the line bellow makes it so that the array_to_string function is used when printing the array or getting string version. Was used while testing
 # np.set_string_function(array_to_string, repr=False)
-
 
 def string_to_square_numpy_array(string):
     # Split the string into integers and convert them to a numpy array
@@ -477,6 +476,24 @@ def string_to_square_numpy_array(string):
     array = flat_array.reshape((array_size, array_size))
 
     return array
+
+def export_board(board):
+    #TODO this is gonna be hard without some way 
+    alphabet = list(string.ascii_lowercase)
+    export_string = ""
+    print(alphabet)
+    print(alphabet[0])
+    pseudo_player = False
+    for i in board:
+        for j in board:
+            if board[i][j] == int(pseudo_player)+1:
+                export_string.append("[" + str(i) + "," + str(j) + "]" + "player" + int(pseudo_player+1))
+                pseudo_player = not pseudo_player
+            elif board[i][j] == 1:
+                export_string.append("[" + str(i) + "," + str(j) + "]" + "player" + int(pseudo_player+1))
+                pseudo_player = not pseudo_player
+    #TODO i also include the color and then i can switch between blue and red moves for the final print
+    pass
 
 # Checking the elements in arr are either 0,1,2 and that ther is only a difference of 1 in the ammount of player elements
 def is_board_legal(board):
@@ -500,8 +517,11 @@ def is_board_legal(board):
     elif(np.amin(board) < 0):
         print(" wrong values in array, entries cant be smaller than 0")
         return False
+    #checks if the boards only contains 0's
+    elif(len(values) < 2):
+        print("board is empty but legal")
+        return True
     #if player 1 has more or equal 2 tiles while player 2 has 0 board is illegal
-
     elif len(values) < 3 and (0 in values and 1 in values):
         if counts[1] >= 2:
             print("player 1 has too many tiles")
@@ -524,8 +544,6 @@ def is_board_legal(board):
     #we can now check if the ammount of player tiles is correct
     #TODO solve problem where a full board fucks up becuase len(values) no longer contains 0 so the difference between
     #player tiles is calculated out of index
-
-
 
 
 def calculate_player_turn(board):
@@ -620,10 +638,10 @@ while run:
             first_menu = True
             second_menu = False
             action = True
-
+            
     if game_running == True:
         board1 = Board(hexagon1, gamelogic.board_size, game_surface)
-        game1 = Game(game_surface, board1, 0)
+        game1 = Game(game_surface, board1, 1)
         game1.play()
         game_running = False
         first_menu = True
@@ -667,6 +685,7 @@ while run:
                         elif event.key == pygame.K_RETURN:
                             #TODO change the game logic boardsize
                             print("enter has been pressed")
+                            export_board(gamelogic.board)
                             print(array_to_string(gamelogic.board))
                             placeholder_arr = string_to_square_numpy_array(user_text)
                             #TODO check if the board is leagal (equal player moves)
