@@ -4,21 +4,20 @@ import ai1
 import gamelogic
 import onlinelogic
 
+from myModule import opponent
 
-board_size = 11
+board_size = 7
 
 board = np.zeros((board_size, board_size), dtype=int)
 
-player_no = 0
+cpu = 1
+
+player_no = 1
 client_no = 0
 player_won = False
 multiplayer = False
 update_board = True
 move_list = list()
-
-board = np.zeros((board_size, board_size), dtype=int)
-
-player_no = 1
 
 
 def is_empty_default(pos):
@@ -28,16 +27,19 @@ def is_empty_default(pos):
 def is_empty(pos, board_in):
     return board_in[pos] == 0
 
+
 def findplayercolor(player):
-    if player==1:
-        return "blue"
-    if player ==2:
-        return "red"
-    # for quickly and conveniently finding the player number of the opponent
-def opponent(player):
     if player == 1:
-        return 2
-    return 1
+        return "blue"
+    if player == 2:
+        return "red"
+
+
+# for quickly and conveniently finding the player number of the opponent
+# def opponent(player):
+#     if player == 1:
+#         return 2
+#     return 1
 
 
 def make_actual_move(pos, new_pos = False):
@@ -52,10 +54,10 @@ def make_actual_move(pos, new_pos = False):
         if multiplayer:
             move_list.append(pos)
         # print find_neighbours(pos)
-        if has_player_won(player_no, gamelogic.board):
-            print("Player {p} won!".format(p=gamelogic.findplayercolor(player_no)))
+        if has_player_won(player_no , board):
+            print("Player {p} won!".format(p=findplayercolor(player_no)))
             player_won = True
-        player_no = (player_no % 2 )+1
+        player_no = (player_no % 2)+1
     # else:
     #     print("Illegal move")
 
@@ -79,7 +81,7 @@ def make_cpu_move(random_move=False):
         print(board)
         board[move] = player_no
         if has_player_won(player_no, board):
-            print("Player {p} won!".format(p=gamelogic.findplayercolor(player_no)))
+            print("Player {p} won!".format(p=findplayercolor(player_no)))
     player_no = opponent(player_no)
 
 
@@ -125,9 +127,11 @@ def find_neighbours(pos, board_in, value=-1):
             # ... however, a hexagon has at most 6 neighbours. The surplus elements are skipped by:
             if i == j:
                 continue
+
             # this handles the edge cases:
             if r + i < 0 or r + i >= board_in.shape[0] or c + j < 0 or c + j >= board_in.shape[0]:
                 continue
+
             # here we only extract neighbours of a specific value, if a nonnegative value is specified
             if value >= 0:
                 if value == board_in[r + i, c + j]:
@@ -139,7 +143,7 @@ def find_neighbours(pos, board_in, value=-1):
 
 def has_player_won(playerno, board_in):
     # player cannot have won if there are too few tiles to form a path
-    if np.count_nonzero(board_in == player_no) < board_size-1:
+    if np.count_nonzero(board_in == player_no) < board_size - 1:
         return False
 
     path_found = False

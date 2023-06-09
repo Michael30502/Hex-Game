@@ -3,6 +3,7 @@ import threading
 
 import numpy as np
 import pygame
+import math
 
 import gamelogic
 import onlinelogic
@@ -16,7 +17,7 @@ RED = (255, 0, 0)
 
 FPS = 60
 
-cpu = 0
+cpu = gamelogic.cpu
 board_size_list = [3, 5, 7, 9, 11]
 board_size = len(board_size_list) - 1
 
@@ -507,7 +508,7 @@ base_font = pygame.font.Font(None, 32)
 user_text = ''
 
 # create rectangle
-input_rect = pygame.Rect(200, 600, 400, 50)
+input_rect = pygame.Rect(0, 600, 800, 50)
 
 # color_active stores color(lightskyblue3) which
 # gets active when input box is clicked by user
@@ -553,19 +554,79 @@ def string_to_square_numpy_array(string):
 
     return array
 
-
 # Checking the elements in arr are either 0,1,2 and that ther is only a difference of 1 in the ammount of player elements
-def is_board_legal(arr):
-    values, counts = np.unique(arr, return_counts=True)
+def is_board_legal(board):
+    #perfect square calculations
+    root = math.sqrt(board.size)
+    ceil = math.ceil(root)**2
+    floor = math.floor(root)**2
+
+    #for player tile checking
+    values, counts = np.unique(board, return_counts=True)
     print(values)
     print(counts)
-    # TODO This doesnt work if one of the players hasnt made a move.
+    #we start by determining if the size is a perfect square
+    if not(ceil == floor == board.size):
+        print("board size is not a perfect square")
+        return False
+    #check if other values than 0,1,2 is in the array
+    elif(np.amax(board) > 2):
+        print(" wrong values in array, entries cant be larger than 2")
+        return False
+    elif(np.amin(board) < 0):
+        print(" wrong values in array, entries cant be smaller than 0")
+        return False
+    #if player 1 has more or equal 2 tiles while player 2 has 0 board is illegal
 
-    pass
-    # TODO check size restraints
+    elif len(values) < 3 and (0 in values and 1 in values):
+        if counts[1] >= 2:
+            print("player 1 has too many tiles")
+            return False
+    #same with player 2 but this time since player 1 always starts the number cant exceed 1
+    elif len(values) < 3 and (0 in values and 2 in values):
+        if counts[1] >= 1:
+            print("player 2 has too many tiles")
+            return False
+    #checking if the difference between player tiles is larger than 1
+    elif abs(counts[1] - counts[2]) >= 2:
+        print("difference in player tiles is too big")
+        return False
+        
+    
+    else:
+        print("board is legal")
+        return True   
+    
+    #we can now check if the ammount of player tiles is correct
+    #TODO solve problem where a full board fucks up becuase len(values) no longer contains 0 so the difference between
+    #player tiles is calculated out of index
 
 
-# import end -----------------------------------------------------------------------------------------
+
+
+def calculate_player_turn(board):
+    values = np.unique(board)
+    #absolute difference between player tiles (must not exceed 1)
+    
+    #if there is only 1 element in values assuming the only element present is 0 #TODO
+    if len(values) < 2:
+        return 1
+    #if there are 2 elements present in our array and 1 of them is 1 assuming rest is 0 then it must be player 2's turn
+    elif len(values) < 3 and (1 in values):
+        return 2
+    elif len(values) < 3 and (2 in values):
+        return 1
+
+    elif values[1] <= values[2]:
+        return 1
+    elif values[2] < values[1]:
+        return 2
+    else:
+        print("calculate_player_turn ERROR")
+        return 0
+    
+
+#import end -----------------------------------------------------------------------------------------
 
 # game loop
 def server_thread():
@@ -674,7 +735,7 @@ while run:
                     if event.type == pygame.QUIT:
                         import_game = False
                         user_text = ""
-                        input_rect = pygame.Rect(200, 600, 400, 50)
+                        input_rect = pygame.Rect(0, 600, 400, 50)
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if input_rect.collidepoint(event.pos):
                             active = True
@@ -686,25 +747,28 @@ while run:
                             # delete character from string
                             user_text = user_text[:-1]
                         elif event.key == pygame.K_RETURN:
-
+                            #TODO change the game logic boardsize
                             print("enter has been pressed")
-                            print(gamelogic.board)
                             print(array_to_string(gamelogic.board))
-                            # TODO check if the board is leagal (size constraint, values in array, equal player moves)
-
-                            # error handling
-                            if is_board_legal(string_to_square_numpy_array(user_text)):
+                            placeholder_arr = string_to_square_numpy_array(user_text)
+                            #TODO check if the board is leagal (equal player moves)
+                            import_game = False
+                            #error handling
+                            if (is_board_legal(placeholder_arr)):
                                 try:
                                     gamelogic.board = string_to_square_numpy_array(user_text)
+                                    print(gamelogic.board)
+                                    print(calculate_player_turn(gamelogic.board))
                                 except ValueError:
                                     print("wrong format")
                                     user_text = ""
                                 except:
                                     print("something else")
-                                print(gamelogic.board)
                                 import_game = False
                             else:
-                                print("is_board_legal = FALSE")
+                                print("board is illegal")
+                                # gamelogic.board = string_to_square_numpy_array(user_text)
+                                
                         # Unicode standard is used for string
                         else:
                             user_text += event.unicode
@@ -713,7 +777,7 @@ while run:
                 text_surface = base_font.render(user_text, True, (255, 255, 255))
 
                 # render at position stated in arguments
-                game_surface.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
+                game_surface.blit(text_surface, (input_rect.x, input_rect.y))
 
                 pygame.display.flip()
                 clock.tick(60)
