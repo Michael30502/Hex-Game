@@ -3,20 +3,19 @@ import ai1
 import numpy as np
 import cProfile
 
-
 test_board = np.array([[0, 0, 0, 0],
                        [0, 2, 0, 0],
                        [1, 0, 1, 1],
                        [0, 2, 2, 0]])
 
 print(gamelogic.board)
+
+
 # print(ai1.actions_available(gamelogic.board))
 
 # test_state = ai1.State(gamelogic.board, gamelogic.player_no)
 
 # print("minimax result: " + str(ai1.minimax_search(test_state)))
-
-
 
 
 # def recursive_factorial(n):
@@ -35,13 +34,10 @@ print(gamelogic.board)
 # print(l2)
 # print(ai1.identify_tiles_on_path(test_board, l2, 2))
 
-
 # print(gamelogic.board)
 
-#
-
 def foo():
-    while not (gamelogic.has_player_won(1, gamelogic.board) or gamelogic.has_player_won(2, gamelogic.board)):
+    while not gamelogic.has_any_won(gamelogic.board):
         if gamelogic.player_no == 1:
             gamelogic.make_ai1_move()
             print(gamelogic.board)
@@ -51,8 +47,6 @@ def foo():
             gamelogic.make_actual_move(res)
 
 
+# test = test_board[3, -1]
+# print(test)
 cProfile.run('foo()')
-
-
-
-

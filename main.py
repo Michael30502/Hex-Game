@@ -18,7 +18,7 @@ RED = (255, 0, 0)
 
 FPS = 60
 
-cpu = 0
+cpu = gamelogic.cpu
 board_size_list = [3, 5, 7, 9, 11]
 board_size = len(board_size_list) - 1
 
