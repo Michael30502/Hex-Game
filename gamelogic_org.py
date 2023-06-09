@@ -2,6 +2,9 @@ import random
 
 import numpy as np
 
+import gamelogic
+import onlinelogic
+
 board_size = 11
 
 
@@ -24,7 +27,10 @@ def opponent(player):
 def make_actual_move(pos):
     global player_no
     # print(board[pos])
-    if is_empty(pos):
+    if is_empty(pos) and (gamelogic.multiplayer == False or gamelogic.client_no == 2 or onlinelogic.clientsocket is not None ):
+        print(gamelogic.multiplayer)
+        print(gamelogic.client_no)
+        print(onlinelogic.clientsocket)
         # print(pos)
         board[pos] = player_no
         # print find_neighbours(pos)

@@ -28,7 +28,7 @@ game_running = False
 game_paused = False
 game_finished = False
 
-# Surface/Screen size (this shoudl be scaleable
+# Surface/Screen size (this should be scaleable
 WIDTH, HEIGHT = 800, 800
 game_surface = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("HEX")
@@ -57,19 +57,52 @@ hexagon_player2_img = pygame.image.load("assets/tile_2.png").convert_alpha()
 action = False
 pos = None
 new_pos = False
+new_command = False
+command = None
 thread_started = False
 receive_thread_client = None
 receive_thread_server = None
+running_thread_server = None
 
 
 def receive_wait(client_no):
-    global pos, new_pos
-    if client_no == 2:
-        pos = connection.receive()
-    else:
-        pos = onlinelogic.clientsocket.recv(5)
-    new_pos = True
-    sys.exit()
+    global pos, new_pos, new_command, command
+    while True:
+        if client_no == 2:
+            pos = connection.receive()
+            if pos.decode('utf-8') == "contt" or pos.decode('utf-8') == "exitt" or pos.decode('utf-8')[0] == "S":
+                print('command received')
+                new_command = True
+                command = pos.decode('utf-8')
+                pos = None
+            else:
+                print('pos received')
+                new_pos = True
+        elif onlinelogic.clientsocket is not None:
+            print('pos received')
+            pos = onlinelogic.clientsocket.recv(5)
+            new_pos = True
+
+
+def restart_game():
+    game_surface.fill(WHITE)
+    gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
+    gamelogic.player_won = False
+    gamelogic.player_no = 1
+    game1.board.make_grid()
+
+
+def exit_game():
+    global connection
+    print("exit")
+    restart_game()
+    game1.running = False
+    if gamelogic.multiplayer:
+        if connection is not None:
+            connection.sock.close()
+            connection.sock.shutdown()
+            connection = None
+    gamelogic.multiplayer = False
 
 
 class Button:
@@ -161,6 +194,7 @@ class Button:
                 action = True
                 self.clicked = True
                 gamelogic.make_actual_move(self.unit)
+                game1.board.draw_grid()
 
             if pygame.mouse.get_pressed()[0] == 0:
                 action = False
@@ -261,15 +295,30 @@ class Game:
     #
 
     def play(self):
-        global new_pos
+        global new_pos, new_command
         global pos
         global thread_started
         global receive_thread_client
         global receive_thread_server
+        global running_thread_server
+        on_connect = True
         game_surface.fill(WHITE)
         self.board.make_grid()
         print("check")
         while self.running:
+            if gamelogic.client_no == 1 and gamelogic.multiplayer:
+                if running_thread_server is not None:
+                    if not running_thread_server.is_alive():
+                        print("Server dead")
+                        onlinelogic.shutdown = True
+                        exit_game()
+                        running_thread_server = None
+                else:
+                    exit_game()
+
+            if gamelogic.update_board:
+                game1.board.draw_grid()
+            # print(gamelogic.has_any_won(gamelogic.board))
             if gamelogic.player_no == cpu and not gamelogic.has_any_won(gamelogic.board):
                 self.unit = gamelogic.make_ai1_move()
             else:
@@ -282,17 +331,25 @@ class Game:
                     textRect2 = text2.get_rect()
                     textRect2.center = (100, 100)
                     game_surface.blit(text2, [300, 500])
-                    if back_to_menu.drawMenu(game_surface):
-                        game_surface.fill(WHITE)
-                        gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
-                        # gamelogic.player_won = False
-                        self.board.make_grid()
-                        self.running = False
-                    if restart_button.drawMenu(game_surface):
-                        game_surface.fill(WHITE)
-                        gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
-                        # gamelogic.player_won = False
-                        self.board.make_grid()
+                    if not gamelogic.multiplayer or gamelogic.client_no == 1:
+
+
+                        if back_to_menu.drawMenu(game_surface):
+                            if gamelogic.multiplayer:
+                                onlinelogic.clientsocket.send(bytes("exitt", 'utf-8'))
+                                onlinelogic.shutdown = True
+                            exit_game()
+
+                        if restart_button.drawMenu(game_surface):
+                            if gamelogic.multiplayer:
+                                onlinelogic.clientsocket.send((bytes("contt", 'utf-8')))
+
+                            restart_game()
+                    else:
+                        text3 = font.render("Waiting for host...", True, BLACK)
+                        # textRect3 = text2.get_rect()
+                        # textRect3.center = (100, 100)
+                        game_surface.blit(text3, [300, 650])
 
             if gamelogic.multiplayer:
                 if gamelogic.client_no == 2:
@@ -306,23 +363,39 @@ class Game:
                         gamelogic.move_list.clear()
                         print("checkmove")
 
-                    elif gamelogic.client_no != gamelogic.player_no and thread_started == False:
-                        receive_thread_client.start()
-                        thread_started = True
-
                     if new_pos:
                         pos = pos.decode('utf-8')
                         print(pos)
                         (x, y) = pos.split(",")
+                        print(pos)
                         pos = (int(x), int(y))
-                        gamelogic.board[pos] = 1
-                        game1.board.draw_grid()
-                        gamelogic.player_no = (gamelogic.player_no % 2)+1
-                        new_pos = False
-                        thread_started = False
-                        receive_thread_client = threading.Thread(target=receive_wait, args=(2,))
+                        gamelogic.make_actual_move(pos, True)
 
-                if gamelogic.client_no == 1:
+                        new_pos = False
+                        #receive_thread_client = threading.Thread(target=receive_wait, args=(2,))
+                    if new_command:
+                        if command == "contt":
+                            restart_game()
+                        if command == "exitt":
+                            exit_game()
+                            #Settings
+                        if command[0] == "S":
+                            if command[1] == "s":
+                                gamelogic.board_size = int(command[2:])
+                                print(gamelogic.board_size)
+                                board1.size=gamelogic.board_size
+                                restart_game()
+
+
+
+                        new_command = False
+
+                # print(onlinelogic.clientsocket)
+                if gamelogic.client_no == 1 and onlinelogic.clientsocket is not None:
+                    if on_connect:
+                        game_surface.fill(WHITE)
+                        self.board.make_grid()
+                        on_connect = False
                     if len(gamelogic.move_list) > 0:
                         (x, y) = gamelogic.move_list[0]
                         value = str(x) + "," + str(y)
@@ -334,24 +407,27 @@ class Game:
                         onlinelogic.clientsocket.send(bytes(value, 'utf-8'))
                         gamelogic.move_list.clear()
 
-                    elif gamelogic.client_no != gamelogic.player_no and thread_started == False:
-                        receive_thread_server.start()
-                        thread_started = True
+
                     if new_pos:
                         pos = pos.decode('utf-8')
                         print(pos)
                         (x, y) = pos.split(",")
                         pos = (int(x), int(y))
                         print(pos)
-                        gamelogic.board[pos] = 2
+                        gamelogic.make_actual_move(pos, True)
                         game1.board.draw_grid()
-                        gamelogic.player_no = (gamelogic.player_no % 2)+1
                         new_pos = False
-                        thread_started = False
-                        receive_thread_server = threading.Thread(target=receive_wait, args=(1,))
 
+
+                elif onlinelogic.clientsocket is None and gamelogic.client_no == 1:
+                    # print("checks")
+                    text2 = font.render("Waiting for player...", True, BLACK)
+                    textRect2 = text2.get_rect()
+                    textRect2.center = (100, 100)
+                    game_surface.blit(text2, [300, 500])
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    exit_game()
                     self.running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -495,6 +571,7 @@ def is_board_legal(arr):
 def server_thread():
     global receive_thread_client
     global receive_thread_server
+    global running_thread_server
     server = onlinelogic.serversocket()
     server.create_server()
 
@@ -529,9 +606,10 @@ while run:
             action = True
         if ai_2_button.drawMenu(game_surface) and not action:
             print('hosting a server')
-            thread = threading.Thread(target=server_thread)
-            thread.start()
+            running_thread_server = threading.Thread(target=server_thread)
+            running_thread_server.start()
             receive_thread_server = threading.Thread(target=receive_wait, args=(1,))
+            receive_thread_server.start()
 
             gamelogic.client_no = 1
             game_running = True
@@ -543,17 +621,21 @@ while run:
             action = True
         if play_online_button.drawMenu(game_surface) and not action:
             print('joining a server')
-            connection = onlinelogic.GameSocket()
-            gamelogic.multiplayer = True
-            receive_thread_client = threading.Thread(target=receive_wait, args=(2,))
-            gamelogic.client_no = 2
+
             try:
-                #ipv4
-                connection.connect("10.209.209.76", 25565)
+                # ipv4
+                connection = onlinelogic.GameSocket()
+                connection.connect("10.209.175.124", 25565)
                 game_running = True
                 second_menu = False
+                receive_thread_client = threading.Thread(target=receive_wait, args=(2,))
+                receive_thread_client.start()
+                gamelogic.client_no = 2
+                gamelogic.multiplayer = True
+
             except:
                 print("Connection not made")
+
             action = True
         if go_back_button.drawMenu(game_surface) and not action:
             first_menu = True

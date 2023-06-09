@@ -2,6 +2,8 @@ import random
 import numpy as np
 import ai1
 import gamelogic
+import onlinelogic
+
 
 board_size = 11
 
@@ -11,6 +13,7 @@ player_no = 0
 client_no = 0
 player_won = False
 multiplayer = False
+update_board = True
 move_list = list()
 
 board = np.zeros((board_size, board_size), dtype=int)
@@ -37,18 +40,19 @@ def opponent(player):
     return 1
 
 
-def make_actual_move(pos):
+def make_actual_move(pos, new_pos = False):
     global player_no
     global player_won
-
+    print(multiplayer)
+    print(onlinelogic.clientsocket)
     # print(board[pos])
-    if is_empty(pos, gamelogic.board) and player_won is False and (multiplayer is False or player_no == client_no):
+    if is_empty(pos, gamelogic.board) and player_won is False and ((player_no == client_no or new_pos == True) and (client_no==2 or onlinelogic.clientsocket is not None)) or multiplayer is False:
         # print("multiplayer: {} {}".format(multiplayer, client_no))
         board[pos] = player_no
         if multiplayer:
             move_list.append(pos)
         # print find_neighbours(pos)
-        if has_player_won(player_no , gamelogic.board):
+        if has_player_won(player_no, gamelogic.board):
             print("Player {p} won!".format(p=gamelogic.findplayercolor(player_no)))
             player_won = True
         player_no = (player_no % 2 )+1
@@ -135,7 +139,7 @@ def find_neighbours(pos, board_in, value=-1):
 
 def has_player_won(playerno, board_in):
     # player cannot have won if there are too few tiles to form a path
-    if np.count_nonzero(board_in == player_no) < board_size:
+    if np.count_nonzero(board_in == player_no) < board_size-1:
         return False
 
     path_found = False
