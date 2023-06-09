@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import ai1
+from myModule import opponent
 
 board_size = 7
 
@@ -31,10 +32,10 @@ def findplayercolor(player):
 
 
 # for quickly and conveniently finding the player number of the opponent
-def opponent(player):
-    if player == 1:
-        return 2
-    return 1
+# def opponent(player):
+#     if player == 1:
+#         return 2
+#     return 1
 
 
 def make_actual_move(pos):
@@ -121,16 +122,17 @@ def find_neighbours(pos, board_in, value=-1):
             # ... however, a hexagon has at most 6 neighbours. The surplus elements are skipped by:
             if i == j:
                 continue
+
             # this handles the edge cases:
-            try:
-                # here we only extract neighbours of a specific value, if a nonnegative value is specified
-                if value >= 0:
-                    if value == board_in[r + i, c + j]:
-                        nset.add((r + i, c + j))
-                else:
+            if r + i < 0 or r + i >= board_in.shape[0] or c + j < 0 or c + j >= board_in.shape[0]:
+                continue
+
+            # here we only extract neighbours of a specific value, if a nonnegative value is specified
+            if value >= 0:
+                if value == board_in[r + i, c + j]:
                     nset.add((r + i, c + j))
-            except IndexError:
-                pass
+            else:
+                nset.add((r + i, c + j))
     return nset
 
 

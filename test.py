@@ -3,7 +3,6 @@ import ai1
 import numpy as np
 import cProfile
 
-
 test_board = np.array([[0, 0, 0, 0],
                        [0, 2, 0, 0],
                        [1, 0, 1, 1],
@@ -48,4 +47,6 @@ def foo():
             gamelogic.make_actual_move(res)
 
 
+# test = test_board[3, -1]
+# print(test)
 cProfile.run('foo()')
