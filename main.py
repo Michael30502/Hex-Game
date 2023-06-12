@@ -365,7 +365,7 @@ class Game:
                         text2 = font.render(("Player "+str(gamelogic.player_no+1)+" has won"), True, BLACK)
                         textRect2 = text2.get_rect()
                         textRect2.center = (100, 100)
-                        game_surface.blit(text2, [300, 500])
+                        game_surface.blit(text2, [195,200])
                         if back_to_menu.drawMenu(game_surface):
                             #game_surface.fill(YELLOW)
                             gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
