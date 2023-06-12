@@ -938,18 +938,20 @@ while run:
             player_option = True
             print('import saved game') 
 
-        if player_option == True:
-            if player_1_button.drawMenu(game_surface):
-                print('choose player 1')
-            if player_2_button.drawMenu(game_surface):
-                print('choose player 2')
-            if go_back_button.drawMenu(game_surface):
-                player_option = False
-                setting_menu = True
+
                 
         if go_back_button.drawMenu(game_surface):
             setting_menu = False
             first_menu = True
+
+    if player_option == True:
+        if player_1_button.drawMenu(game_surface):
+            print('choose player 1')
+        if player_2_button.drawMenu(game_surface):
+            print('choose player 2')
+        if go_back_button.drawMenu(game_surface):
+            player_option = False
+            setting_menu = True
 
     if pygame.mouse.get_pressed()[0] == 0:
         action = False
