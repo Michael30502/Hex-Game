@@ -4,9 +4,16 @@ import ai1
 import gamelogic
 import onlinelogic
 
+
+
+
+
+
 #from myModule import opponent
 
 board_size = 7
+
+x_offset = 76.5
 
 board = np.zeros((board_size, board_size), dtype=int)
 
