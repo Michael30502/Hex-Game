@@ -38,6 +38,7 @@ game_running = False
 game_paused = False
 game_finished = False
 player_option = False
+online_menu = False
 
 
 # Surface/Screen size (this shoudl be scaleable
@@ -76,6 +77,9 @@ Player_1_pic_Img = pygame.image.load('assets/Player_1_pic.png').convert_alpha()
 Player_1_pic_img = pygame.transform.scale(Player_1_pic_Img, (50, 50))
 Player_2_pic_Img = pygame.image.load('assets/Player_2_pic.png').convert_alpha()
 Player_2_pic_img = pygame.transform.scale(Player_2_pic_Img, (50, 50))
+Main_Menu_img = pygame.image.load('assets/Main_Menu.png').convert_alpha()
+Play_Again_img = pygame.image.load('assets/Play_Again.png').convert_alpha()
+Exit_Game_img = pygame.image.load('assets/Exit_Game.png').convert_alpha()
 YELLOW = pygame.image.load('assets/honeycomb2.jpg')
 YELLOW = pygame.transform.scale(YELLOW, (640, 480))
 
@@ -138,6 +142,11 @@ def exit_game():
             connection = None
     gamelogic.multiplayer = False
 
+def draw_textbox(screen, rect, text):
+    font = pygame.font.Font(None, 32)
+    text_surface = font.render(text, True, (255, 255, 255)) # White color text
+    pygame.draw.rect(screen, (0, 0, 0), rect) # Black color box
+    screen.blit(text_surface, (rect[0]+5, rect[1]+5))
 
 class Button:
     def __init__(self, x, y, image, scale, unit):
@@ -179,7 +188,7 @@ class Button:
                 board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
 
         # checking collision and clicked
-        if self.rect.collidepoint(mouse_pos):
+        if self.rect.collidepoint(mouse_pos) and not game1.paused:
             # print('hover:' + str(self.unit))
             # Checking if we are leftclicking a button that has not been clicked, then changing the image
 
@@ -222,7 +231,7 @@ class Button:
             board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
 
         # checking colision and clicked
-        if self.rect.collidepoint(mouse_pos):
+        if self.rect.collidepoint(mouse_pos) and not game1.paused:
             pygame.event.get()
             if pygame.mouse.get_pressed()[0] == 1 and not action:
                 action = True
@@ -265,16 +274,16 @@ class Board:
             y_extra_offset = 40
         elif self.size==9:
              x_extra_offset=120.8
-             y_extra_offset = 40
+             y_extra_offset = 50
         elif self.size==7:
              x_extra_offset=165
-             y_extra_offset = 40
+             y_extra_offset = 60
         elif self.size==5:
              x_extra_offset=209.3
-             y_extra_offset = 40
+             y_extra_offset = 70
         elif self.size==3:
              x_extra_offset=253.6
-             y_extra_offset = 40
+             y_extra_offset = 80
         hex_grid = []
         for i in range(self.size):
             row = []
@@ -331,8 +340,8 @@ class Board:
         bottom_left_red = (self.grid[-1][0].rect.left+2, self.grid[-1][0].rect.centery+8)
         bottom_right_red = (self.grid[-1][-1].rect.right-2, self.grid[-1][-1].rect.centery+8)
 
-        top_bottom_border_color = (255, 0, 0)
-        sides_border_color = (0, 0, 255)
+        top_bottom_border_color = (160, 44, 44)
+        sides_border_color = (0, 0, 170)
         border_thickness = 20
 
         self.draw_custom_line(self.surface, top_bottom_border_color, top_left_red, top_right_red, border_thickness, True)  # top
@@ -422,10 +431,13 @@ class Game:
                 if go_back_button.drawMenu(game_surface):
                     self.paused = False
                 self.board.draw_grid()
+                if exit_game_button.drawMenu(game_surface):
+                    exit_game()
             if not self.paused:
                 #game_surface.fill(YELLOW)
-                if pause_game_button.drawMenu(game_surface):
-                    self.paused = True 
+                if not gamelogic.has_any_won(gamelogic.board):
+                    if pause_game_button.drawMenu(game_surface):
+                        self.paused = True 
                 if gamelogic.client_no == 1 and gamelogic.multiplayer:
                     if running_thread_server is not None:
                         if not running_thread_server.is_alive():
@@ -450,17 +462,17 @@ class Game:
                             text2 = font.render("Player 2 has won", True, BLACK)
                         textRect2 = text2.get_rect()
                         textRect2.center = (100, 100)
-                        game_surface.blit(text2, [300, 500])
+                        game_surface.blit(text2, [195, 200])
                         if not gamelogic.multiplayer or gamelogic.client_no == 1:
 
 
-                            if back_to_menu.drawMenu(game_surface):
+                            if main_menu_button.drawMenu(game_surface):
                                 if gamelogic.multiplayer:
                                     onlinelogic.clientsocket.send(bytes("exitt", 'utf-8'))
                                     onlinelogic.shutdown = True
                                 exit_game()
 
-                            if restart_button.drawMenu(game_surface):
+                            if play_again_button.drawMenu(game_surface):
                                 if gamelogic.multiplayer:
                                     onlinelogic.clientsocket.send((bytes("contt", 'utf-8')))
 
@@ -591,6 +603,9 @@ class MenuButton:
 
 
 #create button instances
+exit_game_button = MenuButton(350, 50, Exit_Game_img, 1)
+play_again_button = MenuButton(195, 275, Play_Again_img, 1)
+main_menu_button = MenuButton(195, 350, Main_Menu_img, 1)
 start_game_button = MenuButton(195, 50, start_game_img, 1)
 play_online_button = MenuButton(195, 100, Play_Online_img, 1)
 ai_2_button = MenuButton(195, 250, AI_2_img, 1)
@@ -605,8 +620,8 @@ continue_button = MenuButton(195, 100, Continue_img, 1)
 export_game_button = MenuButton(46.6, 400, Export_Game_img, 1)
 import_game_button = MenuButton(195, 50, Import_Game_img, 1)
 go_back_button = MenuButton(343.4, 400, Go_Back_img, 1)
-join_game_button = MenuButton(195, 400, Join_Game_img, 1)
-host_game_button = MenuButton(195, 400, Host_Game_img, 1)
+join_game_button = MenuButton(195, 150, Join_Game_img, 1)
+host_game_button = MenuButton(195, 50, Host_Game_img, 1)
 pause_game_button = MenuButton(195, 350, Pause_Game_img, 1)
 player_1_button = MenuButton(195, 50, Player_1_img, 1)
 player_2_button = MenuButton(195, 150, Player_2_img, 1)
@@ -820,6 +835,8 @@ while run:
             print('playing against bot 1')
             action = True
         if play_online_button.drawMenu(game_surface) and not action:
+            online_menu = True
+            second_menu = False
             print('joining a server')
 
             try:
@@ -842,6 +859,18 @@ while run:
             second_menu = False
             action = True
             
+    if online_menu == True:
+        input_box = pygame.Rect(200, 210, 243, 32)
+        text = ''
+        draw_textbox(game_surface, input_box, text)
+        if go_back_button.drawMenu(game_surface) and not action:
+            second_menu = True
+            online_menu = False
+        if join_game_button.drawMenu(game_surface) and not action:
+            print('join game')
+        if host_game_button.drawMenu(game_surface) and not action:
+            print('host game')
+
     if game_running == True:
         board1 = Board(hexagon1, gamelogic.board_size, game_surface)
         game1 = Game(game_surface, board1, 1)
@@ -865,7 +894,7 @@ while run:
         text = font.render(str(gamelogic.board_size), True, WHITE)
         textRect = text.get_rect()
         textRect.center = (100, 100)
-        game_surface.blit(text, [220, 225])
+        game_surface.blit(text, [450, 160])
         if change_board_size_button.drawMenu(game_surface) and not action:
 
             board_size += 1
@@ -955,6 +984,7 @@ while run:
 
     if pygame.mouse.get_pressed()[0] == 0:
         action = False
+
     for event in pygame.event.get():
         # quit game
         if event.type == pygame.QUIT:
@@ -963,5 +993,14 @@ while run:
             if event.key == pygame.K_c:
                 # exporting game as a string to load
                 user_text = array_to_string(gamelogic.board)
+            elif event.key == pygame.K_RETURN:
+                print(text)
+                text = ''
+            elif event.key == pygame.K_BACKSPACE:
+                text = text[:-1]
+            else:
+                text += event.unicode
+
     pygame.display.flip()
+
 pygame.quit()
