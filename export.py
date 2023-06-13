@@ -1,21 +1,19 @@
 import numpy as np
 import string
-    
-board = np.array(([1,2,0], [2,1,0], [0,2,1]))
 
 #this splits a board into 2 lists containing moves from player 1 and 2 respectively
 def split_board(board):
-    #TODO this is gonna be hard without some way 
+    #TODO this is gonna be hard without some way
     alphabet = list(string.ascii_uppercase)
     p1_list = []
     p2_list = []
     for i in range(len(board)):
         for j in range(len(board)):
             if board[i][j] == 1:
-                p1_list.append(str(alphabet[i]) + str(j)+" ")
+                p1_list.append(str(alphabet[i]) + str(j+1)+" ")
                 
             elif board[i][j] == 2:
-                p2_list.append(str(alphabet[i]) + str(j)+" ")
+                p2_list.append(str(alphabet[i]) + str(j+1)+" ")
     return p1_list, p2_list
 
     #TODO i also include the color and then i can switch between blue and red moves for the final print

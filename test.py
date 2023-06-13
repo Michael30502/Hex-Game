@@ -42,7 +42,7 @@ def foo():
             gamelogic.make_ai1_move()
             print(gamelogic.board)
         else:
-            string_move = raw_input('Make a move (in the format x, y):')
+            string_move = input('Make a move (in the format x, y):')
             res = tuple(map(int, string_move.split(', ')))
             gamelogic.make_actual_move(res)
 
