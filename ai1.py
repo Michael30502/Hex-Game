@@ -2,6 +2,7 @@ import gamelogic
 import numpy as np
 import sys
 from collections import deque
+import random
 
 
 cut_off_depth = 2
@@ -22,13 +23,22 @@ class State:
 
 
 # generate the list of actions possible on the board
-def actions_available(board):
+def actions_to_explore(board):
+    # actions available
     moves_list = []
     for i in range(0, gamelogic.board_size):
         for j in range(0, gamelogic.board_size):
             if board[i, j] == 0:
                 moves_list.append((i, j))
-    return moves_list
+
+    tiles_on_1_shortest_path = identify_tiles_on_path(board, 1)
+    tiles_on_2_shortest_path = identify_tiles_on_path(board, 2)
+    tiles_on_both_paths = tiles_on_1_shortest_path.intersection(tiles_on_2_shortest_path)
+    candidate_moves = set(moves_list).intersection(tiles_on_both_paths)
+    # while len(candidate_moves) > 7:
+    #     candidate_moves.remove(max(candidate_moves))
+    #     candidate_moves.remove(min(candidate_moves))
+    return candidate_moves
 
 
 def result_state(state, action):
@@ -41,36 +51,32 @@ def result_state(state, action):
 
 
 # currently assumes that AI is player 1
-def victory_counter(state, sum_so_far):
-    if gamelogic.has_player_won(1, state.board_config):
-        return 1
-    elif gamelogic.has_player_won(2, state.board_config):
-        return -1
-    res_list = []
+# def victory_counter(state, sum_so_far):
+#     if gamelogic.has_player_won(1, state.board_config):
+#         return 1
+#     elif gamelogic.has_player_won(2, state.board_config):
+#         return -1
+#     res_list = []
+#
+#     print("actions_to_explore within victory counter: " + str(actions_to_explore(state)))
+#     for a in actions_to_explore(state):
+#         new_state = result_state(state, a)
+#         res = victory_counter(new_state, sum_so_far)
+#         res_list.append(res)
+#     victories_found = sum(res_list)
+#     return victories_found
 
-    tiles_on_a_shortest_path = identify_tiles_on_path(state.board_config, state.player_turn)
 
-    for a in set(actions_available(state.board_config)).intersection(tiles_on_a_shortest_path):
-        new_state = result_state(state, a)
-        res = victory_counter(new_state, sum_so_far)
-        res_list.append(res)
-    victories_found = sum(res_list)
-    return victories_found
-
-
-def pick_action_most_wins(state):
-    res_list = []
-    tiles_on_a_shortest_path = identify_tiles_on_path(state.board_config, state.player_turn)
-    print("tiles on shortest path:" + str(tiles_on_a_shortest_path))
-    remainder = set(actions_available(state.board_config)).intersection(tiles_on_a_shortest_path)
-    print("remainder: " + str(remainder))
-    for a in remainder:
-        new_state = result_state(state, a)
-        if new_state.is_terminal_state():
-            return a
-        res_list.append((victory_counter(new_state, 0), a))
-    print(res_list)
-    return max(res_list, key=lambda item: item[0])[1]
+# def pick_action_most_wins(state):
+#     res_list = []
+#     print("actions to explore in pick most wins: " + str(actions_to_explore(state)))
+#     for a in actions_to_explore(state):
+#         new_state = result_state(state, a)
+#         if new_state.is_terminal_state():
+#             return a
+#         res_list.append((victory_counter(new_state, 0), a))
+#     print(res_list)
+#     return max(res_list, key=lambda item: item[0])[1]
 
 
 # how do we measure how good a board is? Suggestion: Length of shortest path from one side to the other
@@ -100,8 +106,7 @@ def shortest_path(board, player):
         visited.add(pos)
         if board[pos] == gamelogic.opponent(player):
             continue
-        neighs = gamelogic.find_neighbours(pos, board)
-        neighs = neighs.difference(visited)
+        neighs = gamelogic.find_neighbours(pos, board, skipping=visited)
         for n in neighs:
             frontier.append(n)
             if lengths_found[n] > lengths_found[pos] + weight(board[n], player):
@@ -149,7 +154,8 @@ def identify_tiles_on_path(board, player):
 
     while len(path_found - visited) > 0:
         for elem in path_found - visited:
-            for nb in gamelogic.find_neighbours(elem, board):
+            neighbours = gamelogic.find_neighbours(elem, board)
+            for nb in neighbours:
                 if lengths_found[elem] - weight(board[elem], player) == lengths_found[nb]:
                     path_found.add(nb)
             visited.add(elem)
@@ -171,9 +177,8 @@ def max_value(state, depth, alpha, beta):
         return heuristic(state), None
     v = float('-inf')
     move = None
-    tiles_on_a_shortest_path = identify_tiles_on_path(state.board_config, state.player_turn)
 
-    for a in set(actions_available(state.board_config)).intersection(tiles_on_a_shortest_path):
+    for a in actions_to_explore(state.board_config):
         new_state = result_state(state, a)
         if new_state.is_terminal_state():
             return v, a
@@ -192,9 +197,7 @@ def min_value(state, depth, alpha, beta):
     v = float('inf')
     move = None
 
-    tiles_on_a_shortest_path = identify_tiles_on_path(state.board_config, state.player_turn)
-
-    for a in set(actions_available(state.board_config)).intersection(tiles_on_a_shortest_path):
+    for a in actions_to_explore(state.board_config):
         new_state = result_state(state, a)
         if new_state.is_terminal_state():
             return v, a
@@ -209,12 +212,53 @@ def min_value(state, depth, alpha, beta):
 
 def minimax_search(state):
     value, move = max_value(state, 0, float('-inf'), float('inf'))
+    if move is None:
+        print("minimax found no move. None returned")
     return move
 
 
+# very simple function to build bridges for initial gameplay
+def bridge_builder(state):
+    suggested_moves = []
+    for i in range(0, gamelogic.board_size):
+        for j in range(0, gamelogic.board_size):
+            if state.board_config[i, j] == state.player_turn:
+                candidates = [(i-1, j-1), (i-1, j+2), (i+1, j-2), (i+1, j+1)]
+                print("candidates: " + str(candidates))
+                for c in candidates:
+                    if c[0] < 0 or c[1] < 0 or c[0] >= gamelogic.board_size or c[1] >= gamelogic.board_size:
+                        print("candidate discarded as out of bounds: " + str(c))
+                        continue
+                    if state.board_config[c] != 0:
+                        print("candidate discarded as not empty: " + str(c))
+                        continue
+                    if has_opponent_neighbour(c, state):
+                        print("candidate discarded due to opponent neighbour: " + str(c))
+                        continue
+                    if c in identify_tiles_on_path(state.board_config, state.player_turn):
+                        return c
+                    suggested_moves.append(c)
+    suggested_moves = list(set(suggested_moves).intersection(identify_tiles_on_path(state.board_config, state.player_turn)))
+    print("suggested moves in bridge builder: " + str(suggested_moves))
+    if len(suggested_moves) == 0:
+        print("no moves found via bridge builder")
+        return None
+    return random.choice(suggested_moves)
 
 
+# the bridge builder takes too little concern in the position of the opponent.
+# what about a strategy that just tries to block as much as possible?
 
+def has_opponent_neighbour(pos, state):
+    r, c = pos
+    for i in [-1, 0, 1]:
+        for j in [-1, 0, 1]:
+            if i == j:
+                continue
 
+            if r + i < 0 or r + i >= state.board_config.shape[0] or c + j < 0 or c + j >= state.board_config.shape[0]:
+                continue
 
-
+            if state.board_config[r + i, c + j] == gamelogic.opponent(state.player_turn):
+                return True
+    return False

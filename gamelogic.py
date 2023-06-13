@@ -1,11 +1,12 @@
 import random
 import numpy as np
 import ai1
-from myModule import opponent
 
-board_size = 7
+board_size = 3
 
 board = np.zeros((board_size, board_size), dtype=int)
+
+no_elems = board_size * board_size
 
 cpu = 1
 
@@ -32,10 +33,10 @@ def findplayercolor(player):
 
 
 # for quickly and conveniently finding the player number of the opponent
-# def opponent(player):
-#     if player == 1:
-#         return 2
-#     return 1
+def opponent(player):
+    if player == 1:
+        return 2
+    return 1
 
 
 def make_actual_move(pos):
@@ -43,6 +44,7 @@ def make_actual_move(pos):
     global player_won
 
     # print(board[pos])
+    print("playerno: " + str(player_no))
     if is_empty(pos, board) and player_won is False and (multiplayer is False or player_no == client_no):
         # print("multiplayer: {} {}".format(multiplayer, client_no))
         board[pos] = player_no
@@ -52,7 +54,7 @@ def make_actual_move(pos):
         if has_player_won(player_no , board):
             print("Player {p} won!".format(p=findplayercolor(player_no)))
             player_won = True
-        player_no = (player_no % 2)+1
+        player_no = opponent(player_no)
     # else:
     #     print("Illegal move")
 
@@ -81,14 +83,29 @@ def make_cpu_move(random_move=False):
 
 
 def make_ai1_move():
+    global player_no
+    # first move is hard coded as it is computationally way too heavy
     if board[board.shape[0] // 2, board.shape[0] // 2] == 0:
         make_actual_move((board.shape[0] // 2, board.shape[0] // 2))
         return
-    # move = ai1.pick_action_most_wins(ai1.State(board, player))
-    move = ai1.minimax_search(ai1.State(board, player_no))
-    if move is None:
-        move = ai1.pick_action_most_wins(ai1.State(board, player_no))
-    make_actual_move(move)
+
+    state = ai1.State(board, player_no)
+
+    # uncomment to start with bridge builder strategy
+    # actions_explore = ai1.actions_to_explore(state)
+    # if len(actions_explore) > 15:
+    #     if ai1.bridge_builder(state) is not None:
+    #         move = ai1.bridge_builder(state)
+    #         make_actual_move(move)
+    #         return
+
+    move = ai1.minimax_search(state)
+    if move is not None:
+        make_actual_move(move)
+    else:
+        naive_moves = list(ai1.actions_to_explore(board))
+        move = random.choice(naive_moves)
+        make_actual_move(move)
 
 
 def get_random_empty_pos():
@@ -113,7 +130,7 @@ def get_random_empty_pos():
 
 
 # if a nonnegative value is specified when calling, only neighbours of that value are returned
-def find_neighbours(pos, board_in, value=-1):
+def find_neighbours(pos, board_in, value=-1, skipping=None):
     (r, c) = pos
     nset = set()
     # this loop will pass through all 8 neighbours of the array, plus the element itself ...
@@ -121,6 +138,9 @@ def find_neighbours(pos, board_in, value=-1):
         for j in [-1, 0, 1]:
             # ... however, a hexagon has at most 6 neighbours. The surplus elements are skipped by:
             if i == j:
+                continue
+
+            if skipping is not None and (r + i, c + j) in skipping:
                 continue
 
             # this handles the edge cases:
