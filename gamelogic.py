@@ -1,13 +1,13 @@
 import random
 import numpy as np
 import ai1
-from myModule import opponent
+# from myModule import opponent
 
 board_size = 7
 
 board = np.zeros((board_size, board_size), dtype=int)
 
-cpu = 1
+cpu = 0
 
 player_no = 1
 client_no = 0
@@ -32,10 +32,10 @@ def findplayercolor(player):
 
 
 # for quickly and conveniently finding the player number of the opponent
-# def opponent(player):
-#     if player == 1:
-#         return 2
-#     return 1
+def opponent(player):
+    if player == 1:
+        return 2
+    return 1
 
 
 def make_actual_move(pos):

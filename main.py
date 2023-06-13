@@ -8,6 +8,7 @@ import string
 
 import gamelogic
 import onlinelogic
+import export
 
 pygame.init()
 font = pygame.font.SysFont("Arial", 36)
@@ -464,50 +465,40 @@ def array_to_string(array):
 # the line bellow makes it so that the array_to_string function is used when printing the array or getting string version. Was used while testing
 # np.set_string_function(array_to_string, repr=False)
 
-def string_to_square_numpy_array(string):
+#TODO check size of array in this function maybe
+def string_to_square_numpy_array(input_string):
     # Split the string into integers and convert them to a numpy array
-    flat_array = np.array([int(elem) for elem in string.split()])
-
+    flat_array = np.array([int(elem) for elem in input_string.split()])
+    print("flat array is")
+    print(flat_array)
     # assumes that the  array is square
     # TODO if we are moving into none-square arrays another method will be needed
     array_size = int(np.sqrt(flat_array.size))
 
     # Reshape the flat array into a square array
     array = flat_array.reshape((array_size, array_size))
-
+    print("new array is")
+    print(array)
+    print(type(array))
     return array
-
-def export_board(board):
-    #TODO this is gonna be hard without some way 
-    alphabet = list(string.ascii_lowercase)
-    export_string = ""
-    print(alphabet)
-    print(alphabet[0])
-    pseudo_player = False
-    for i in board:
-        for j in board:
-            if board[i][j] == int(pseudo_player)+1:
-                export_string.append("[" + str(i) + "," + str(j) + "]" + "player" + int(pseudo_player+1))
-                pseudo_player = not pseudo_player
-            elif board[i][j] == 1:
-                export_string.append("[" + str(i) + "," + str(j) + "]" + "player" + int(pseudo_player+1))
-                pseudo_player = not pseudo_player
-    #TODO i also include the color and then i can switch between blue and red moves for the final print
-    pass
 
 # Checking the elements in arr are either 0,1,2 and that ther is only a difference of 1 in the ammount of player elements
 def is_board_legal(board):
     #perfect square calculations
     root = math.sqrt(board.size)
-    ceil = math.ceil(root)**2
-    floor = math.floor(root)**2
+    ceil = math.ceil(root)
+    floor = math.floor(root)
 
     #for player tile checking
     values, counts = np.unique(board, return_counts=True)
-    print(values)
-    print(counts)
     #we start by determining if the size is a perfect square
-    if not(ceil == floor == board.size):
+    print(board.size)
+    print(ceil)
+    print(floor)
+    print(root)
+    print(ceil == floor == root)
+    #TODO this is not working. a bad fix is hardcoding for the specific size we allow
+    if not(ceil == floor == root):
         print("board size is not a perfect square")
         return False
     #check if other values than 0,1,2 is in the array
@@ -526,26 +517,32 @@ def is_board_legal(board):
         if counts[1] >= 2:
             print("player 1 has too many tiles")
             return False
+        else:
+            #this is when the only move made is player 1
+            return True
     #same with player 2 but this time since player 1 always starts the number cant exceed 1
     elif len(values) < 3 and (0 in values and 2 in values):
         if counts[1] >= 1:
             print("player 2 has too many tiles")
             return False
+        else:
+            print("this should not be possible to reach 2")
+            return True
+        
+    elif len(values) < 3 and (1 in values and 2 in values):
+        #this is a case where the board we are trying to import is full
+        #TODO maybe give a prompt to the user that player x has won
+        print("player has won")
+        return False
     #checking if the difference between player tiles is larger than 1
     elif abs(counts[1] - counts[2]) >= 2:
         print("difference in player tiles is too big")
         return False
         
-    
     else:
         print("board is legal")
         return True   
     
-    #we can now check if the ammount of player tiles is correct
-    #TODO solve problem where a full board fucks up becuase len(values) no longer contains 0 so the difference between
-    #player tiles is calculated out of index
-
-
 def calculate_player_turn(board):
     values = np.unique(board)
     #absolute difference between player tiles (must not exceed 1)
@@ -671,7 +668,6 @@ while run:
                     if event.type == pygame.QUIT:
                         import_game = False
                         user_text = ""
-                        input_rect = pygame.Rect(0, 600, 400, 50)
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if input_rect.collidepoint(event.pos):
                             active = True
@@ -685,17 +681,22 @@ while run:
                         elif event.key == pygame.K_RETURN:
                             #TODO change the game logic boardsize
                             print("enter has been pressed")
-                            export_board(gamelogic.board)
-                            print(array_to_string(gamelogic.board))
                             placeholder_arr = string_to_square_numpy_array(user_text)
-                            #TODO check if the board is leagal (equal player moves)
+                            # print(array_to_string(gamelogic.board))
+                            #temporary fix for my dimension check #TODO remove this
+                            # try:
+                            #     placeholder_arr = string_to_square_numpy_array(user_text)
+
+                            # except:
+                            #     #TODO we need to prompt the user that the board was not successfully imported
+                            #     placeholder_arr = gamelogic.board
+                            #     print("wrong format, original board loaded")
+                                
                             import_game = False
                             #error handling
                             if (is_board_legal(placeholder_arr)):
                                 try:
                                     gamelogic.board = string_to_square_numpy_array(user_text)
-                                    print(gamelogic.board)
-                                    print(calculate_player_turn(gamelogic.board))
                                 except ValueError:
                                     print("wrong format")
                                     user_text = ""
@@ -705,7 +706,6 @@ while run:
                             else:
                                 print("board is illegal")
                                 # gamelogic.board = string_to_square_numpy_array(user_text)
-                                
                         # Unicode standard is used for string
                         else:
                             user_text += event.unicode
@@ -731,5 +731,12 @@ while run:
             if event.key == pygame.K_c:
                 # exporting game as a string to load
                 user_text = array_to_string(gamelogic.board)
+            elif event.key == pygame.K_v:
+                if(is_board_legal(gamelogic.board)):
+                    print(gamelogic.board)
+                    export.export_board(gamelogic.board)
+                    print("board exported")
+                else:
+                    print("board not legal")
     pygame.display.flip()
 pygame.quit()
