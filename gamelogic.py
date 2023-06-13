@@ -1,19 +1,29 @@
 import random
 import numpy as np
 import ai1
+import gamelogic
+import onlinelogic
+
+
+
+
+
+
+#from myModule import opponent
 
 board_size = 3
 
+x_offset = 76.5
+
 board = np.zeros((board_size, board_size), dtype=int)
 
-no_elems = board_size * board_size
-
-cpu = 1
+cpu = 0
 
 player_no = 1
 client_no = 0
 player_won = False
 multiplayer = False
+update_board = True
 move_list = list()
 
 
@@ -39,14 +49,15 @@ def opponent(player):
     return 1
 
 
-def make_actual_move(pos):
+def make_actual_move(pos, new_pos = False):
     global player_no
     global player_won
-
+    print(multiplayer)
+    print(onlinelogic.clientsocket)
     # print(board[pos])
-    print("playerno: " + str(player_no))
-    if is_empty(pos, board) and player_won is False and (multiplayer is False or player_no == client_no):
+    if is_empty(pos, gamelogic.board) and player_won is False and ((player_no == client_no or new_pos == True) and (client_no==2 or onlinelogic.clientsocket is not None) or multiplayer is False):
         # print("multiplayer: {} {}".format(multiplayer, client_no))
+        print(pos)
         board[pos] = player_no
         if multiplayer:
             move_list.append(pos)
