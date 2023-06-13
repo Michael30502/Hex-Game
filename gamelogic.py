@@ -1,6 +1,6 @@
 import random
 import numpy as np
-import ai1
+import ai
 import gamelogic
 import onlinelogic
 
@@ -85,7 +85,7 @@ def make_cpu_move(random_move=False):
             board[random_number] = player_no
     else:
         print(board)
-        move = ai1.minimax_search(ai1.State(board, player_no))
+        move = ai.minimax_search(ai.State(board, player_no))
         print(board)
         board[move] = player_no
         if has_player_won(player_no, board):
@@ -93,28 +93,35 @@ def make_cpu_move(random_move=False):
     player_no = opponent(player_no)
 
 
+# picks a random move on the current shortest path
 def make_ai1_move():
+    greedy_moves = ai.identify_tiles_on_path(board)
+    move = random.choice(greedy_moves)
+    make_actual_move(move)
+
+
+# considers moves that are both on own shortest path as well as blocking the opponent
+def make_ai2_move():
+    naive_moves = ai.actions_to_explore(board)
+    move = random.choice(naive_moves)
+    make_actual_move(move)
+
+
+# most difficult setting - actually thinks moves ahead
+def make_ai3_move():
     global player_no
     # first move is hard coded as it is computationally way too heavy
     if board[board.shape[0] // 2, board.shape[0] // 2] == 0:
         make_actual_move((board.shape[0] // 2, board.shape[0] // 2))
         return
 
-    state = ai1.State(board, player_no)
+    state = ai.State(board, player_no)
 
-    # uncomment to start with bridge builder strategy
-    # actions_explore = ai1.actions_to_explore(state)
-    # if len(actions_explore) > 15:
-    #     if ai1.bridge_builder(state) is not None:
-    #         move = ai1.bridge_builder(state)
-    #         make_actual_move(move)
-    #         return
-
-    move = ai1.minimax_search(state)
+    move = ai.minimax_search(state)
     if move is not None:
         make_actual_move(move)
     else:
-        naive_moves = list(ai1.actions_to_explore(board))
+        naive_moves = list(ai.actions_to_explore(board))
         move = random.choice(naive_moves)
         make_actual_move(move)
 

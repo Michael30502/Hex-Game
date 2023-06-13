@@ -347,9 +347,9 @@ class Board:
         border_thickness = 20
 
         self.draw_custom_line(self.surface, top_bottom_border_color, top_left_red, top_right_red, border_thickness, True)  # top
-        self.draw_custom_line(self.surface, top_bottom_border_color, bottom_left_red, bottom_right_red, border_thickness, True)  # bund
-        self.draw_custom_line(self.surface, sides_border_color, top_left, bottom_left, border_thickness, False)  # venstre
-        self.draw_custom_line(self.surface, sides_border_color, top_right, bottom_right, border_thickness, False)  # højre
+        self.draw_custom_line(self.surface, top_bottom_border_color, bottom_left_red, bottom_right_red, border_thickness, True)  # bottom
+        self.draw_custom_line(self.surface, sides_border_color, top_left, bottom_left, border_thickness, False)  # left
+        self.draw_custom_line(self.surface, sides_border_color, top_right, bottom_right, border_thickness, False)  # right
 
         for row in self.grid:
             for hexagon in row:

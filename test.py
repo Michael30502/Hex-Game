@@ -1,5 +1,5 @@
 import gamelogic
-import ai1
+import ai
 import numpy as np
 import cProfile
 

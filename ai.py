@@ -1,6 +1,5 @@
 import gamelogic
 import numpy as np
-import sys
 from collections import deque
 import random
 
