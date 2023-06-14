@@ -12,6 +12,7 @@ import export
 
 pygame.init()
 font = pygame.font.SysFont("Arial", 36)
+user_text = ""
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -412,6 +413,7 @@ class Game:
         self.board.make_grid()
         print("check")
         
+        global user_text
         # boardToDisplay = pygame.transform.scale_by(board_surface,0.7)
         #game_surface.blit(boardToDisplay, (51.2, 30))
         while self.running:
@@ -423,6 +425,9 @@ class Game:
                     exit_game()
                     self.running = False
                 if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_c:
+                        # exporting game as a string to load
+                        user_text = array_to_string(gamelogic.board)
                     if event.key == pygame.K_ESCAPE:
                         self.game_menu = True
 
@@ -431,6 +436,7 @@ class Game:
                     if(is_board_legal(gamelogic.board)):
                         print(gamelogic.board)
                         export.export_board(gamelogic.board)
+                        user_text = array_to_string(gamelogic.board)
                         with open('export.txt', 'a') as f:
                             f.write("\n")
                             f.write(array_to_string(gamelogic.board))
@@ -652,8 +658,9 @@ user_text = ''
 
 # create rectangle for input 
 input_rect = pygame.Rect(0, 210, WINDOWWIDTH, 32)
-color_passive = pygame.Color('chartreuse4')
-input_rect_color = color_passive
+input_rect_color = pygame.Color('chartreuse4')
+# color_passive = pygame.Color('chartreuse4')
+# input_rect_color = color_passive
 
 # takes gamelogic board and changes it
 # better name may be needed TODO
@@ -797,7 +804,7 @@ while run:
             action = True
         if ai_1_button.drawMenu(game_surface) and not action:
             print(cpu)
-            cpu = 1
+            cpu = 2 #TODO this need to be no hard coded if the change player works
             game_running = True
             second_menu = False
             print(cpu)
@@ -909,6 +916,9 @@ while run:
                         if event.key == pygame.K_BACKSPACE:
                             # delete character from string
                             user_text = user_text[:-1]
+
+                        elif event.key == pygame.key.get_mods():
+                            pass
                         elif event.key == pygame.K_RETURN:
                             #TODO change the game logic boardsize
                             #TODO make some variable to show that the game has been imported and let
@@ -936,6 +946,7 @@ while run:
                                 if (is_board_legal(placeholder_arr)):
                                     try:
                                         gamelogic.board = string_to_square_numpy_array(user_text)
+                                        print("board has been imported")
                                     except ValueError:
                                         print("wrong format")
                                         user_text = ""
@@ -945,7 +956,7 @@ while run:
                                     import_game = False
                                 else:
                                     print("board is illegal")
-                                print("board has been imported")
+                                
                                 # gamelogic.board = string_to_square_numpy_array(user_text)
                         # Unicode standard is used for string
                         else:
