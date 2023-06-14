@@ -22,7 +22,6 @@ RED = (255, 0, 0)
 
 FPS = 60
 
-cpu = gamelogic.cpu
 board_size_list = [3, 5, 7, 9, 11]
 full_board_size_list = []
 for elem in board_size_list:
@@ -149,7 +148,7 @@ def restart_game():
     game_surface.fill(WHITE)
     gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
     gamelogic.player_won = False
-    gamelogic.player_no = 1
+    gamelogic.player_no = gamelogic.default_starting_player
     game1.board.make_grid()
 
 
@@ -178,6 +177,7 @@ def exit_game():
     gamelogic.client_no = 0
     gamelogic.player_won = False
     gamelogic.multiplayer = False
+    gamelogic.local_multiplayer = False
 
 def draw_textbox(screen, rect, text):
     font = pygame.font.Font(None, 32)
@@ -216,10 +216,10 @@ class Button:
         # getting mouse pos
         mouse_pos = pygame.mouse.get_pos()
         if board1.grid is not None:
-            if gamelogic.board[self.unit[0]][self.unit[1]] == 1:
+            if gamelogic.board[self.unit[0]][self.unit[1]] == gamelogic.default_starting_player:
                 # print(board1.grid)
                 board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
-            elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
+            elif gamelogic.board[self.unit[0]][self.unit[1]] != 0:
                 board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
 
         # checking collision and clicked
@@ -260,9 +260,9 @@ class Button:
         # getting mouse pos
         mouse_pos = pygame.mouse.get_pos()
 
-        if gamelogic.board[self.unit[0]][self.unit[1]] == 1:
+        if gamelogic.board[self.unit[0]][self.unit[1]] == gamelogic.default_starting_player:
             board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
-        elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
+        elif gamelogic.board[self.unit[0]][self.unit[1]] != 0:
             board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
 
         # checking colision and clicked
@@ -498,7 +498,7 @@ class Game:
                 if gamelogic.update_board:
                     game1.board.draw_grid()
                 # print(gamelogic.has_any_won(gamelogic.board))
-                if gamelogic.player_no == cpu and not gamelogic.has_any_won(gamelogic.board):
+                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(gamelogic.board) and not gamelogic.multiplayer and not gamelogic.local_multiplayer:
                     self.unit = gamelogic.make_ai1_move()
                 else:
                     self.board.draw_grid()
@@ -579,6 +579,11 @@ class Game:
                                 gamelogic.board_size = int(command[2:])
                                 print(gamelogic.board_size)
                                 board1.size = gamelogic.board_size
+                                restart_game()
+                            elif command[1] == "p":
+                                gamelogic.default_starting_player = int(command[2:])
+                                print("current player = {}".format(gamelogic.default_starting_player))
+                                gamelogic.player_no = gamelogic.default_starting_player
                                 restart_game()
 
                         new_command = False
@@ -817,10 +822,11 @@ while run:
         if two_player_button.drawMenu(game_surface) and not action:
             game_running = True
             second_menu = False
+            gamelogic.local_multiplayer = True
             action = True
         if ai_1_button.drawMenu(game_surface) and not action:
             print(cpu)
-            cpu = 2 #TODO this need to be no hard coded if the change player works
+            #cpu = 2 #TODO this need to be no hard coded if the change player works
             game_running = True
             second_menu = False
             print(cpu)
@@ -882,6 +888,7 @@ while run:
         game1 = Game(game_surface, board1, 1)
         game1.play()
         game_running = False
+        print(gamelogic.player_no)
         if pause_game_button.drawMenu(game_surface):
                 game_paused = True
 
@@ -1001,8 +1008,14 @@ while run:
     if player_option == True:
         if player_1_button.drawMenu(game_surface):
             print('choose player 1')
+            gamelogic.default_starting_player = 1
+            gamelogic.cpu = 2
+            gamelogic.player_no = gamelogic.default_starting_player
         if player_2_button.drawMenu(game_surface):
             print('choose player 2')
+            gamelogic.default_starting_player = 2
+            gamelogic.cpu = 1
+            gamelogic.player_no = gamelogic.default_starting_player
         if go_back_button.drawMenu(game_surface):
             player_option = False
             setting_menu = True

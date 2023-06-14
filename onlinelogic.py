@@ -69,7 +69,14 @@ class serversocket:
         while len(value) < max_msg_len:
             value += " "
         clientsocket.send(bytes(value, "utf-8"))
+        value = "Sp" + str(gamelogic.default_starting_player)
+        while len(value) < max_msg_len:
+            value += " "
+        clientsocket.send(bytes(value, "utf-8"))
+
+
         print(clientsocket, address)
+
 
         while True:
             if shutdown:
