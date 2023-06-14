@@ -1,14 +1,12 @@
 import gamelogic
 import numpy as np
-import sys
 from collections import deque
 
 
 cut_off_depth = 2
 
-state_counter = 0
 
-
+# class used for managing states in the state space
 class State:
     def __init__(self, board_config, player_turn):
         self.board_config = board_config
@@ -21,60 +19,42 @@ class State:
         return "board in state: \n" + str(self.board_config)
 
 
-# generate the list of actions possible on the board
-def actions_available(board):
-    moves_list = []
-    for i in range(0, gamelogic.board_size):
-        for j in range(0, gamelogic.board_size):
-            if board[i, j] == 0:
-                moves_list.append((i, j))
-    return moves_list
-
-
+# utility function for generating the next state given a certain action
 def result_state(state, action):
-    # global state_counter
-    # state_counter += 1
-    # print(state_counter)
     next_player = gamelogic.opponent(state.player_turn)
     new_board = gamelogic.make_sim_move(action, state.board_config, next_player)
     return State(new_board, next_player)
 
 
-# currently assumes that AI is player 1
-def victory_counter(state, sum_so_far):
-    if gamelogic.has_player_won(1, state.board_config):
+# generate the list of relevant actions to consider, i.e. actions lying on the shortest path for both opponent and AI
+def actions_to_explore(board):
+    # identify the actions available
+    moves_list = []
+    for i in range(0, gamelogic.board_size):
+        for j in range(0, gamelogic.board_size):
+            if board[i, j] == 0:
+                moves_list.append((i, j))
+
+    # find the actions on the shortest paths in both directions
+    tiles_on_1_shortest_path = identify_tiles_on_path(board, 1)
+    tiles_on_2_shortest_path = identify_tiles_on_path(board, 2)
+    tiles_on_both_paths = tiles_on_1_shortest_path.intersection(tiles_on_2_shortest_path)
+    # the moves to explore are those that are both on a shortest path as well as actually legal
+    return set(moves_list).intersection(tiles_on_both_paths)
+
+
+# small utility function for interpreting array elements as nodes with edges in a graph
+def weight(elem, player):
+    if elem == 0:
         return 1
-    elif gamelogic.has_player_won(2, state.board_config):
-        return -1
-    res_list = []
-
-    tiles_on_a_shortest_path = identify_tiles_on_path(state.board_config, state.player_turn)
-
-    for a in set(actions_available(state.board_config)).intersection(tiles_on_a_shortest_path):
-        new_state = result_state(state, a)
-        res = victory_counter(new_state, sum_so_far)
-        res_list.append(res)
-    victories_found = sum(res_list)
-    return victories_found
+    elif elem == player:
+        return 0
+    else:
+        return float('inf')
 
 
-def pick_action_most_wins(state):
-    res_list = []
-    tiles_on_a_shortest_path = identify_tiles_on_path(state.board_config, state.player_turn)
-    print("tiles on shortest path:" + str(tiles_on_a_shortest_path))
-    remainder = set(actions_available(state.board_config)).intersection(tiles_on_a_shortest_path)
-    print("remainder: " + str(remainder))
-    for a in remainder:
-        new_state = result_state(state, a)
-        if new_state.is_terminal_state():
-            return a
-        res_list.append((victory_counter(new_state, 0), a))
-    print(res_list)
-    return max(res_list, key=lambda item: item[0])[1]
-
-
-# how do we measure how good a board is? Suggestion: Length of shortest path from one side to the other
-# Note that player 1 is always horizontal and player 2 always vertical
+# algorithm based on Dijkstra's shortest path
+# note that player 1 is always horizontal and player 2 always vertical
 def shortest_path(board, player):
     # initialise the matrix containing all lenghts found so far
     lengths_found = np.full(board.shape, float('inf'))
@@ -82,7 +62,6 @@ def shortest_path(board, player):
     frontier = deque()
     visited = set()
     # the first column can be immediatly set
-    # Empty tiles have cost 1, own tiles are free and enemy tiles are obstacles
     if player == 1:
         for i in range(0, board.shape[0]):
             lengths_found[i, 0] = weight(board[i, 0], player)
@@ -100,8 +79,7 @@ def shortest_path(board, player):
         visited.add(pos)
         if board[pos] == gamelogic.opponent(player):
             continue
-        neighs = gamelogic.find_neighbours(pos, board)
-        neighs = neighs.difference(visited)
+        neighs = gamelogic.find_neighbours(pos, board, skipping=visited)
         for n in neighs:
             frontier.append(n)
             if lengths_found[n] > lengths_found[pos] + weight(board[n], player):
@@ -120,17 +98,7 @@ def minimal_length_values(board, player):
         return min(lengths_found[board_size - 1, :])
 
 
-def weight(elem, player):
-    if elem == 0:
-        return 1
-    elif elem == player:
-        return 0
-    else:
-        return float('inf')
-
-
-# function for finding the tiles that are actually involved in the shortest path
-# hopefully this can save a lot of computation time
+# function for finding the tiles that are actually involved in some shortest path
 def identify_tiles_on_path(board, player):
     lengths_found = shortest_path(board, player)
     min_length_1 = minimal_length_values(board, 1)
@@ -149,31 +117,30 @@ def identify_tiles_on_path(board, player):
 
     while len(path_found - visited) > 0:
         for elem in path_found - visited:
-            for nb in gamelogic.find_neighbours(elem, board):
+            neighbours = gamelogic.find_neighbours(elem, board)
+            for nb in neighbours:
                 if lengths_found[elem] - weight(board[elem], player) == lengths_found[nb]:
                     path_found.add(nb)
             visited.add(elem)
     return path_found
 
 
-# IDEA shamelessly stolen from
-# https://gsurma.medium.com/hex-creating-intelligent-adversaries-part-2-heuristics-dijkstras-algorithm-597e4dcacf93
-# the heuristic should be: heuristic_score = remaining_opponent_hexes - remaining_cpu_hexes
-# currently assumes that AI is player 1
+# simple heuristic function to be used in the MiniMax algorithm with cut-off
 def heuristic(state):
     min_for_player_1 = minimal_length_values(state.board_config, 2)
     min_for_player_2 = minimal_length_values(state.board_config, 2)
     return min_for_player_1 - min_for_player_2
 
 
+# maximises the AI's score in the minimax algorithm
+# based upon the algorithms presented in [[[[book reference]]]]
 def max_value(state, depth, alpha, beta):
     if depth > min(cut_off_depth, state.board_config.shape[0] - 1) or state.is_terminal_state():
         return heuristic(state), None
     v = float('-inf')
     move = None
-    tiles_on_a_shortest_path = identify_tiles_on_path(state.board_config, state.player_turn)
 
-    for a in set(actions_available(state.board_config)).intersection(tiles_on_a_shortest_path):
+    for a in actions_to_explore(state.board_config):
         new_state = result_state(state, a)
         if new_state.is_terminal_state():
             return v, a
@@ -186,15 +153,15 @@ def max_value(state, depth, alpha, beta):
     return v, move
 
 
+# minimises the AI's score in the minimax algorithm
+# based upon the algorithms presented in [[[[book reference]]]]
 def min_value(state, depth, alpha, beta):
     if depth > min(cut_off_depth, state.board_config.shape[0] - 1) or state.is_terminal_state():
         return heuristic(state), None
     v = float('inf')
     move = None
 
-    tiles_on_a_shortest_path = identify_tiles_on_path(state.board_config, state.player_turn)
-
-    for a in set(actions_available(state.board_config)).intersection(tiles_on_a_shortest_path):
+    for a in actions_to_explore(state.board_config):
         new_state = result_state(state, a)
         if new_state.is_terminal_state():
             return v, a
@@ -207,14 +174,9 @@ def min_value(state, depth, alpha, beta):
     return v, move
 
 
+# starts the MiniMax search, returning the move to make
 def minimax_search(state):
     value, move = max_value(state, 0, float('-inf'), float('inf'))
+    if move is None:
+        print("minimax found no move. None returned")
     return move
-
-
-
-
-
-
-
-

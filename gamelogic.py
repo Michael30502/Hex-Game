@@ -1,17 +1,12 @@
 import random
 import numpy as np
-import ai1
+import ai
 import gamelogic
 import onlinelogic
 
-
-
-
-
-
 #from myModule import opponent
 
-board_size = 7
+board_size = 3
 
 x_offset = 76.5
 
@@ -49,25 +44,21 @@ def opponent(player):
     return 1
 
 
-def make_actual_move(pos, new_pos = False):
+def make_actual_move(pos, new_pos=False):
     global player_no
     global player_won
     print(multiplayer)
     print(onlinelogic.clientsocket)
-    # print(board[pos])
-    if is_empty(pos, gamelogic.board) and player_won is False and ((player_no == client_no or new_pos == True) and (client_no==2 or onlinelogic.clientsocket is not None) or multiplayer is False):
-        # print("multiplayer: {} {}".format(multiplayer, client_no))
-        print(pos)
+    if is_empty(pos, gamelogic.board) and player_won is False and \
+            ((player_no == client_no or new_pos) and
+             (client_no == 2 or onlinelogic.clientsocket is not None) or multiplayer is False):
         board[pos] = player_no
         if multiplayer:
             move_list.append(pos)
-        # print find_neighbours(pos)
-        if has_player_won(player_no , board):
+        if has_player_won(player_no, board):
             print("Player {p} won!".format(p=findplayercolor(player_no)))
             player_won = True
-        player_no = (player_no % 2)+1
-    # else:
-    #     print("Illegal move")
+        player_no = opponent(player_no)
 
 
 def make_sim_move(pos, board_in, player):
@@ -85,7 +76,7 @@ def make_cpu_move(random_move=False):
             board[random_number] = player_no
     else:
         print(board)
-        move = ai1.minimax_search(ai1.State(board, player_no))
+        move = ai.minimax_search(ai.State(board, player_no))
         print(board)
         board[move] = player_no
         if has_player_won(player_no, board):
@@ -93,15 +84,37 @@ def make_cpu_move(random_move=False):
     player_no = opponent(player_no)
 
 
+# picks a random move on the current shortest path
 def make_ai1_move():
+    greedy_moves = ai.identify_tiles_on_path(board)
+    move = random.choice(greedy_moves)
+    make_actual_move(move)
+
+
+# considers moves that are both on own shortest path as well as blocking the opponent
+def make_ai2_move():
+    naive_moves = ai.actions_to_explore(board)
+    move = random.choice(naive_moves)
+    make_actual_move(move)
+
+
+# most difficult setting - actually thinks moves ahead
+def make_ai3_move():
+    global player_no
+    # first move is hard coded as it is computationally way too heavy
     if board[board.shape[0] // 2, board.shape[0] // 2] == 0:
         make_actual_move((board.shape[0] // 2, board.shape[0] // 2))
         return
-    # move = ai1.pick_action_most_wins(ai1.State(board, player))
-    move = ai1.minimax_search(ai1.State(board, player_no))
-    if move is None:
-        move = ai1.pick_action_most_wins(ai1.State(board, player_no))
-    make_actual_move(move)
+
+    state = ai.State(board, player_no)
+
+    move = ai.minimax_search(state)
+    if move is not None:
+        make_actual_move(move)
+    else:
+        naive_moves = list(ai.actions_to_explore(board))
+        move = random.choice(naive_moves)
+        make_actual_move(move)
 
 
 def get_random_empty_pos():
@@ -126,7 +139,7 @@ def get_random_empty_pos():
 
 
 # if a nonnegative value is specified when calling, only neighbours of that value are returned
-def find_neighbours(pos, board_in, value=-1):
+def find_neighbours(pos, board_in, value=-1, skipping=None):
     (r, c) = pos
     nset = set()
     # this loop will pass through all 8 neighbours of the array, plus the element itself ...
@@ -134,6 +147,9 @@ def find_neighbours(pos, board_in, value=-1):
         for j in [-1, 0, 1]:
             # ... however, a hexagon has at most 6 neighbours. The surplus elements are skipped by:
             if i == j:
+                continue
+
+            if skipping is not None and (r + i, c + j) in skipping:
                 continue
 
             # this handles the edge cases:

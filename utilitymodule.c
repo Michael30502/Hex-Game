@@ -47,6 +47,25 @@ static PyObject* opponent(PyObject* self, PyObject* args)
     return Py_BuildValue("i", Copponent(playerno));
 }
 
+
+// Utility function to determine which weight is added to an edge when treating a board as a graph
+int Cweight(int elem, int playerno) {
+    if(elem==0) return 1;
+    if(elem==playerno) return 0;
+    return 1000;
+}
+
+static PyObject* weight(PyObject* self, PyObject* args)
+{
+    int elem, playerno;
+    if(!PyArg_ParseTuple(args, "ii", &elem, &playerno))
+        return NULL;
+    return Py_BuildValue("i", Cweight(elem, playerno));
+}
+
+
+
+
 // Our Module's Function Definition struct
 // We require this `NULL` to signal the end of our method
 // definition
@@ -54,6 +73,7 @@ static PyMethodDef myMethods[] = {
     { "helloworld", helloworld, METH_NOARGS, "Prints Hello World" },
     { "fib", fib, METH_VARARGS, "Computes the n'th fibonnachi number"},
     { "opponent", opponent, METH_VARARGS, "Quickly finds the opponent number"},
+    { "weight", weight, METH_VARARGS, "Utility for treating board as graph"},
     { NULL, NULL, 0, NULL }
 };
 

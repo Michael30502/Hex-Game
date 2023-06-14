@@ -1,12 +1,13 @@
 import gamelogic
-import ai1
+import ai
 import numpy as np
 import cProfile
 
-test_board = np.array([[0, 0, 0, 0],
-                       [0, 2, 0, 0],
-                       [1, 0, 1, 1],
-                       [0, 2, 2, 0]])
+test_board = np.array([[0, 0, 0, 0, 0],
+                       [0, 2, 0, 0, 1],
+                       [1, 0, 1, 1, 0],
+                       [0, 2, 2, 0, 2],
+                       [1, 2, 1, 0, 0]])
 
 print(gamelogic.board)
 
@@ -39,14 +40,26 @@ print(gamelogic.board)
 def foo():
     while not gamelogic.has_any_won(gamelogic.board):
         if gamelogic.player_no == 1:
+            print("AI turn")
             gamelogic.make_ai1_move()
             print(gamelogic.board)
         else:
+            print("Human turn")
             string_move = input('Make a move (in the format x, y):')
-            res = tuple(map(int, string_move.split(', ')))
-            gamelogic.make_actual_move(res)
+            # res = tuple(map(int, string_move.split(', ')))
+            gamelogic.make_actual_move(string_move)
 
 
 # test = test_board[3, -1]
 # print(test)
 cProfile.run('foo()')
+
+# def test_index(i, j, board):
+#     board[i - 1, j - 1] = 3
+#     board[i - 1, j + 2] = 3
+#     board[i + 1, j - 2] = 3
+#     board[i + 1, j + 1] = 3
+#     return board
+
+
+# print(test_index(2, 2, test_board))
