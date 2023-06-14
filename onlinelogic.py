@@ -7,8 +7,8 @@ import gamelogic
 clientsocket = None
 max_msg_len = 5
 shutdown = False
-ip_text = '82.211.207.108'
-port_text = 65535
+ip_text = '192.168.0.113'
+port_text = 7777
 
 class GameSocket:
 
@@ -19,6 +19,8 @@ class GameSocket:
             self.sock = sock
 
     def connect(self, host, port):
+        print(host)
+        print(port)
         self.sock.connect((host, port))
 
     def send(self, msg):
@@ -71,12 +73,6 @@ class serversocket:
 
         while True:
             if shutdown:
-                clientsocket.shutdown()
-                clientsocket.close()
-                clientsocket = None
-                serversocket.close()
-                serversocket.shutdown()
-                serversocket = None
                 shutdown = False
                 sys.exit()
 
