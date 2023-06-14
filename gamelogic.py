@@ -4,11 +4,6 @@ import ai
 import gamelogic
 import onlinelogic
 
-
-
-
-
-
 #from myModule import opponent
 
 board_size = 3
@@ -49,25 +44,21 @@ def opponent(player):
     return 1
 
 
-def make_actual_move(pos, new_pos = False):
+def make_actual_move(pos, new_pos=False):
     global player_no
     global player_won
     print(multiplayer)
     print(onlinelogic.clientsocket)
-    # print(board[pos])
-    if is_empty(pos, gamelogic.board) and player_won is False and ((player_no == client_no or new_pos == True) and (client_no==2 or onlinelogic.clientsocket is not None) or multiplayer is False):
-        # print("multiplayer: {} {}".format(multiplayer, client_no))
-        print(pos)
+    if is_empty(pos, gamelogic.board) and player_won is False and \
+            ((player_no == client_no or new_pos) and
+             (client_no == 2 or onlinelogic.clientsocket is not None) or multiplayer is False):
         board[pos] = player_no
         if multiplayer:
             move_list.append(pos)
-        # print find_neighbours(pos)
-        if has_player_won(player_no , board):
+        if has_player_won(player_no, board):
             print("Player {p} won!".format(p=findplayercolor(player_no)))
             player_won = True
         player_no = opponent(player_no)
-    # else:
-    #     print("Illegal move")
 
 
 def make_sim_move(pos, board_in, player):

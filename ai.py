@@ -1,14 +1,12 @@
 import gamelogic
 import numpy as np
 from collections import deque
-import random
 
 
 cut_off_depth = 2
 
-state_counter = 0
 
-
+# class used for managing states in the state space
 class State:
     def __init__(self, board_config, player_turn):
         self.board_config = board_config
@@ -21,65 +19,42 @@ class State:
         return "board in state: \n" + str(self.board_config)
 
 
-# generate the list of actions possible on the board
+# utility function for generating the next state given a certain action
+def result_state(state, action):
+    next_player = gamelogic.opponent(state.player_turn)
+    new_board = gamelogic.make_sim_move(action, state.board_config, next_player)
+    return State(new_board, next_player)
+
+
+# generate the list of relevant actions to consider, i.e. actions lying on the shortest path for both opponent and AI
 def actions_to_explore(board):
-    # actions available
+    # identify the actions available
     moves_list = []
     for i in range(0, gamelogic.board_size):
         for j in range(0, gamelogic.board_size):
             if board[i, j] == 0:
                 moves_list.append((i, j))
 
+    # find the actions on the shortest paths in both directions
     tiles_on_1_shortest_path = identify_tiles_on_path(board, 1)
     tiles_on_2_shortest_path = identify_tiles_on_path(board, 2)
     tiles_on_both_paths = tiles_on_1_shortest_path.intersection(tiles_on_2_shortest_path)
-    candidate_moves = set(moves_list).intersection(tiles_on_both_paths)
-    # while len(candidate_moves) > 7:
-    #     candidate_moves.remove(max(candidate_moves))
-    #     candidate_moves.remove(min(candidate_moves))
-    return candidate_moves
+    # the moves to explore are those that are both on a shortest path as well as actually legal
+    return set(moves_list).intersection(tiles_on_both_paths)
 
 
-def result_state(state, action):
-    # global state_counter
-    # state_counter += 1
-    # print(state_counter)
-    next_player = gamelogic.opponent(state.player_turn)
-    new_board = gamelogic.make_sim_move(action, state.board_config, next_player)
-    return State(new_board, next_player)
+# small utility function for interpreting array elements as nodes with edges in a graph
+def weight(elem, player):
+    if elem == 0:
+        return 1
+    elif elem == player:
+        return 0
+    else:
+        return float('inf')
 
 
-# currently assumes that AI is player 1
-# def victory_counter(state, sum_so_far):
-#     if gamelogic.has_player_won(1, state.board_config):
-#         return 1
-#     elif gamelogic.has_player_won(2, state.board_config):
-#         return -1
-#     res_list = []
-#
-#     print("actions_to_explore within victory counter: " + str(actions_to_explore(state)))
-#     for a in actions_to_explore(state):
-#         new_state = result_state(state, a)
-#         res = victory_counter(new_state, sum_so_far)
-#         res_list.append(res)
-#     victories_found = sum(res_list)
-#     return victories_found
-
-
-# def pick_action_most_wins(state):
-#     res_list = []
-#     print("actions to explore in pick most wins: " + str(actions_to_explore(state)))
-#     for a in actions_to_explore(state):
-#         new_state = result_state(state, a)
-#         if new_state.is_terminal_state():
-#             return a
-#         res_list.append((victory_counter(new_state, 0), a))
-#     print(res_list)
-#     return max(res_list, key=lambda item: item[0])[1]
-
-
-# how do we measure how good a board is? Suggestion: Length of shortest path from one side to the other
-# Note that player 1 is always horizontal and player 2 always vertical
+# algorithm based on Dijkstra's shortest path
+# note that player 1 is always horizontal and player 2 always vertical
 def shortest_path(board, player):
     # initialise the matrix containing all lenghts found so far
     lengths_found = np.full(board.shape, float('inf'))
@@ -87,7 +62,6 @@ def shortest_path(board, player):
     frontier = deque()
     visited = set()
     # the first column can be immediatly set
-    # Empty tiles have cost 1, own tiles are free and enemy tiles are obstacles
     if player == 1:
         for i in range(0, board.shape[0]):
             lengths_found[i, 0] = weight(board[i, 0], player)
@@ -124,17 +98,7 @@ def minimal_length_values(board, player):
         return min(lengths_found[board_size - 1, :])
 
 
-def weight(elem, player):
-    if elem == 0:
-        return 1
-    elif elem == player:
-        return 0
-    else:
-        return float('inf')
-
-
-# function for finding the tiles that are actually involved in the shortest path
-# hopefully this can save a lot of computation time
+# function for finding the tiles that are actually involved in some shortest path
 def identify_tiles_on_path(board, player):
     lengths_found = shortest_path(board, player)
     min_length_1 = minimal_length_values(board, 1)
@@ -161,16 +125,15 @@ def identify_tiles_on_path(board, player):
     return path_found
 
 
-# IDEA shamelessly stolen from
-# https://gsurma.medium.com/hex-creating-intelligent-adversaries-part-2-heuristics-dijkstras-algorithm-597e4dcacf93
-# the heuristic should be: heuristic_score = remaining_opponent_hexes - remaining_cpu_hexes
-# currently assumes that AI is player 1
+# simple heuristic function to be used in the MiniMax algorithm with cut-off
 def heuristic(state):
     min_for_player_1 = minimal_length_values(state.board_config, 2)
     min_for_player_2 = minimal_length_values(state.board_config, 2)
     return min_for_player_1 - min_for_player_2
 
 
+# maximises the AI's score in the minimax algorithm
+# based upon the algorithms presented in [[[[book reference]]]]
 def max_value(state, depth, alpha, beta):
     if depth > min(cut_off_depth, state.board_config.shape[0] - 1) or state.is_terminal_state():
         return heuristic(state), None
@@ -190,6 +153,8 @@ def max_value(state, depth, alpha, beta):
     return v, move
 
 
+# minimises the AI's score in the minimax algorithm
+# based upon the algorithms presented in [[[[book reference]]]]
 def min_value(state, depth, alpha, beta):
     if depth > min(cut_off_depth, state.board_config.shape[0] - 1) or state.is_terminal_state():
         return heuristic(state), None
@@ -209,55 +174,9 @@ def min_value(state, depth, alpha, beta):
     return v, move
 
 
+# starts the MiniMax search, returning the move to make
 def minimax_search(state):
     value, move = max_value(state, 0, float('-inf'), float('inf'))
     if move is None:
         print("minimax found no move. None returned")
     return move
-
-
-# very simple function to build bridges for initial gameplay
-def bridge_builder(state):
-    suggested_moves = []
-    for i in range(0, gamelogic.board_size):
-        for j in range(0, gamelogic.board_size):
-            if state.board_config[i, j] == state.player_turn:
-                candidates = [(i-1, j-1), (i-1, j+2), (i+1, j-2), (i+1, j+1)]
-                print("candidates: " + str(candidates))
-                for c in candidates:
-                    if c[0] < 0 or c[1] < 0 or c[0] >= gamelogic.board_size or c[1] >= gamelogic.board_size:
-                        print("candidate discarded as out of bounds: " + str(c))
-                        continue
-                    if state.board_config[c] != 0:
-                        print("candidate discarded as not empty: " + str(c))
-                        continue
-                    if has_opponent_neighbour(c, state):
-                        print("candidate discarded due to opponent neighbour: " + str(c))
-                        continue
-                    if c in identify_tiles_on_path(state.board_config, state.player_turn):
-                        return c
-                    suggested_moves.append(c)
-    suggested_moves = list(set(suggested_moves).intersection(identify_tiles_on_path(state.board_config, state.player_turn)))
-    print("suggested moves in bridge builder: " + str(suggested_moves))
-    if len(suggested_moves) == 0:
-        print("no moves found via bridge builder")
-        return None
-    return random.choice(suggested_moves)
-
-
-# the bridge builder takes too little concern in the position of the opponent.
-# what about a strategy that just tries to block as much as possible?
-
-def has_opponent_neighbour(pos, state):
-    r, c = pos
-    for i in [-1, 0, 1]:
-        for j in [-1, 0, 1]:
-            if i == j:
-                continue
-
-            if r + i < 0 or r + i >= state.board_config.shape[0] or c + j < 0 or c + j >= state.board_config.shape[0]:
-                continue
-
-            if state.board_config[r + i, c + j] == gamelogic.opponent(state.player_turn):
-                return True
-    return False
