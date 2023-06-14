@@ -7,6 +7,8 @@ import gamelogic
 clientsocket = None
 max_msg_len = 5
 shutdown = False
+ip_text = '82.211.207.108'
+port_text = 65535
 
 class GameSocket:
 
@@ -53,7 +55,7 @@ class serversocket:
         # bind the socket to a public host, and a well-known port
         # serversocket.bind((socket.gethostname(), 25565))
         serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        serversocket.bind((socket.gethostname(), 25565))
+        serversocket.bind((socket.gethostname(), port_text))
         print(socket.gethostname())
         # become a server socket
         serversocket.listen(1)

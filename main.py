@@ -810,6 +810,43 @@ while run:
             print(cpu)
             action = True
         if ai_2_button.drawMenu(game_surface) and not action:
+            print('Playing gainst bot 2')
+        if ai_3_button.drawMenu(game_surface) and not action:
+            print('playing against bot 3')
+            action = True
+        if play_online_button.drawMenu(game_surface) and not action:
+            online_menu = True
+            second_menu = False
+            print('joining a server')
+            action = True
+        if go_back_button.drawMenu(game_surface) and not action:
+            first_menu = True
+            second_menu = False
+            action = True
+            
+    if online_menu == True:
+        input_box = pygame.Rect(200, 210, 243, 32)
+        ip_text = onlinelogic.ip_text
+        draw_textbox(game_surface, input_box, onlinelogic.ip_text)
+        if go_back_button.drawMenu(game_surface) and not action:
+            second_menu = True
+            online_menu = False
+        if join_game_button.drawMenu(game_surface) and not action:
+            #try:
+            # ipv4
+            connection = onlinelogic.GameSocket()
+            connection.connect('82.211.207.108', onlinelogic.port_text)
+            game_running = True
+            second_menu = False
+            receive_thread_client = threading.Thread(target=receive_wait, args=(2,))
+            receive_thread_client.start()
+            gamelogic.client_no = 2
+            gamelogic.multiplayer = True
+
+            #except:
+            #    print("Connection not made")
+
+        if host_game_button.drawMenu(game_surface) and not action:
             print('hosting a server')
             running_thread_server = threading.Thread(target=server_thread)
             running_thread_server.start()
@@ -821,45 +858,6 @@ while run:
             second_menu = False
             gamelogic.multiplayer = True
             action = True
-        if ai_3_button.drawMenu(game_surface) and not action:
-            print('playing against bot 1')
-            action = True
-        if play_online_button.drawMenu(game_surface) and not action:
-            online_menu = True
-            second_menu = False
-            print('joining a server')
-
-            try:
-                # ipv4
-                connection = onlinelogic.GameSocket()
-                connection.connect("10.209.175.124", 25565)
-                game_running = True
-                second_menu = False
-                receive_thread_client = threading.Thread(target=receive_wait, args=(2,))
-                receive_thread_client.start()
-                gamelogic.client_no = 2
-                gamelogic.multiplayer = True
-
-            except:
-                print("Connection not made")
-
-            action = True
-        if go_back_button.drawMenu(game_surface) and not action:
-            first_menu = True
-            second_menu = False
-            action = True
-            
-    if online_menu == True:
-        input_box = pygame.Rect(200, 210, 243, 32)
-        text = ''
-        draw_textbox(game_surface, input_box, text)
-        if go_back_button.drawMenu(game_surface) and not action:
-            second_menu = True
-            online_menu = False
-        if join_game_button.drawMenu(game_surface) and not action:
-            print('join game')
-        if host_game_button.drawMenu(game_surface) and not action:
-            print('host game')
 
     if game_running == True:
         board1 = Board(hexagon1, gamelogic.board_size, game_surface)
@@ -1010,12 +1008,13 @@ while run:
                 else:
                     print("board not legal")
             elif event.key == pygame.K_RETURN:
-                print(text)
-                text = ''
+                print(user_text)
+                user_text = ''
+
             elif event.key == pygame.K_BACKSPACE:
-                text = text[:-1]
+                user_text = user_text[:-1]
             else:
-                text += event.unicode
+                user_text += event.unicode
 
     pygame.display.flip()
 
