@@ -12,12 +12,14 @@ x_offset = 76.5
 
 board = np.zeros((board_size, board_size), dtype=int)
 
-cpu = 0
+cpu = 2
 
 player_no = 1
+default_starting_player = 1
 client_no = 0
 player_won = False
 multiplayer = False
+local_multiplayer = False
 update_board = True
 move_list = list()
 
@@ -31,9 +33,9 @@ def is_empty(pos, board_in):
 
 
 def findplayercolor(player):
-    if player == 1:
+    if player == default_starting_player:
         return "blue"
-    if player == 2:
+    else:
         return "red"
 
 
@@ -93,7 +95,7 @@ def make_ai1_move():
 
 # considers moves that are both on own shortest path as well as blocking the opponent
 def make_ai2_move():
-    naive_moves = ai.actions_to_explore(board)
+    naive_moves = list(ai.actions_to_explore(board))
     move = random.choice(naive_moves)
     make_actual_move(move)
 

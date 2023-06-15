@@ -30,8 +30,8 @@ def result_state(state, action):
 def actions_to_explore(board):
     # identify the actions available
     moves_list = []
-    for i in range(0, gamelogic.board_size):
-        for j in range(0, gamelogic.board_size):
+    for i in range(0, board.shape[0]):
+        for j in range(0, board.shape[0]):
             if board[i, j] == 0:
                 moves_list.append((i, j))
 
@@ -99,18 +99,18 @@ def minimal_length_values(board, player):
 
 
 # function for finding the tiles that are actually involved in some shortest path
-def identify_tiles_on_path(board, player):
-    lengths_found = shortest_path(board, player)
+def identify_tiles_on_path(board, player_no):
+    lengths_found = shortest_path(board, player_no)
     min_length_1 = minimal_length_values(board, 1)
     min_length_2 = minimal_length_values(board, 2)
     board_size = board.shape[0]
     path_found = set()
     visited = set()
-    if player == 1:
+    if player_no == 1:
         for i in range(0, board_size):
             if lengths_found[i, board_size - 1] == min_length_1:
                 path_found.add((i, board_size - 1))
-    elif player == 2:
+    elif player_no == 2:
         for i in range(0, board_size):
             if lengths_found[board_size - 1, i] == min_length_2:
                 path_found.add((board_size - 1, i))
@@ -119,7 +119,7 @@ def identify_tiles_on_path(board, player):
         for elem in path_found - visited:
             neighbours = gamelogic.find_neighbours(elem, board)
             for nb in neighbours:
-                if lengths_found[elem] - weight(board[elem], player) == lengths_found[nb]:
+                if lengths_found[elem] - weight(board[elem], player_no) == lengths_found[nb]:
                     path_found.add(nb)
             visited.add(elem)
     return path_found

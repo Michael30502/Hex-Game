@@ -7,6 +7,8 @@ import gamelogic
 clientsocket = None
 max_msg_len = 5
 shutdown = False
+ip_text = '192.168.0.113'
+port_text = 7777
 
 class GameSocket:
 
@@ -17,6 +19,8 @@ class GameSocket:
             self.sock = sock
 
     def connect(self, host, port):
+        print(host)
+        print(port)
         self.sock.connect((host, port))
 
     def send(self, msg):
@@ -53,7 +57,7 @@ class serversocket:
         # bind the socket to a public host, and a well-known port
         # serversocket.bind((socket.gethostname(), 25565))
         serversocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        serversocket.bind((socket.gethostname(), 25565))
+        serversocket.bind((socket.gethostname(), port_text))
         print(socket.gethostname())
         # become a server socket
         serversocket.listen(1)
@@ -65,16 +69,17 @@ class serversocket:
         while len(value) < max_msg_len:
             value += " "
         clientsocket.send(bytes(value, "utf-8"))
+        value = "Sp" + str(gamelogic.default_starting_player)
+        while len(value) < max_msg_len:
+            value += " "
+        clientsocket.send(bytes(value, "utf-8"))
+
+
         print(clientsocket, address)
+
 
         while True:
             if shutdown:
-                clientsocket.shutdown()
-                clientsocket.close()
-                clientsocket = None
-                serversocket.close()
-                serversocket.shutdown()
-                serversocket = None
                 shutdown = False
                 sys.exit()
 
