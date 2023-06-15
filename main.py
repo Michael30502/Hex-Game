@@ -118,7 +118,7 @@ def receive_wait(client_no):
     new_command = None
 
     while True:
-        if gamelogic.multiplayer == False:
+        if not gamelogic.multiplayer:
             print("multiplayer off")
 
             sys.exit()
@@ -474,8 +474,8 @@ class Game:
                         self.game_menu = True
 
             if self.paused:
-                if export_game_button.drawMenu(game_surface):
-                    if (is_board_legal(gamelogic.board)):
+                if export_game_button.draw_menu(game_surface):
+                    if is_board_legal(gamelogic.board):
                         print(gamelogic.board)
                         export.export_board(gamelogic.board)
                         user_text = array_to_string(gamelogic.board)
@@ -486,15 +486,15 @@ class Game:
                     else:
                         print("board is not legal and cant be exported ")
                     self.paused = False
-                if go_back_button.drawMenu(game_surface):
+                if go_back_button.draw_menu(game_surface):
                     self.paused = False
                 self.board.draw_grid()
-                if exit_game_button.drawMenu(game_surface):
+                if exit_game_button.draw_menu(game_surface):
                     exit_game()
             if not self.paused:
                 # game_surface.fill(YELLOW)
                 if not gamelogic.has_any_won(gamelogic.board):
-                    if pause_game_button.drawMenu(game_surface):
+                    if pause_game_button.draw_menu(game_surface):
                         self.paused = True
                 if gamelogic.client_no == 1 and gamelogic.multiplayer:
                     if running_thread_server is not None:
@@ -508,11 +508,14 @@ class Game:
                 if gamelogic.update_board:
                     game1.board.draw_grid()
                 # print(gamelogic.has_any_won(gamelogic.board))
-                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(gamelogic.board) and not gamelogic.multiplayer and ai_difficulty ==1:
+                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(
+                        gamelogic.board) and not gamelogic.multiplayer and ai_difficulty == 1:
                     self.unit = gamelogic.make_ai1_move()
-                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(gamelogic.board) and not gamelogic.multiplayer and ai_difficulty == 2:
+                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(
+                        gamelogic.board) and not gamelogic.multiplayer and ai_difficulty == 2:
                     self.unit = gamelogic.make_ai2_move()
-                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(gamelogic.board) and not gamelogic.multiplayer and ai_difficulty == 3:
+                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(
+                        gamelogic.board) and not gamelogic.multiplayer and ai_difficulty == 3:
                     self.unit = gamelogic.make_ai3_move()
                 else:
                     self.board.draw_grid()
@@ -521,18 +524,18 @@ class Game:
                             text2 = font.render("Player 1 has won", True, BLACK)
                         elif gamelogic.has_player_won(2, gamelogic.board):
                             text2 = font.render("Player 2 has won", True, BLACK)
-                        textRect2 = text2.get_rect()
-                        textRect2.center = (100, 100)
+                        text_rect2 = text2.get_rect()
+                        text_rect2.center = (100, 100)
                         game_surface.blit(text2, [195, 200])
                         if not gamelogic.multiplayer or gamelogic.client_no == 1:
 
-                            if main_menu_button.drawMenu(game_surface):
+                            if main_menu_button.draw_menu(game_surface):
                                 if gamelogic.multiplayer:
                                     onlinelogic.clientsocket.send(bytes("exitt", 'utf-8'))
 
                                 exit_game()
 
-                            if play_again_button.drawMenu(game_surface):
+                            if play_again_button.draw_menu(game_surface):
                                 if gamelogic.multiplayer:
                                     onlinelogic.clientsocket.send((bytes("contt", 'utf-8')))
 
@@ -572,12 +575,11 @@ class Game:
                             onlinelogic.clientsocket.send(bytes(value, 'utf-8'))
                             gamelogic.move_list.clear()
 
-
                     elif onlinelogic.clientsocket is None and gamelogic.client_no == 1:
                         # print("checks")
                         text2 = font.render("Waiting for player...", True, BLACK)
-                        textRect2 = text2.get_rect()
-                        textRect2.center = (100, 100)
+                        text_rect2 = text2.get_rect()
+                        text_rect2.center = (100, 100)
                         game_surface.blit(text2, [200, 420])
 
                     if new_command:
@@ -631,14 +633,14 @@ class MenuButton:
         self.rect.topleft = (x, y)
         self.clicked = False
 
-    def drawMenu(self, surface):
+    def draw_menu(self, surface):
         action = False
         # get mouse position
         pos = pygame.mouse.get_pos()
 
         # check mouseover and clicked conditions
         if self.rect.collidepoint(pos):
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 self.clicked = True
                 action = True
 
@@ -687,7 +689,6 @@ clock = pygame.time.Clock()
 
 # basic font for user typed
 base_font = pygame.font.Font(None, 32)
-user_text = ''
 
 # create rectangle for input 
 input_rect = pygame.Rect(0, 210, WINDOWWIDTH, 32)
@@ -712,8 +713,9 @@ def array_to_string(array):
     return " ".join(str(elem) for elem in array.flat)
 
 
-# the line bellow makes it so that the array_to_string function is used when printing the array or getting string version. Was used while testing
-# np.set_string_function(array_to_string, repr=False)
+# the line bellow makes it so that the array_to_string function is used when printing the array or getting string
+# version. Was used while testing np.set_string_function(array_to_string, repr=False)
+
 
 # TODO check size of array in this function maybe
 def string_to_square_numpy_array(input_string):
@@ -733,21 +735,22 @@ def string_to_square_numpy_array(input_string):
     return array
 
 
-# Checking the elements in arr are either 0,1,2 and that ther is only a difference of 1 in the ammount of player elements
+# Checking the elements in arr are either 0,1,2 and that ther is only a difference of 1 in the ammount of player
+# elements
 def is_board_legal(board):
     # for player tile checking
     values, counts = np.unique(board, return_counts=True)
     # we start by determining if the size is a perfect square
     # TODO this is not working. a bad fix is hardcoding for the specific size we allow
     # check if other values than 0,1,2 is in the array
-    if (np.amax(board) > 2):
+    if np.amax(board) > 2:
         print(" wrong values in array, entries cant be larger than 2")
         return False
-    elif (np.amin(board) < 0):
+    elif np.amin(board) < 0:
         print(" wrong values in array, entries cant be smaller than 0")
         return False
     # checks if the boards only contains 0's
-    elif (len(values) < 2):
+    elif len(values) < 2:
         print("board is empty but legal")
         return True
     # if player 1 has more or equal 2 tiles while player 2 has 0 board is illegal
@@ -817,31 +820,31 @@ def server_thread():
 while run:
     game_surface.fill((200, 200, 255))
 
-    if first_menu == True:
-        if start_game_button.drawMenu(game_surface):
+    if first_menu:
+        if start_game_button.draw_menu(game_surface):
             print('first menu')
             second_menu = True
             first_menu = False
             action = True
             gamelogic.multiplayer = False
             gamelogic.player_won = False
-        if settings_button.drawMenu(game_surface):
+        if settings_button.draw_menu(game_surface):
             first_menu = False
             setting_menu = True
             action = True
 
-    if second_menu == True:
+    if second_menu:
         game_surface.blit(Drone_Bee_img, (140, 175))
         game_surface.blit(Worker_Bee_img, (450, 250))
         game_surface.blit(Queen_Bee_img, (140, 325))
 
-        if two_player_button.drawMenu(game_surface) and not action:
+        if two_player_button.draw_menu(game_surface) and not action:
             game_running = True
             second_menu = False
             gamelogic.local_multiplayer = True
             action = True
-        if ai_1_button.drawMenu(game_surface) and not action:
-            #print(cpu)
+        if ai_1_button.draw_menu(game_surface) and not action:
+            # print(cpu)
             gamelogic.cpu = 2
             ai_difficulty = 1
             # cpu = 2 #TODO this need to be no hard coded if the change player works
@@ -849,37 +852,37 @@ while run:
             second_menu = False
             # print(cpu)
             action = True
-        if ai_2_button.drawMenu(game_surface) and not action:
+        if ai_2_button.draw_menu(game_surface) and not action:
             gamelogic.cpu = 2
             ai_difficulty = 2
             game_running = True
             second_menu = False
             print('Playing gainst bot 2')
-        if ai_3_button.drawMenu(game_surface) and not action:
+        if ai_3_button.draw_menu(game_surface) and not action:
             gamelogic.cpu = 2
             ai_difficulty = 3
             game_running = True
             second_menu = False
             print('playing against bot 3')
             action = True
-        if play_online_button.drawMenu(game_surface) and not action:
+        if play_online_button.draw_menu(game_surface) and not action:
             online_menu = True
             second_menu = False
             print('joining a server')
             action = True
-        if go_back_button.drawMenu(game_surface) and not action:
+        if go_back_button.draw_menu(game_surface) and not action:
             first_menu = True
             second_menu = False
             action = True
 
-    if online_menu == True:
+    if online_menu:
         input_box = pygame.Rect(200, 210, 243, 32)
         ip_text = onlinelogic.ip_text
         draw_textbox(game_surface, input_box, onlinelogic.ip_text)
-        if go_back_button.drawMenu(game_surface) and not action:
+        if go_back_button.draw_menu(game_surface) and not action:
             second_menu = True
             online_menu = False
-        if join_game_button.drawMenu(game_surface) and not action:
+        if join_game_button.draw_menu(game_surface) and not action:
             try:
                 connection = onlinelogic.GameSocket()
                 connection.connect(onlinelogic.ip_text, onlinelogic.port_text)
@@ -895,7 +898,7 @@ while run:
             except:
                 print("Connection not made")
 
-        if host_game_button.drawMenu(game_surface) and not action:
+        if host_game_button.draw_menu(game_surface) and not action:
             online_menu = False
             print('hosting a server')
             gamelogic.multiplayer = True
@@ -909,31 +912,31 @@ while run:
             second_menu = False
             action = True
 
-    if game_running == True:
+    if game_running:
         board1 = Board(hexagon1, gamelogic.board_size, game_surface)
         game1 = Game(game_surface, board1, 1)
         game1.play()
         game_running = False
         print(gamelogic.player_no)
-        if pause_game_button.drawMenu(game_surface):
+        if pause_game_button.draw_menu(game_surface):
             game_paused = True
 
-        if game_paused == True:
-            if export_game_button.drawMenu(game_surface):
+        if game_paused:
+            if export_game_button.draw_menu(game_surface):
                 print('ExportGame')
                 game_paused = False
 
-            if go_back_button.drawMenu(game_surface):
+            if go_back_button.draw_menu(game_surface):
                 game_paused = False
         first_menu = True
 
-    if setting_menu == True:
+    if setting_menu:
 
         text = font.render(str(gamelogic.board_size), True, WHITE)
         textRect = text.get_rect()
         textRect.center = (100, 100)
         game_surface.blit(text, [450, 160])
-        if change_board_size_button.drawMenu(game_surface) and not action:
+        if change_board_size_button.draw_menu(game_surface) and not action:
 
             board_size += 1
             if board_size >= len(board_size_list):
@@ -943,10 +946,10 @@ while run:
             gamelogic.board_size = board_size_list[board_size]
             gamelogic.board = np.zeros((board_size_list[board_size], board_size_list[board_size]), dtype=int)
 
-        if import_game_button.drawMenu(game_surface):
+        if import_game_button.draw_menu(game_surface):
             import_game = True
 
-            while (import_game):
+            while import_game:
 
                 for event in pygame.event.get():
                     # quit game
@@ -974,7 +977,7 @@ while run:
                             # the function "calculate_player" determine whos turn it is
                             user_text_size = user_text.split()
                             # print(len(user_text_size))
-                            if (len(user_text_size) not in full_board_size_list):
+                            if len(user_text_size) not in full_board_size_list:
                                 print("board size is not a perfect square ")
                                 print("please try again")
                                 import_game = False
@@ -992,7 +995,7 @@ while run:
                             else:
 
                                 placeholder_arr = string_to_square_numpy_array(user_text)
-                                if (is_board_legal(placeholder_arr)):
+                                if is_board_legal(placeholder_arr):
                                     try:
                                         gamelogic.board = string_to_square_numpy_array(user_text)
                                         print("board has been imported")
@@ -1020,25 +1023,25 @@ while run:
                 input_rect.w = max(100, text_surface.get_width() + 1000)
                 pygame.display.flip()
                 clock.tick(60)
-        if change_player_button.drawMenu(game_surface):
+        if change_player_button.draw_menu(game_surface):
             setting_menu = False
             player_option = True
             print('import saved game')
 
-        if go_back_button.drawMenu(game_surface):
+        if go_back_button.draw_menu(game_surface):
             setting_menu = False
             first_menu = True
 
-    if player_option == True:
-        if player_1_button.drawMenu(game_surface):
+    if player_option:
+        if player_1_button.draw_menu(game_surface):
             print('choose player 1')
             gamelogic.default_starting_player = 1
             gamelogic.player_no = gamelogic.default_starting_player
-        if player_2_button.drawMenu(game_surface):
+        if player_2_button.draw_menu(game_surface):
             print('choose player 2')
             gamelogic.default_starting_player = 2
             gamelogic.player_no = gamelogic.default_starting_player
-        if go_back_button.drawMenu(game_surface):
+        if go_back_button.draw_menu(game_surface):
             player_option = False
             setting_menu = True
 
@@ -1054,7 +1057,7 @@ while run:
                 # exporting game as a string to load
                 user_text = array_to_string(gamelogic.board)
             elif event.key == pygame.K_v:
-                if (is_board_legal(gamelogic.board)):
+                if is_board_legal(gamelogic.board):
                     print(gamelogic.board)
                     export.export_board(gamelogic.board)
                     print("board exported")
