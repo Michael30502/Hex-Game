@@ -1,6 +1,0 @@
-setup.py
-utilitymodule.c
-myModule.egg-info/PKG-INFO
-myModule.egg-info/SOURCES.txt
-myModule.egg-info/dependency_links.txt
-myModule.egg-info/top_level.txt
