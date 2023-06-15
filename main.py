@@ -14,7 +14,7 @@ import onlinelogic
 import export
 
 pygame.init()
-font = pygame.font.SysFont("Arial", 36)
+font = pygame.font.SysFont("Arial", 32)
 user_text = ""
 # LINJER 446 og 455 kan gøre baggrund om til hvid
 WHITE = (255, 255, 255)
@@ -47,7 +47,7 @@ game_paused = False
 game_finished = False
 player_option = False
 online_menu = False
-
+imported = False
 
 # Surface/Screen size (this shoudl be scaleable
 # WIDTH, HEIGHT = 768, 466
@@ -682,9 +682,6 @@ clock = pygame.time.Clock()
 # it will display on screen
 
 # basic font for user typed
-base_font = pygame.font.Font(None, 32)
-user_text = ''
-
 # create rectangle for input 
 input_rect = pygame.Rect(0, 210, WINDOWWIDTH, 32)
 input_rect_color = pygame.Color('chartreuse4')
@@ -898,13 +895,22 @@ while run:
             action = True
 
     if game_running == True:
-        board1 = Board(hexagon1, gamelogic.board_size, game_surface)
-        game1 = Game(game_surface, board1, 1)
-        game1.play()
-        game_running = False
-        print(gamelogic.player_no)
-        if pause_game_button.drawMenu(game_surface):
-                game_paused = True
+        if imported:
+            # game1.play()
+            print("Game has been abrupted")
+            game_running = False
+            print(gamelogic.player_no)
+            imported = False
+            if pause_game_button.drawMenu(game_surface):
+                    game_paused = True
+        else:
+            board1 = Board(hexagon1, gamelogic.board_size, game_surface)
+            game1 = Game(game_surface, board1, 1)
+            game1.play()
+            game_running = False
+            print(gamelogic.player_no)
+            if pause_game_button.drawMenu(game_surface):
+                    game_paused = True
 
         if game_paused == True:
             if export_game_button.drawMenu(game_surface):
@@ -914,6 +920,7 @@ while run:
             if go_back_button.drawMenu(game_surface):
                  game_paused = False
         first_menu = True
+        setting_menu = False
 
     
     if setting_menu == True:
@@ -934,9 +941,7 @@ while run:
 
         if import_game_button.drawMenu(game_surface):
             import_game = True
-
             while (import_game):
-                
                 for event in pygame.event.get():
                     # quit game
                     # TODO make the other settings buttons work in this loop
@@ -979,12 +984,23 @@ while run:
                                 
                             #error handling
                             else:
-                                
+                                user_text_size = len(user_text.split())
+                                root = int(math.sqrt(user_text_size))
+
                                 placeholder_arr = string_to_square_numpy_array(user_text)
                                 if (is_board_legal(placeholder_arr)):
                                     try:
-                                        gamelogic.board = string_to_square_numpy_array(user_text)
+                                        
                                         print("board has been imported")
+                                        board1 = Board(hexagon1, root, game_surface)
+                                        gamelogic.board_size = root
+                                        gamelogic.board = string_to_square_numpy_array(user_text)
+                                        # board1.draw_grid()
+                                        game1 = Game(game_surface, board1, 1) #calculate_player_turn()
+                                        game1.play()
+                                        imported = True
+                                        import_game = False 
+
                                     except ValueError:
                                         print("wrong format")
                                         user_text = ""
@@ -1002,7 +1018,7 @@ while run:
                 #ez input field with less settings solution
                 # draw_textbox(game_surface,input_rect, user_text)
                 pygame.draw.rect(game_surface, input_rect_color, input_rect)
-                text_surface = base_font.render(user_text, True, (255, 255, 255))
+                text_surface = font.render(user_text, True, (255, 255, 255))
 
                 # render at position stated in arguments
                 game_surface.blit(text_surface, (input_rect.x, input_rect.y))
