@@ -1035,17 +1035,17 @@ while run:
             first_menu = True
 
     if player_option:
-        if player_1_button.drawMenu(game_surface) and not action:
+        if player_1_button.draw_menu(game_surface) and not action:
             print('choose player 1')
             gamelogic.default_starting_player = 1
             gamelogic.player_no = gamelogic.default_starting_player
             action = True
-        if player_2_button.drawMenu(game_surface) and not action:
+        if player_2_button.draw_menu(game_surface) and not action:
             print('choose player 2')
             gamelogic.default_starting_player = 2
             gamelogic.player_no = gamelogic.default_starting_player
             action = True
-        if go_back_button.drawMenu(game_surface) and not action:
+        if go_back_button.draw_menu(game_surface) and not action:
             player_option = False
             setting_menu = True
             action = True
