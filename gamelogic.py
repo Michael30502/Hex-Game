@@ -12,7 +12,7 @@ x_offset = 76.5
 
 board = np.zeros((board_size, board_size), dtype=int)
 
-cpu = 2
+cpu = 0
 
 player_no = 1
 default_starting_player = 1
