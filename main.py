@@ -946,7 +946,7 @@ while run:
             gamelogic.board_size = board_size_list[board_size]
             gamelogic.board = np.zeros((board_size_list[board_size], board_size_list[board_size]), dtype=int)
 
-        if import_game_button.draw_menu(game_surface):
+        if import_game_button.drawMenu(game_surface) and not action:
             import_game = True
 
             while import_game:
@@ -1023,27 +1023,32 @@ while run:
                 input_rect.w = max(100, text_surface.get_width() + 1000)
                 pygame.display.flip()
                 clock.tick(60)
-        if change_player_button.draw_menu(game_surface):
+            action = True
+        if change_player_button.drawMenu(game_surface) and not action:
             setting_menu = False
             player_option = True
-            print('import saved game')
+            print('Change player menu')
+            action = True
 
         if go_back_button.draw_menu(game_surface):
             setting_menu = False
             first_menu = True
 
     if player_option:
-        if player_1_button.draw_menu(game_surface):
+        if player_1_button.drawMenu(game_surface) and not action:
             print('choose player 1')
             gamelogic.default_starting_player = 1
             gamelogic.player_no = gamelogic.default_starting_player
-        if player_2_button.draw_menu(game_surface):
+            action = True
+        if player_2_button.drawMenu(game_surface) and not action:
             print('choose player 2')
             gamelogic.default_starting_player = 2
             gamelogic.player_no = gamelogic.default_starting_player
-        if go_back_button.draw_menu(game_surface):
+            action = True
+        if go_back_button.drawMenu(game_surface) and not action:
             player_option = False
             setting_menu = True
+            action = True
 
     if pygame.mouse.get_pressed()[0] == 0:
         action = False
