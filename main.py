@@ -4,8 +4,6 @@ import threading
 
 import numpy as np
 import pygame
-import math
-import string
 
 import pyperclip
 
@@ -980,7 +978,7 @@ while run:
             gamelogic.board_size = board_size_list[board_size]
             gamelogic.board = np.zeros((board_size_list[board_size], board_size_list[board_size]), dtype=int)
 
-        if import_game_button.drawMenu(game_surface) and not action:
+        if import_game_button.draw_menu(game_surface) and not action:
             import_game = True
 
             while import_game:
@@ -1067,7 +1065,7 @@ while run:
                 pygame.display.flip()
                 clock.tick(60)
             action = True
-        if change_player_button.drawMenu(game_surface) and not action:
+        if change_player_button.draw_menu(game_surface) and not action:
             setting_menu = False
             player_option = True
             print('Change player menu')
