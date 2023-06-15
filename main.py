@@ -34,6 +34,7 @@ tile_scale = 0.4
 #y_extra_offset= len(y_extra_offset_list)-1
 board_size = len(board_size_list)-1
 #x_extra_offset = 76.5
+ai_difficulty = 1
 
 run = True
 first_menu = True
@@ -498,8 +499,12 @@ class Game:
                 if gamelogic.update_board:
                     game1.board.draw_grid()
                 # print(gamelogic.has_any_won(gamelogic.board))
-                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(gamelogic.board) and not gamelogic.multiplayer and not gamelogic.local_multiplayer:
+                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(gamelogic.board) and not gamelogic.multiplayer and not gamelogic.local_multiplayer and ai_difficulty ==1:
                     self.unit = gamelogic.make_ai1_move()
+                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(gamelogic.board) and not gamelogic.multiplayer and not gamelogic.local_multiplayer and ai_difficulty == 2:
+                    self.unit = gamelogic.make_ai2_move()
+                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(gamelogic.board) and not gamelogic.multiplayer and not gamelogic.local_multiplayer and ai_difficulty == 3:
+                    self.unit = gamelogic.make_ai3_move()
                 else:
                     self.board.draw_grid()
                     if gamelogic.has_any_won(gamelogic.board):
@@ -825,15 +830,22 @@ while run:
             gamelogic.local_multiplayer = True
             action = True
         if ai_1_button.drawMenu(game_surface) and not action:
-            print(cpu)
+            #print(cpu)
+            ai_difficulty = 1
             #cpu = 2 #TODO this need to be no hard coded if the change player works
             game_running = True
             second_menu = False
-            print(cpu)
+            #print(cpu)
             action = True
         if ai_2_button.drawMenu(game_surface) and not action:
+            ai_difficulty = 2
+            game_running = True
+            second_menu = False
             print('Playing gainst bot 2')
         if ai_3_button.drawMenu(game_surface) and not action:
+            ai_difficulty = 3
+            game_running = True
+            second_menu = False
             print('playing against bot 3')
             action = True
         if play_online_button.drawMenu(game_surface) and not action:
