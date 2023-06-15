@@ -30,8 +30,8 @@ def result_state(state, action):
 def actions_to_explore(board):
     # identify the actions available
     moves_list = []
-    for i in range(0, gamelogic.board_size):
-        for j in range(0, gamelogic.board_size):
+    for i in range(0, board.shape[0]):
+        for j in range(0, board.shape[0]):
             if board[i, j] == 0:
                 moves_list.append((i, j))
 

@@ -88,14 +88,14 @@ def make_cpu_move(random_move=False):
 
 # picks a random move on the current shortest path
 def make_ai1_move():
-    greedy_moves = ai.identify_tiles_on_path(board)
+    greedy_moves = list(ai.identify_tiles_on_path(board))
     move = random.choice(greedy_moves)
     make_actual_move(move)
 
 
 # considers moves that are both on own shortest path as well as blocking the opponent
 def make_ai2_move():
-    naive_moves = ai.actions_to_explore(board)
+    naive_moves = list(ai.actions_to_explore(board))
     move = random.choice(naive_moves)
     make_actual_move(move)
 
