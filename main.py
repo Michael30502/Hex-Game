@@ -5,7 +5,7 @@ import threading
 import numpy as np
 import pygame
 
-import pyperclip
+#import pyperclip
 
 import gamelogic
 import onlinelogic
@@ -73,18 +73,32 @@ Host_Game_img = pygame.image.load('assets/Host_Game.png').convert_alpha()
 Join_Game_img = pygame.image.load('assets/Join_Game.png').convert_alpha()
 Change_Player_img = pygame.image.load('assets/Change_Player.png').convert_alpha()
 Drone_Bee_Img = pygame.image.load('assets/Drone_Bee_pic.png').convert_alpha()
+Drone_Bee_Img_flip = pygame.transform.flip(Drone_Bee_Img,True,False)
 Drone_Bee_img = pygame.transform.scale(Drone_Bee_Img, (50, 50))
 Worker_Bee_Img = pygame.image.load('assets/Worker_Bee_pic.png').convert_alpha()
+Worker_Bee_Img_flip = pygame.transform.flip(Worker_Bee_Img,True,False)
 Worker_Bee_img = pygame.transform.scale(Worker_Bee_Img, (50, 50))
 Queen_Bee_Img = pygame.image.load('assets/Queen_Bee_pic.png').convert_alpha()
+Queen_Bee_Img_flip = pygame.transform.flip(Queen_Bee_Img,True,False)
 Queen_Bee_img = pygame.transform.scale(Queen_Bee_Img, (50, 50))
 Player_1_pic_Img = pygame.image.load('assets/Player_1_pic.png').convert_alpha()
 Player_1_pic_img = pygame.transform.scale(Player_1_pic_Img, (50, 50))
 Player_2_pic_Img = pygame.image.load('assets/Player_2_pic.png').convert_alpha()
-Player_2_pic_img = pygame.transform.scale(Player_2_pic_Img, (50, 50))
+Player_2_pic_Img_flip = pygame.transform.flip(Player_2_pic_Img,True,False)
+Player_2_pic_img = pygame.transform.scale(Player_2_pic_Img_flip, (50, 50))
 Main_Menu_img = pygame.image.load('assets/Main_Menu.png').convert_alpha()
 Play_Again_img = pygame.image.load('assets/Play_Again.png').convert_alpha()
 Exit_Game_img = pygame.image.load('assets/Exit_Game.png').convert_alpha()
+
+Player_1_man_img = pygame.transform.scale(Player_2_pic_Img_flip, (50, 50))
+Player_2_man_img = pygame.transform.scale(Player_1_pic_Img, (50, 50))
+Player_1_ai1_img = pygame.transform.scale(Drone_Bee_Img, (50, 50))
+Player_2_ai1_img = pygame.transform.scale(Drone_Bee_Img_flip, (50, 50))
+Player_1_ai2_img = pygame.transform.scale(Worker_Bee_Img_flip, (50, 50))
+Player_2_ai2_img = pygame.transform.scale(Worker_Bee_Img, (50, 50))
+Player_1_ai3_img = pygame.transform.scale(Queen_Bee_Img_flip, (50, 50))
+Player_2_ai3_img = pygame.transform.scale(Queen_Bee_Img, (50, 50))
+
 YELLOW = pygame.image.load('assets/honeycomb2.jpg')
 YELLOW = pygame.transform.scale(YELLOW, (640, 480))
 
@@ -219,10 +233,10 @@ class Button:
         # getting mouse pos
         mouse_pos = pygame.mouse.get_pos()
         if board1.grid is not None:
-            if gamelogic.board[self.unit[0]][self.unit[1]] == gamelogic.default_starting_player:
+            if gamelogic.board[self.unit[0]][self.unit[1]] == 1:
                 # print(board1.grid)
                 board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
-            elif gamelogic.board[self.unit[0]][self.unit[1]] != 0:
+            elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
                 board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
 
         # checking collision and clicked
@@ -505,6 +519,11 @@ class Game:
 
                 if gamelogic.update_board:
                     game1.board.draw_grid()
+                    if gamelogic.player_no == 1:
+                        game_surface.blit(Player_1_man_img,(100,200))
+                    else:
+                        game_surface.blit(Player_2_man_img,(400,200))
+                        
                 # print(gamelogic.has_any_won(gamelogic.board))
                 if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(
                         gamelogic.board) and not gamelogic.multiplayer and ai_difficulty == 1:
@@ -515,6 +534,10 @@ class Game:
                 if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(
                         gamelogic.board) and not gamelogic.multiplayer and ai_difficulty == 3:
                     self.unit = gamelogic.make_ai3_move()
+                    if gamelogic.player_no == 1:
+                        game_surface.blit(Player_1_ai3_img,(100,200))
+                    else:
+                        game_surface.blit(Player_2_ai3_img,(400,200))
                 else:
                     self.board.draw_grid()
                     if gamelogic.has_any_won(gamelogic.board):
@@ -545,6 +568,8 @@ class Game:
                             game_surface.blit(text3, [300, 650])
 
                 if gamelogic.multiplayer:
+                    game_surface.blit(Player_1_man_img,(100,200))
+                    game_surface.blit(Player_2_man_img,(400,200))
                     if gamelogic.client_no == 2:
                         if len(gamelogic.move_list) > 0:
                             (x, y) = gamelogic.move_list[0]

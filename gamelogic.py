@@ -44,6 +44,12 @@ def opponent(player):
     if player == 1:
         return 2
     return 1
+def get_relative_player_no(player_no):
+    if player_no==default_starting_player:
+        return 1
+    else:
+        return 2
+
 
 
 def make_actual_move(pos, new_pos=False):
@@ -54,7 +60,7 @@ def make_actual_move(pos, new_pos=False):
     if is_empty(pos, gamelogic.board) and player_won is False and \
             ((player_no == client_no or new_pos) and
              (client_no == 2 or onlinelogic.clientsocket is not None) or multiplayer is False):
-        board[pos] = player_no
+        board[pos] = get_relative_player_no(gamelogic.player_no)
         if multiplayer:
             move_list.append(pos)
         if has_player_won(player_no, board):
@@ -169,6 +175,7 @@ def find_neighbours(pos, board_in, value=-1, skipping=None):
 
 def has_player_won(playerno, board_in):
     # player cannot have won if there are too few tiles to form a path
+
     if np.count_nonzero(board_in == player_no) < board_size - 1:
         return False
 
