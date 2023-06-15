@@ -14,7 +14,7 @@ import export
 pygame.init()
 font = pygame.font.SysFont("Arial", 36)
 user_text = ""
-
+# LINJER 446 og 455 kan gøre baggrund om til hvid
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -442,7 +442,8 @@ class Game:
         global receive_thread_server
         global running_thread_server
         on_connect = True
-        game_surface.blit(YELLOW, (0,0))
+        game_surface.blit(YELLOW,(0,0))
+        #game_surface.fill(WHITE)
         self.board.make_grid()
         print("check")
         
@@ -451,8 +452,8 @@ class Game:
         #game_surface.blit(boardToDisplay, (51.2, 30))
         while self.running:
 
-
             game_surface.blit(YELLOW, (0,0))
+            #game_surface.fill(WHITE)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit_game()

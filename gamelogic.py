@@ -88,7 +88,7 @@ def make_cpu_move(random_move=False):
 
 # picks a random move on the current shortest path
 def make_ai1_move():
-    greedy_moves = list(ai.identify_tiles_on_path(board))
+    greedy_moves = list(ai.identify_tiles_on_path(board, player_no))
     move = random.choice(greedy_moves)
     make_actual_move(move)
 
