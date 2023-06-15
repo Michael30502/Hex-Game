@@ -5,6 +5,8 @@ import threading
 import numpy as np
 import pygame
 
+import math
+import string
 import pyperclip
 
 import gamelogic
@@ -489,7 +491,7 @@ class Game:
             if self.paused:
                 if export_game_button.draw_menu(game_surface):
                     if is_board_legal(gamelogic.board):
-                        print(gamelogic.board)
+                        print(np.array2string(gamelogic.board, separator=','))
                         export.export_board(gamelogic.board)
                         user_text = array_to_string(gamelogic.board)
                         with open('export.txt', 'a') as f:
@@ -941,7 +943,7 @@ while run:
             game_running = False
             print(gamelogic.player_no)
             imported = False
-            if pause_game_button.drawMenu(game_surface):
+            if pause_game_button.draw_menu(game_surface):
                     game_paused = True
         else:
             board1 = Board(hexagon1, gamelogic.board_size, game_surface)
@@ -949,7 +951,7 @@ while run:
             game1.play()
             game_running = False
             print(gamelogic.player_no)
-            if pause_game_button.drawMenu(game_surface):
+            if pause_game_button.draw_menu(game_surface):
                     game_paused = True
 
         if game_paused:
@@ -1029,7 +1031,7 @@ while run:
                                 placeholder_arr = string_to_square_numpy_array(user_text)
                                 if is_board_legal(placeholder_arr):
                                     try:
-                                        
+                                        root = int(math.sqrt(len(user_text_size)))
                                         print("board has been imported")
                                         board1 = Board(hexagon1, root, game_surface)
                                         gamelogic.board_size = root
