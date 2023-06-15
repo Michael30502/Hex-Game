@@ -180,6 +180,7 @@ def exit_game():
     gamelogic.player_won = False
     gamelogic.multiplayer = False
     gamelogic.local_multiplayer = False
+    gamelogic.cpu = 0
 
 
 def draw_textbox(screen, rect, text):
@@ -507,14 +508,11 @@ class Game:
                 if gamelogic.update_board:
                     game1.board.draw_grid()
                 # print(gamelogic.has_any_won(gamelogic.board))
-                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(
-                        gamelogic.board) and not gamelogic.multiplayer and not gamelogic.local_multiplayer and ai_difficulty == 1:
+                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(gamelogic.board) and not gamelogic.multiplayer and ai_difficulty ==1:
                     self.unit = gamelogic.make_ai1_move()
-                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(
-                        gamelogic.board) and not gamelogic.multiplayer and not gamelogic.local_multiplayer and ai_difficulty == 2:
+                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(gamelogic.board) and not gamelogic.multiplayer and ai_difficulty == 2:
                     self.unit = gamelogic.make_ai2_move()
-                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(
-                        gamelogic.board) and not gamelogic.multiplayer and not gamelogic.local_multiplayer and ai_difficulty == 3:
+                if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(gamelogic.board) and not gamelogic.multiplayer and ai_difficulty == 3:
                     self.unit = gamelogic.make_ai3_move()
                 else:
                     self.board.draw_grid()
@@ -843,7 +841,8 @@ while run:
             gamelogic.local_multiplayer = True
             action = True
         if ai_1_button.drawMenu(game_surface) and not action:
-            # print(cpu)
+            #print(cpu)
+            gamelogic.cpu = 2
             ai_difficulty = 1
             # cpu = 2 #TODO this need to be no hard coded if the change player works
             game_running = True
@@ -851,11 +850,13 @@ while run:
             # print(cpu)
             action = True
         if ai_2_button.drawMenu(game_surface) and not action:
+            gamelogic.cpu = 2
             ai_difficulty = 2
             game_running = True
             second_menu = False
             print('Playing gainst bot 2')
         if ai_3_button.drawMenu(game_surface) and not action:
+            gamelogic.cpu = 2
             ai_difficulty = 3
             game_running = True
             second_menu = False
@@ -1032,12 +1033,10 @@ while run:
         if player_1_button.drawMenu(game_surface):
             print('choose player 1')
             gamelogic.default_starting_player = 1
-            gamelogic.cpu = 2
             gamelogic.player_no = gamelogic.default_starting_player
         if player_2_button.drawMenu(game_surface):
             print('choose player 2')
             gamelogic.default_starting_player = 2
-            gamelogic.cpu = 1
             gamelogic.player_no = gamelogic.default_starting_player
         if go_back_button.drawMenu(game_surface):
             player_option = False
