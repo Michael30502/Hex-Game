@@ -221,10 +221,10 @@ class Button:
         # getting mouse pos
         mouse_pos = pygame.mouse.get_pos()
         if board1.grid is not None:
-            if gamelogic.board[self.unit[0]][self.unit[1]] == gamelogic.default_starting_player:
+            if gamelogic.board[self.unit[0]][self.unit[1]] == 1:
                 # print(board1.grid)
                 board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
-            elif gamelogic.board[self.unit[0]][self.unit[1]] != 0:
+            elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
                 board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
 
         # checking collision and clicked
