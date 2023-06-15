@@ -7,6 +7,8 @@ import pygame
 import math
 import string
 
+import pyperclip
+
 import gamelogic
 import onlinelogic
 import export
@@ -785,7 +787,6 @@ def calculate_player_turn(board):
         return 2
     elif len(values) < 3 and (2 in values):
         return 1
-
     elif values[1] <= values[2]:
         return 1
     elif values[2] < values[1]:
@@ -956,7 +957,8 @@ while run:
                         if event.key == pygame.K_BACKSPACE:
                             # delete character from string
                             user_text = user_text[:-1]
-
+                        elif event.key == pygame.K_b:
+                            user_text = str(pyperclip.paste())
                         elif event.key == pygame.key.get_mods():
                             pass
                         elif event.key == pygame.K_RETURN:
@@ -1053,6 +1055,8 @@ while run:
                     print("board exported")
                 else:
                     print("board not legal")
+            elif event.key == pygame.K_b:
+                user_text = str(pyperclip.paste())
             elif event.key == pygame.K_RETURN:
                 print(user_text)
                 user_text = ''
