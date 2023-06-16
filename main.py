@@ -7,8 +7,8 @@ import pygame
 
 import math
 import string
-#import pyperclip
-
+import pyperclip
+import Inputing
 import gamelogic
 import onlinelogic
 import export
@@ -976,7 +976,7 @@ while run:
 
         if import_game_button.draw_menu(game_surface) and not action:
             import_game = True
-
+            # Inputing.input_field(test_text, input_rect, game_surface, pygame.Color('black'))
             while import_game:
 
                 for event in pygame.event.get():
@@ -1030,9 +1030,6 @@ while run:
                                         board1 = Board(hexagon1, root, game_surface)
                                         gamelogic.board_size = root
                                         gamelogic.board = string_to_square_numpy_array(user_text)
-                                        # board1.draw_grid()
-                                        #game1 = Game(game_surface, board1, 1) #calculate_player_turn()
-                                        #game1.play()
                                         imported = True
                                         import_game = False 
                                         setting_menu = False
