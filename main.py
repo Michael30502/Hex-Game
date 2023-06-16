@@ -718,11 +718,6 @@ clock = pygame.time.Clock()
 input_rect = pygame.Rect(0, 210, WINDOWWIDTH, 32)
 input_rect_color = pygame.Color('chartreuse4')
 
-
-# color_passive = pygame.Color('chartreuse4')
-# input_rect_color = color_passive
-
-# takes gamelogic board and changes it
 # better name may be needed TODO
 def import_game_setter(game_arr_str):
     gamelogic.board = game_arr_str
@@ -958,7 +953,6 @@ while run:
             if export_game_button.draw_menu(game_surface):
                 print('ExportGame')
                 game_paused = False
-
             if go_back_button.draw_menu(game_surface):
                 game_paused = False
         first_menu = True
