@@ -8,7 +8,7 @@ import pygame
 import math
 import string
 import pyperclip
-
+import Inputing
 import gamelogic
 import onlinelogic
 import export
@@ -718,11 +718,6 @@ clock = pygame.time.Clock()
 input_rect = pygame.Rect(0, 210, WINDOWWIDTH, 32)
 input_rect_color = pygame.Color('chartreuse4')
 
-
-# color_passive = pygame.Color('chartreuse4')
-# input_rect_color = color_passive
-
-# takes gamelogic board and changes it
 # better name may be needed TODO
 def import_game_setter(game_arr_str):
     gamelogic.board = game_arr_str
@@ -958,7 +953,6 @@ while run:
             if export_game_button.draw_menu(game_surface):
                 print('ExportGame')
                 game_paused = False
-
             if go_back_button.draw_menu(game_surface):
                 game_paused = False
         first_menu = True
@@ -982,7 +976,7 @@ while run:
 
         if import_game_button.draw_menu(game_surface) and not action:
             import_game = True
-
+            # Inputing.input_field(test_text, input_rect, game_surface, pygame.Color('black'))
             while import_game:
 
                 for event in pygame.event.get():
@@ -1036,9 +1030,6 @@ while run:
                                         board1 = Board(hexagon1, root, game_surface)
                                         gamelogic.board_size = root
                                         gamelogic.board = string_to_square_numpy_array(user_text)
-                                        # board1.draw_grid()
-                                        #game1 = Game(game_surface, board1, 1) #calculate_player_turn()
-                                        #game1.play()
                                         imported = True
                                         import_game = False 
                                         setting_menu = False
