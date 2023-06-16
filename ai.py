@@ -1,6 +1,7 @@
 import gamelogic
 import numpy as np
 from collections import deque
+#Written by Freja
 
 
 cut_off_depth = 2

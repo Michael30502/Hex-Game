@@ -1,28 +1,33 @@
 # https://docs.python.org/3/howto/sockets.html
+#Written by Michael
 import socket
 import sys
 
 import gamelogic
-
+#initial variables
 clientsocket = None
 max_msg_len = 5
 shutdown = False
 ip_text = '192.168.0.113'
 port_text = 7777
 
+#class that contains the functions for the client socket
 class GameSocket:
 
+#initializes the socket
     def __init__(self, sock=None):
         if sock is None:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         else:
             self.sock = sock
 
+#connect the soccket to a server
     def connect(self, host, port):
         print(host)
         print(port)
         self.sock.connect((host, port))
 
+#Sends data to the server
     def send(self, msg):
         global max_msg_len
         totalsent = 0
@@ -32,6 +37,7 @@ class GameSocket:
                 raise RuntimeError("socket connection broken")
             totalsent = totalsent + sent
 
+#Receives data from the server
     def receive(self):
         global max_msg_len
         chunks = []
@@ -47,8 +53,11 @@ class GameSocket:
         return b"".join(chunks)
 
 
+#class that contains server
 class serversocket:
     global shutdown
+
+    #creates/ starts the server and run initial code
     def create_server(self):
         global clientsocket
         global shutdown
@@ -77,7 +86,7 @@ class serversocket:
 
         print(clientsocket, address)
 
-
+        #Shutsdown the server when no longer active
         while True:
             if shutdown:
                 shutdown = False

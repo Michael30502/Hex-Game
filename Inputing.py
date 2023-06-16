@@ -1,4 +1,6 @@
 # import sys module
+#Written by William, minor improvements Michael
+
 import pygame
 import sys
 import pyperclip
@@ -39,7 +41,7 @@ def input_field(text, input_rect, screen, color = pygame.Color('chartreuse4')):
         text_surface = base_font.render(text, True, (255, 255, 255))
         screen.blit(text_surface, (input_rect.x+5, input_rect.y+5))
         input_rect.w = max(100, text_surface.get_width()+10)
-        if initial_text!= text:
+        if initial_text != text:
             pygame.display.flip()
     return text
 
