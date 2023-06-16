@@ -1,4 +1,5 @@
-#Written by everyone, specific sections marked
+# Written by everyone, specific sections marked
+
 import socket
 import sys
 import threading
@@ -17,11 +18,9 @@ import export
 pygame.init()
 font = pygame.font.SysFont("Arial", 32)
 user_text = ""
-# LINES 446 and 455 can make the background white
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
-# YELLOW = (255,255,0)
 
 FPS = 60
 

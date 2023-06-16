@@ -1,10 +1,7 @@
 import random
 import numpy as np
 import ai
-import gamelogic
 import onlinelogic
-
-#from myModule import opponent
 
 board_size = 3
 
@@ -58,10 +55,10 @@ def make_actual_move(pos, new_pos=False):
     global player_won
     print(multiplayer)
     print(onlinelogic.clientsocket)
-    if is_empty(pos, gamelogic.board) and player_won is False and \
+    if is_empty(pos, board) and player_won is False and \
             ((player_no == client_no or new_pos) and
              (client_no == 2 or onlinelogic.clientsocket is not None) or multiplayer is False):
-        board[pos] = get_relative_player_no(gamelogic.player_no)
+        board[pos] = get_relative_player_no(player_no)
         if multiplayer:
             move_list.append(pos)
         if has_player_won(player_no, board):
@@ -77,7 +74,7 @@ def make_sim_move(pos, board_in, player):
     return board_out
 
 
-# picks a random move on the current shortest path
+# picks the first move on the current shortest path
 def make_ai1_move():
     greedy_moves = ai.identify_tiles_on_path(board, player_no)
     for move in greedy_moves:
