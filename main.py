@@ -337,21 +337,8 @@ class Board:
     def make_grid(self):
         x_offset = self.hexagon.image.get_width() * self.hexagon.scale
         y_offset = self.hexagon.image.get_height() * self.hexagon.scale
-        if self.size == 11:
-            x_extra_offset = 76.5
-            y_extra_offset = 40
-        elif self.size == 9:
-            x_extra_offset = 120.8
-            y_extra_offset = 50
-        elif self.size == 7:
-            x_extra_offset = 165
-            y_extra_offset = 60
-        elif self.size == 5:
-            x_extra_offset = 209.3
-            y_extra_offset = 70
-        elif self.size == 3:
-            x_extra_offset = 253.6
-            y_extra_offset = 80
+        x_extra_offset = (640-(self.size*44.2))*0.5
+        y_extra_offset = 95-(self.size*5)
         hex_grid = []
         for i in range(self.size):
             row = []
