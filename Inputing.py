@@ -1,6 +1,7 @@
 # import sys module
 import pygame
 import sys
+import pyperclip
 
 # pygame.init() will initialize all
 # imported module
@@ -11,9 +12,11 @@ pygame.init()
 # it will display on screen
 base_font = pygame.font.Font(None, 32)
 
+entered = False
+
 # input_rect = pygame.Rect(200, 200, 140, 32)
-text = ""
 def input_field(text, input_rect, screen, color = pygame.Color('chartreuse4')):
+    global entered
     initial_text = text
     input_active = True
     if input_active:
@@ -22,11 +25,12 @@ def input_field(text, input_rect, screen, color = pygame.Color('chartreuse4')):
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    print(text)
-                    input_active = False
                 if event.key == pygame.K_v:
                     text = str(pyperclip.paste())
+                elif event.key == pygame.K_RETURN:
+                    print(text)
+                    entered = True
+                    input_active = False
                 elif event.key == pygame.K_BACKSPACE:
                     text = text[:-1]
                 else:
@@ -41,5 +45,6 @@ def input_field(text, input_rect, screen, color = pygame.Color('chartreuse4')):
         if initial_text!= text:
             pygame.display.flip()
     return text
+
 
 # input_field(text, input_rect, game_surface)
