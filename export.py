@@ -1,3 +1,4 @@
+#Written by William
 import numpy as np
 import string
 

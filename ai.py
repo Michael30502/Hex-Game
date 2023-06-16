@@ -1,7 +1,8 @@
+# Majority of this file is authored by Freja (S204493)
+
 import gamelogic
 import numpy as np
 from collections import deque
-
 
 cut_off_depth = 2
 
