@@ -8,7 +8,7 @@ import pygame
 
 import math
 import string
-#import pyperclip
+import pyperclip
 import Inputing
 import gamelogic
 import onlinelogic
@@ -172,6 +172,8 @@ def receive_wait(client_no):
 
 def restart_game():
     game_surface.fill(WHITE)
+    global ai_difficulty
+    ai_difficulty = 0
     gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
     gamelogic.player_won = False
     gamelogic.player_no = gamelogic.default_starting_player
@@ -180,6 +182,8 @@ def restart_game():
 
 def exit_game():
     global connection
+    global ai_difficulty 
+    ai_difficulty = 0
     print("exit")
     restart_game()
     if gamelogic.multiplayer:
@@ -521,6 +525,7 @@ class Game:
                     if ai_difficulty == 0:
                         game_surface.blit(Player_1_man_img,(70,270))
                         game_surface.blit(Player_2_man_img,(500,100))
+                        print("Test")
                     if ai_difficulty == 1:
                         if gamelogic.default_starting_player == 1:
                             game_surface.blit(Player_1_man_img,(70,270))
@@ -718,8 +723,8 @@ class MenuButton:
 
 # create button instances
 exit_game_button = MenuButton(350, 50, Exit_Game_img, 1)
-play_again_button = MenuButton(195, 275, Play_Again_img, 1)
-main_menu_button = MenuButton(195, 350, Main_Menu_img, 1)
+play_again_button = MenuButton(343.4, 400, Play_Again_img, 1)
+main_menu_button = MenuButton(46.6, 400, Main_Menu_img, 1)
 start_game_button = MenuButton(195, 50, start_game_img, 1)
 play_online_button = MenuButton(195, 100, Play_Online_img, 1)
 ai_2_button = MenuButton(195, 250, AI_2_img, 1)
