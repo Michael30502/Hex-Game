@@ -1,3 +1,4 @@
+#Written by everyone, specific sections marked
 import socket
 import sys
 import threading
@@ -36,7 +37,7 @@ tile_scale = 0.4
 # y_extra_offset= len(y_extra_offset_list)-1
 board_size = len(board_size_list) - 1
 # x_extra_offset = 76.5
-ai_difficulty = 1
+ai_difficulty = 0
 
 run = True
 first_menu = True
@@ -92,6 +93,14 @@ Player_2_pic_img = pygame.transform.scale(Player_2_pic_Img_flip, (50, 50))
 Main_Menu_img = pygame.image.load('assets/Main_Menu.png').convert_alpha()
 Play_Again_img = pygame.image.load('assets/Play_Again.png').convert_alpha()
 Exit_Game_img = pygame.image.load('assets/Exit_Game.png').convert_alpha()
+
+Player_1_Wins_Img =pygame.image.load('assets/Player_1_Wins.png').convert_alpha()
+Player_1_Wins_img =pygame.transform.scale(Player_1_Wins_Img, (50, 50))
+Player_2_Wins_Img =pygame.image.load('assets/Player_2_Wins.png').convert_alpha()
+Player_2_Wins_img =pygame.transform.scale(Player_2_Wins_Img, (50, 50))
+
+Player_1_Turn = pygame.image.load('assets/Player_1_Turn.png').convert_alpha()
+Player_2_Turn = pygame.image.load('assets/Player_2_Turn.png').convert_alpha()
 
 Player_1_man_img = pygame.transform.scale(Player_2_pic_Img_flip, (50, 50))
 Player_2_man_img = pygame.transform.scale(Player_1_pic_Img, (50, 50))
@@ -163,6 +172,8 @@ def receive_wait(client_no):
 
 def restart_game():
     game_surface.fill(WHITE)
+    global ai_difficulty
+    ai_difficulty = 0
     gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
     gamelogic.player_won = False
     gamelogic.player_no = gamelogic.default_starting_player
@@ -171,6 +182,8 @@ def restart_game():
 
 def exit_game():
     global connection
+    global ai_difficulty 
+    ai_difficulty = 0
     print("exit")
     restart_game()
     if gamelogic.multiplayer:
@@ -324,21 +337,8 @@ class Board:
     def make_grid(self):
         x_offset = self.hexagon.image.get_width() * self.hexagon.scale
         y_offset = self.hexagon.image.get_height() * self.hexagon.scale
-        if self.size == 11:
-            x_extra_offset = 76.5
-            y_extra_offset = 40
-        elif self.size == 9:
-            x_extra_offset = 120.8
-            y_extra_offset = 50
-        elif self.size == 7:
-            x_extra_offset = 165
-            y_extra_offset = 60
-        elif self.size == 5:
-            x_extra_offset = 209.3
-            y_extra_offset = 70
-        elif self.size == 3:
-            x_extra_offset = 253.6
-            y_extra_offset = 80
+        x_extra_offset = (640-(self.size*44.2))*0.5
+        y_extra_offset = 95-(self.size*5)
         hex_grid = []
         for i in range(self.size):
             row = []
@@ -508,6 +508,41 @@ class Game:
                     exit_game()
             if not self.paused:
                 # game_surface.fill(YELLOW)
+                if self.running and not gamelogic.has_any_won(gamelogic.board):
+                    if ai_difficulty == 0:
+                        game_surface.blit(Player_1_man_img,(70,270))
+                        game_surface.blit(Player_2_man_img,(500,100))
+                        print("Test")
+                    if ai_difficulty == 1:
+                        if gamelogic.default_starting_player == 1:
+                            game_surface.blit(Player_1_man_img,(70,270))
+                            game_surface.blit(Player_2_ai1_img,(500,100))
+                        else:
+                            game_surface.blit(Player_1_ai1_img,(70,270))
+                            game_surface.blit(Player_2_man_img,(500,100))
+                    if ai_difficulty == 2:
+                        if gamelogic.default_starting_player == 1:
+                            game_surface.blit(Player_1_man_img,(70,270))
+                            game_surface.blit(Player_2_ai2_img,(500,100))
+                        else:
+                            game_surface.blit(Player_1_ai2_img,(70,270))
+                            game_surface.blit(Player_2_man_img,(500,100))
+
+                    if ai_difficulty == 3:
+                        if gamelogic.default_starting_player == 1:
+                            game_surface.blit(Player_1_man_img,(70,270))
+                            game_surface.blit(Player_2_ai3_img,(500,100))
+                        else:
+                            game_surface.blit(Player_1_ai3_img,(70,270))
+                            game_surface.blit(Player_2_man_img,(500,100))
+                    if gamelogic.player_no == 1 and gamelogic.default_starting_player == 1:
+                        game_surface.blit(Player_1_Turn,(50,300))
+                    elif gamelogic.player_no == 2 and gamelogic.default_starting_player == 1:
+                        game_surface.blit(Player_2_Turn,(450,50))
+                    if gamelogic.player_no == 1 and gamelogic.default_starting_player == 2:
+                        game_surface.blit(Player_2_Turn,(450,50))
+                    elif gamelogic.player_no == 2 and gamelogic.default_starting_player == 2:
+                        game_surface.blit(Player_1_Turn,(50,300))
                 if not gamelogic.has_any_won(gamelogic.board):
                     if pause_game_button.draw_menu(game_surface):
                         self.paused = True
@@ -522,10 +557,6 @@ class Game:
 
                 if gamelogic.update_board:
                     game1.board.draw_grid()
-                    if gamelogic.player_no == 1:
-                        game_surface.blit(Player_1_man_img,(100,200))
-                    else:
-                        game_surface.blit(Player_2_man_img,(400,200))
                         
                 # print(gamelogic.has_any_won(gamelogic.board))
                 if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(
@@ -537,20 +568,18 @@ class Game:
                 if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(
                         gamelogic.board) and not gamelogic.multiplayer and ai_difficulty == 3:
                     self.unit = gamelogic.make_ai3_move()
-                    if gamelogic.player_no == 1:
-                        game_surface.blit(Player_1_ai3_img,(100,200))
-                    else:
-                        game_surface.blit(Player_2_ai3_img,(400,200))
                 else:
                     self.board.draw_grid()
                     if gamelogic.has_any_won(gamelogic.board):
                         if gamelogic.has_player_won(1, gamelogic.board):
-                            text2 = font.render("Player 1 has won", True, BLACK)
+                            #text2 = font.render("Player 1 has won", True, BLACK)
+                            game_surface.blit(Player_1_Wins_Img,(180,200))
                         elif gamelogic.has_player_won(2, gamelogic.board):
-                            text2 = font.render("Player 2 has won", True, BLACK)
-                        text_rect2 = text2.get_rect()
-                        text_rect2.center = (100, 100)
-                        game_surface.blit(text2, [195, 200])
+                            #text2 = font.render("Player 2 has won", True, BLACK)
+                            game_surface.blit(Player_2_Wins_Img,(180,200))
+                        #text_rect2 = text2.get_rect()
+                        #text_rect2.center = (100, 100)
+                        #game_surface.blit(text2, [195, 200])
                         if not gamelogic.multiplayer or gamelogic.client_no == 1:
 
                             if main_menu_button.draw_menu(game_surface):
@@ -571,8 +600,6 @@ class Game:
                             game_surface.blit(text3, [300, 650])
 
                 if gamelogic.multiplayer:
-                    game_surface.blit(Player_1_man_img,(100,200))
-                    game_surface.blit(Player_2_man_img,(400,200))
                     if gamelogic.client_no == 2:
                         if len(gamelogic.move_list) > 0:
                             (x, y) = gamelogic.move_list[0]
@@ -681,8 +708,8 @@ class MenuButton:
 
 # create button instances
 exit_game_button = MenuButton(350, 50, Exit_Game_img, 1)
-play_again_button = MenuButton(195, 275, Play_Again_img, 1)
-main_menu_button = MenuButton(195, 350, Main_Menu_img, 1)
+play_again_button = MenuButton(343.4, 400, Play_Again_img, 1)
+main_menu_button = MenuButton(46.6, 400, Main_Menu_img, 1)
 start_game_button = MenuButton(195, 50, start_game_img, 1)
 play_online_button = MenuButton(195, 100, Play_Online_img, 1)
 ai_2_button = MenuButton(195, 250, AI_2_img, 1)
@@ -896,8 +923,8 @@ while run:
 
     if online_menu:
         input_box = pygame.Rect(200, 210, 243, 32)
-        ip_text = onlinelogic.ip_text
-        draw_textbox(game_surface, input_box, onlinelogic.ip_text)
+        onlinelogic.ip_text = Inputing.input_field(onlinelogic.ip_text,input_box,game_surface)
+        #draw_textbox(game_surface, input_box, onlinelogic.ip_text)
         if go_back_button.draw_menu(game_surface) and not action:
             second_menu = True
             online_menu = False
@@ -1088,32 +1115,32 @@ while run:
 
     if pygame.mouse.get_pressed()[0] == 0:
         action = False
+    if online_menu == False:
+        for event in pygame.event.get():
+            # quit game
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_c:
+                    # exporting game as a string to load
+                    user_text = array_to_string(gamelogic.board)
+                elif event.key == pygame.K_v:
+                    if is_board_legal(gamelogic.board):
+                        print(gamelogic.board)
+                        export.export_board(gamelogic.board)
+                        print("board exported")
+                    else:
+                        print("board not legal")
+                elif event.key == pygame.K_b:
+                    user_text = str(pyperclip.paste())
+                elif event.key == pygame.K_RETURN:
+                    print(user_text)
+                    user_text = ''
 
-    for event in pygame.event.get():
-        # quit game
-        if event.type == pygame.QUIT:
-            run = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_c:
-                # exporting game as a string to load
-                user_text = array_to_string(gamelogic.board)
-            elif event.key == pygame.K_v:
-                if is_board_legal(gamelogic.board):
-                    print(gamelogic.board)
-                    export.export_board(gamelogic.board)
-                    print("board exported")
+                elif event.key == pygame.K_BACKSPACE:
+                    user_text = user_text[:-1]
                 else:
-                    print("board not legal")
-            elif event.key == pygame.K_b:
-                user_text = str(pyperclip.paste())
-            elif event.key == pygame.K_RETURN:
-                print(user_text)
-                user_text = ''
-
-            elif event.key == pygame.K_BACKSPACE:
-                user_text = user_text[:-1]
-            else:
-                user_text += event.unicode
+                    user_text += event.unicode
 
     pygame.display.flip()
 

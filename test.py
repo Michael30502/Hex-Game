@@ -1,3 +1,5 @@
+#Written by Freja
+
 import gamelogic
 import ai
 import numpy as np
