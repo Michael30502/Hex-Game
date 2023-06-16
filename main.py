@@ -7,7 +7,7 @@ import pygame
 
 import math
 import string
-#import pyperclip
+import pyperclip
 
 import gamelogic
 import onlinelogic
@@ -466,7 +466,7 @@ class Game:
         global running_thread_server
         on_connect = True
         game_surface.blit(YELLOW, (0, 0))
-        # game_surface.fill(WHITE)
+        game_surface.fill(WHITE) # COMMENT TO BRING BACK BACKGROUND
         self.board.make_grid()
         print("check")
 
@@ -476,7 +476,7 @@ class Game:
         while self.running:
 
             game_surface.blit(YELLOW, (0, 0))
-            # game_surface.fill(WHITE)
+            game_surface.fill(WHITE) # COMMENT TO BRING BACK BACKGROUND
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit_game()
