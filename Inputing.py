@@ -1,7 +1,6 @@
 # import sys module
 import pygame
 import sys
-import pyperclip
 
 # pygame.init() will initialize all
 # imported module
@@ -25,8 +24,6 @@ def input_field(text, input_rect, screen, color = pygame.Color('chartreuse4')):
                 if event.key == pygame.K_RETURN:
                     print(text)
                     input_active = False
-                if event.key == pygame.K_v:
-                    text = str(pyperclip.paste())
                 if event.key == pygame.K_BACKSPACE:
                     text = text[:-1]
                 else:

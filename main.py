@@ -976,90 +976,92 @@ while run:
 
         if import_game_button.draw_menu(game_surface) and not action:
             import_game = True
-            # Inputing.input_field(test_text, input_rect, game_surface, pygame.Color('black'))
-            while import_game:
+            test_text = ""
+            Inputing.input_field(test_text, input_rect, game_surface, pygame.Color('black'))
+            print(test_text)
+            # while import_game:
 
-                for event in pygame.event.get():
-                    # quit game
-                    # TODO make the other settings buttons work in this loop
-                    if event.type == pygame.QUIT:
-                        import_game = False
-                        user_text = ""
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        if input_rect.collidepoint(event.pos):
-                            active = True
-                        else:
-                            active = False
-                    if event.type == pygame.KEYDOWN:
-                        # TODO add arrow keys in order to changes parts of an exported string
-                        if event.key == pygame.K_BACKSPACE:
-                            # delete character from string
-                            user_text = user_text[:-1]
-                        elif event.key == pygame.K_b:
-                            user_text = str(pyperclip.paste())
-                        elif event.key == pygame.key.get_mods():
-                            pass
-                        elif event.key == pygame.K_RETURN:
-                            # TODO change the game logic boardsize
-                            # TODO make some variable to show that the game has been imported and let
-                            # the function "calculate_player" determine whos turn it is
-                            user_text_size = user_text.split()
-                            # print(len(user_text_size))
-                            if len(user_text_size) not in full_board_size_list:
-                                print("board size is not a perfect square ")
-                                print("please try again")
-                                import_game = False
-                            # print(array_to_string(gamelogic.board))
-                            # temporary fix for my dimension check #TODO remove this
-                            # try:
-                            #     placeholder_arr = string_to_square_numpy_array(user_text)
+            #     for event in pygame.event.get():
+            #         # quit game
+            #         # TODO make the other settings buttons work in this loop
+            #         if event.type == pygame.QUIT:
+            #             import_game = False
+            #             user_text = ""
+            #         if event.type == pygame.MOUSEBUTTONDOWN:
+            #             if input_rect.collidepoint(event.pos):
+            #                 active = True
+            #             else:
+            #                 active = False
+            #         if event.type == pygame.KEYDOWN:
+            #             # TODO add arrow keys in order to changes parts of an exported string
+            #             if event.key == pygame.K_BACKSPACE:
+            #                 # delete character from string
+            #                 user_text = user_text[:-1]
+            #             elif event.key == pygame.K_b:
+            #                 user_text = str(pyperclip.paste())
+            #             elif event.key == pygame.key.get_mods():
+            #                 pass
+            #             elif event.key == pygame.K_RETURN:
+            #                 # TODO change the game logic boardsize
+            #                 # TODO make some variable to show that the game has been imported and let
+            #                 # the function "calculate_player" determine whos turn it is
+            #                 user_text_size = user_text.split()
+            #                 # print(len(user_text_size))
+            #                 if len(user_text_size) not in full_board_size_list:
+            #                     print("board size is not a perfect square ")
+            #                     print("please try again")
+            #                     import_game = False
+            #                 # print(array_to_string(gamelogic.board))
+            #                 # temporary fix for my dimension check #TODO remove this
+            #                 # try:
+            #                 #     placeholder_arr = string_to_square_numpy_array(user_text)
 
-                            # except:
-                            #     #TODO we need to prompt the user that the board was not successfully imported
-                            #     placeholder_arr = gamelogic.board
-                            #     print("wrong format, original board loaded")
+            #                 # except:
+            #                 #     #TODO we need to prompt the user that the board was not successfully imported
+            #                 #     placeholder_arr = gamelogic.board
+            #                 #     print("wrong format, original board loaded")
 
-                            # error handling
-                            else:
+            #                 # error handling
+            #                 else:
                                 
-                                placeholder_arr = string_to_square_numpy_array(user_text)
-                                if is_board_legal(placeholder_arr):
-                                    try:
-                                        root = int(math.sqrt(len(user_text_size)))
-                                        print("board has been imported")
-                                        board1 = Board(hexagon1, root, game_surface)
-                                        gamelogic.board_size = root
-                                        gamelogic.board = string_to_square_numpy_array(user_text)
-                                        imported = True
-                                        import_game = False 
-                                        setting_menu = False
-                                        second_menu = True
+            #                     placeholder_arr = string_to_square_numpy_array(user_text)
+            #                     if is_board_legal(placeholder_arr):
+            #                         try:
+            #                             root = int(math.sqrt(len(user_text_size)))
+            #                             print("board has been imported")
+            #                             board1 = Board(hexagon1, root, game_surface)
+            #                             gamelogic.board_size = root
+            #                             gamelogic.board = string_to_square_numpy_array(user_text)
+            #                             imported = True
+            #                             import_game = False 
+            #                             setting_menu = False
+            #                             second_menu = True
 
-                                    except ValueError:
-                                        print("wrong format")
-                                        user_text = ""
-                                    except:
-                                        print("something else")
-                                        user_text = ""
-                                    import_game = False
-                                else:
-                                    print("board is illegal")
+            #                         except ValueError:
+            #                             print("wrong format")
+            #                             user_text = ""
+            #                         except:
+            #                             print("something else")
+            #                             user_text = ""
+            #                         import_game = False
+            #                     else:
+            #                         print("board is illegal")
 
-                                # gamelogic.board = string_to_square_numpy_array(user_text)
-                        # Unicode standard is used for string
-                        else:
-                            user_text += event.unicode
-                # ez input field with less settings solution
-                # draw_textbox(game_surface,input_rect, user_text)
-                pygame.draw.rect(game_surface, input_rect_color, input_rect)
-                text_surface = font.render(user_text, True, (255, 255, 255))
+            #                     # gamelogic.board = string_to_square_numpy_array(user_text)
+            #             # Unicode standard is used for string
+            #             else:
+            #                 user_text += event.unicode
+            #     # ez input field with less settings solution
+            #     # draw_textbox(game_surface,input_rect, user_text)
+            #     pygame.draw.rect(game_surface, input_rect_color, input_rect)
+            #     text_surface = font.render(user_text, True, (255, 255, 255))
 
-                # render at position stated in arguments
-                game_surface.blit(text_surface, (input_rect.x, input_rect.y))
-                input_rect.w = max(100, text_surface.get_width() + 1000)
-                pygame.display.flip()
-                clock.tick(60)
-            action = True
+            #     # render at position stated in arguments
+            #     game_surface.blit(text_surface, (input_rect.x, input_rect.y))
+            #     input_rect.w = max(100, text_surface.get_width() + 1000)
+            #     pygame.display.flip()
+            #     clock.tick(60)
+            # action = True
         if change_player_button.draw_menu(game_surface) and not action:
             setting_menu = False
             player_option = True
