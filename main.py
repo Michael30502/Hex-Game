@@ -24,7 +24,7 @@ RED = (255, 0, 0)
 
 FPS = 60
 
-board_size_list = [3, 4, 5, 7, 9, 11]
+board_size_list = [3,4, 5, 7, 9, 11,12,13,99]
 full_board_size_list = []
 for elem in board_size_list:
     full_board_size_list.append(elem ** 2)
@@ -958,22 +958,22 @@ while run:
             action = True
 
     if game_running == True:
-        if imported:
-            #game1.play()
-            print("Game has been abrupted")
-            #game_running = False
-            print(gamelogic.player_no)
-            imported = False
-            if pause_game_button.draw_menu(game_surface):
-                    game_paused = True
-        else:
-            board1 = Board(hexagon1, gamelogic.board_size, game_surface)
-            game1 = Game(game_surface, board1, 1)
-            game1.play()
-            game_running = False
-            print(gamelogic.player_no)
-            if pause_game_button.draw_menu(game_surface):
-                    game_paused = True
+        # if imported:
+        #     #game1.play()
+        #     print("Game has been abrupted")
+        #     #game_running = False
+        #     print(gamelogic.player_no)
+        #     imported = False
+        #     if pause_game_button.draw_menu(game_surface):
+        #             game_paused = True
+        # else:
+        board1 = Board(hexagon1, gamelogic.board_size, game_surface)
+        game1 = Game(game_surface, board1, 1)
+        game1.play()
+        game_running = False
+        print(gamelogic.player_no)
+        if pause_game_button.draw_menu(game_surface):
+                game_paused = True
 
         if game_paused:
             if export_game_button.draw_menu(game_surface):
