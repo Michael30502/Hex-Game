@@ -918,7 +918,7 @@ while run:
 
     if online_menu:
         input_box = pygame.Rect(200, 210, 243, 32)
-        onlinelogic.ip_text = Inputing.input_field(onlinelogic.ip_text,input_box,game_surface)
+        onlinelogic.ip_text = inputting.input_field(onlinelogic.ip_text,input_box,game_surface)
         #draw_textbox(game_surface, input_box, onlinelogic.ip_text)
         if go_back_button.draw_menu(game_surface) and not action:
             second_menu = True
