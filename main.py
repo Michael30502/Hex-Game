@@ -199,13 +199,6 @@ def exit_game():
     gamelogic.cpu = 0
 
 
-def draw_textbox(screen, rect, text):
-    font = pygame.font.Font(None, 32)
-    text_surface = font.render(text, True, (255, 255, 255))  # White color text
-    pygame.draw.rect(screen, (0, 0, 0), rect)  # Black color box
-    screen.blit(text_surface, (rect[0] + 5, rect[1] + 5))
-
-
 class Button:
     def __init__(self, x, y, image, scale, unit):
         self.image = image  # Store original image
@@ -372,11 +365,6 @@ class Board:
         for row in self.grid:
             for hexagon in row:
                 hexagon.draw(self.surface)
-
-
-class EventHandler:
-    def __init__(self, event):
-        self.event = event
 
 
 class Game:
@@ -596,7 +584,6 @@ class Game:
 
 
 class MenuButton:
-
     def __init__(self, x, y, image, scale):
         width = image.get_width()
         height = image.get_height()
@@ -656,14 +643,6 @@ hexagon_player1 = Button(96, 0, hexagon_player1_img, tile_scale, (1, 1))
 
 # import -----------------------------------------------------------------------------------------
 clock = pygame.time.Clock()
-
-
-def import_game_setter(game_arr_str):
-    gamelogic.board = game_arr_str
-    print("board set")
-    print(gamelogic.board)
-    print(type(gamelogic.board))
-    return gamelogic.board
 
 
 def array_to_string(array):
@@ -739,29 +718,7 @@ def is_board_legal(board):
         return True
 
 
-def calculate_player_turn(board):
-    values = np.unique(board)
-    # absolute difference between player tiles (must not exceed 1)
-
-    # if there is only 1 element in values assuming the only element present is 0 #TODO
-    if len(values) < 2:
-        return 1
-    # if there are 2 elements present in our array and 1 of them is 1 assuming rest is 0 then it must be player 2's turn
-    elif len(values) < 3 and (1 in values):
-        return 2
-    elif len(values) < 3 and (2 in values):
-        return 1
-    elif values[1] <= values[2]:
-        return 1
-    elif values[2] < values[1]:
-        return 2
-    else:
-        print("calculate_player_turn ERROR")
-        return 0
-
-
 # import end -----------------------------------------------------------------------------------------
-
 # game loop
 def server_thread():
     global receive_thread_client
