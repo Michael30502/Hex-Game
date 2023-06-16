@@ -5,17 +5,22 @@ import ai
 import numpy as np
 import cProfile
 
-test_board = np.array([[0, 0, 0, 0, 0, 2, 0],
- [0, 0, 2, 0, 0, 2, 0],
- [0, 0, 2, 0, 0, 2, 0],
- [0, 2, 1, 1, 1, 2, 0],
- [2, 1, 0, 1, 2, 1, 1],
- [1, 0, 0, 1, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0]])
+test_board = np.array([[0,0,0,0,0],
+ [2,0,0,0,0],
+ [1,2,1,0,0],
+ [0,2,0,0,0],
+ [1,0,0,0,0]])
 
-print(test_board)
+gamelogic.board = test_board
 
-print(ai.actions_to_explore(test_board))
+print(gamelogic.board)
+
+while not gamelogic.has_any_won(gamelogic.board):
+    gamelogic.make_ai3_move()
+
+print(gamelogic.board)
+
+# print(ai.actions_to_explore(test_board))
 
 # print(ai1.actions_available(gamelogic.board))
 
