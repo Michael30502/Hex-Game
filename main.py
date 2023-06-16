@@ -896,8 +896,8 @@ while run:
 
     if online_menu:
         input_box = pygame.Rect(200, 210, 243, 32)
-        ip_text = onlinelogic.ip_text
-        draw_textbox(game_surface, input_box, onlinelogic.ip_text)
+        onlinelogic.ip_text = Inputing.input_field(onlinelogic.ip_text,input_box,game_surface)
+        #draw_textbox(game_surface, input_box, onlinelogic.ip_text)
         if go_back_button.draw_menu(game_surface) and not action:
             second_menu = True
             online_menu = False
@@ -1088,32 +1088,32 @@ while run:
 
     if pygame.mouse.get_pressed()[0] == 0:
         action = False
+    if online_menu == False:
+        for event in pygame.event.get():
+            # quit game
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_c:
+                    # exporting game as a string to load
+                    user_text = array_to_string(gamelogic.board)
+                elif event.key == pygame.K_v:
+                    if is_board_legal(gamelogic.board):
+                        print(gamelogic.board)
+                        export.export_board(gamelogic.board)
+                        print("board exported")
+                    else:
+                        print("board not legal")
+                elif event.key == pygame.K_b:
+                    user_text = str(pyperclip.paste())
+                elif event.key == pygame.K_RETURN:
+                    print(user_text)
+                    user_text = ''
 
-    for event in pygame.event.get():
-        # quit game
-        if event.type == pygame.QUIT:
-            run = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_c:
-                # exporting game as a string to load
-                user_text = array_to_string(gamelogic.board)
-            elif event.key == pygame.K_v:
-                if is_board_legal(gamelogic.board):
-                    print(gamelogic.board)
-                    export.export_board(gamelogic.board)
-                    print("board exported")
+                elif event.key == pygame.K_BACKSPACE:
+                    user_text = user_text[:-1]
                 else:
-                    print("board not legal")
-            elif event.key == pygame.K_b:
-                user_text = str(pyperclip.paste())
-            elif event.key == pygame.K_RETURN:
-                print(user_text)
-                user_text = ''
-
-            elif event.key == pygame.K_BACKSPACE:
-                user_text = user_text[:-1]
-            else:
-                user_text += event.unicode
+                    user_text += event.unicode
 
     pygame.display.flip()
 
