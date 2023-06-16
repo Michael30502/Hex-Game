@@ -7,7 +7,7 @@ import pygame
 
 import math
 import string
-import pyperclip
+#import pyperclip
 
 import gamelogic
 import onlinelogic
@@ -938,9 +938,9 @@ while run:
 
     if game_running == True:
         if imported:
-            # game1.play()
+            #game1.play()
             print("Game has been abrupted")
-            game_running = False
+            #game_running = False
             print(gamelogic.player_no)
             imported = False
             if pause_game_button.draw_menu(game_surface):
@@ -1037,10 +1037,12 @@ while run:
                                         gamelogic.board_size = root
                                         gamelogic.board = string_to_square_numpy_array(user_text)
                                         # board1.draw_grid()
-                                        game1 = Game(game_surface, board1, 1) #calculate_player_turn()
-                                        game1.play()
+                                        #game1 = Game(game_surface, board1, 1) #calculate_player_turn()
+                                        #game1.play()
                                         imported = True
                                         import_game = False 
+                                        setting_menu = False
+                                        second_menu = True
 
                                     except ValueError:
                                         print("wrong format")
