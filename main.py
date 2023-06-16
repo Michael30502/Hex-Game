@@ -613,8 +613,6 @@ class Game:
                             game_surface.blit(text3, [300, 650])
 
                 if gamelogic.multiplayer:
-                    game_surface.blit(Player_1_man_img,(70,270))
-                    game_surface.blit(Player_2_man_img,(500,100))
                     if gamelogic.client_no == 2:
                         if len(gamelogic.move_list) > 0:
                             (x, y) = gamelogic.move_list[0]
