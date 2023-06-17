@@ -8,8 +8,6 @@ import numpy as np
 import pygame
 
 import math
-import string
-import pyperclip
 import inputting
 import gamelogic
 import onlinelogic
@@ -18,25 +16,18 @@ import export
 pygame.init()
 font = pygame.font.SysFont("Arial", 32)
 
-# LINES 446 and 455 can make the background white
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 
 FPS = 60
 
-board_size_list = [3,4, 5, 7, 9, 11,12,13,99]
+board_size_list = [3, 4, 5, 7, 9, 11, 12, 13, 99]
 full_board_size_list = []
 for elem in board_size_list:
     full_board_size_list.append(elem ** 2)
-# tile_scale_list = [0.4, 0.4, 0.4 ,0.4 , 0.4]
-# x_extra_offset_list = [76.5, 76.5, 76.5, 76.5, 76.5]
-# y_extra_offset_list = [40,40,40,40,40]
 tile_scale = 0.4
-# x_extra_offset = len(x_extra_offset_list)-1
-# y_extra_offset= len(y_extra_offset_list)-1
 board_size = len(board_size_list) - 1
-# x_extra_offset = 76.5
 ai_difficulty = 0
 
 run = True
@@ -48,14 +39,12 @@ game_paused = False
 game_finished = False
 player_option = False
 online_menu = False
-imported = False #TODO
+imported = False  # TODO
 import_game = False
 
-# Surface/Screen size (this shoudl be scaleable
-# WIDTH, HEIGHT = 768, 466
+# Surface/Screen size
 WINDOWWIDTH, WINDOWHEIGHT = 640, 480
 game_surface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-# board_surface = pygame.Surface((WIDTH, HEIGHT))
 pygame.display.set_caption("HEX")
 user_text = ""
 
@@ -79,27 +68,27 @@ Host_Game_img = pygame.image.load('assets/Host_Game.png').convert_alpha()
 Join_Game_img = pygame.image.load('assets/Join_Game.png').convert_alpha()
 Change_Player_img = pygame.image.load('assets/Change_Player.png').convert_alpha()
 Drone_Bee_Img = pygame.image.load('assets/Drone_Bee_pic.png').convert_alpha()
-Drone_Bee_Img_flip = pygame.transform.flip(Drone_Bee_Img,True,False)
+Drone_Bee_Img_flip = pygame.transform.flip(Drone_Bee_Img, True, False)
 Drone_Bee_img = pygame.transform.scale(Drone_Bee_Img, (50, 50))
 Worker_Bee_Img = pygame.image.load('assets/Worker_Bee_pic.png').convert_alpha()
-Worker_Bee_Img_flip = pygame.transform.flip(Worker_Bee_Img,True,False)
+Worker_Bee_Img_flip = pygame.transform.flip(Worker_Bee_Img, True, False)
 Worker_Bee_img = pygame.transform.scale(Worker_Bee_Img, (50, 50))
 Queen_Bee_Img = pygame.image.load('assets/Queen_Bee_pic.png').convert_alpha()
-Queen_Bee_Img_flip = pygame.transform.flip(Queen_Bee_Img,True,False)
+Queen_Bee_Img_flip = pygame.transform.flip(Queen_Bee_Img, True, False)
 Queen_Bee_img = pygame.transform.scale(Queen_Bee_Img, (50, 50))
 Player_1_pic_Img = pygame.image.load('assets/Player_1_pic.png').convert_alpha()
 Player_1_pic_img = pygame.transform.scale(Player_1_pic_Img, (50, 50))
 Player_2_pic_Img = pygame.image.load('assets/Player_2_pic.png').convert_alpha()
-Player_2_pic_Img_flip = pygame.transform.flip(Player_2_pic_Img,True,False)
+Player_2_pic_Img_flip = pygame.transform.flip(Player_2_pic_Img, True, False)
 Player_2_pic_img = pygame.transform.scale(Player_2_pic_Img_flip, (50, 50))
 Main_Menu_img = pygame.image.load('assets/Main_Menu.png').convert_alpha()
 Play_Again_img = pygame.image.load('assets/Play_Again.png').convert_alpha()
 Exit_Game_img = pygame.image.load('assets/Exit_Game.png').convert_alpha()
 
-Player_1_Wins_Img =pygame.image.load('assets/Player_1_Wins.png').convert_alpha()
-Player_1_Wins_img =pygame.transform.scale(Player_1_Wins_Img, (50, 50))
-Player_2_Wins_Img =pygame.image.load('assets/Player_2_Wins.png').convert_alpha()
-Player_2_Wins_img =pygame.transform.scale(Player_2_Wins_Img, (50, 50))
+Player_1_Wins_Img = pygame.image.load('assets/Player_1_Wins.png').convert_alpha()
+Player_1_Wins_img = pygame.transform.scale(Player_1_Wins_Img, (50, 50))
+Player_2_Wins_Img = pygame.image.load('assets/Player_2_Wins.png').convert_alpha()
+Player_2_Wins_img = pygame.transform.scale(Player_2_Wins_Img, (50, 50))
 
 Player_1_Turn = pygame.image.load('assets/Player_1_Turn.png').convert_alpha()
 Player_2_Turn = pygame.image.load('assets/Player_2_Turn.png').convert_alpha()
@@ -118,11 +107,8 @@ YELLOW = pygame.transform.scale(YELLOW, (640, 480))
 
 start_button_img = pygame.image.load("assets/start_button_img.png").convert_alpha()
 hexagon_neutral_img = pygame.image.load("assets/tile_0.png").convert_alpha()
-# hexagon_neutral_img = pygame.transform.scale_by(0.7)
 hexagon_player1_img = pygame.image.load("assets/tile_1.png").convert_alpha()
-# hexagon_player1_img = pygame.transform.scale_by(0.7)
 hexagon_player2_img = pygame.image.load("assets/tile_2.png").convert_alpha()
-# hexagon_player2_img = pygame.transform.scale_by(0.7)
 
 # game variables
 action = False
@@ -184,7 +170,7 @@ def restart_game():
 
 def exit_game():
     global connection
-    global ai_difficulty 
+    global ai_difficulty
     ai_difficulty = 0
     print("exit")
     restart_game()
@@ -213,13 +199,6 @@ def exit_game():
     gamelogic.cpu = 0
 
 
-def draw_textbox(screen, rect, text):
-    font = pygame.font.Font(None, 32)
-    text_surface = font.render(text, True, (255, 255, 255))  # White color text
-    pygame.draw.rect(screen, (0, 0, 0), rect)  # Black color box
-    screen.blit(text_surface, (rect[0] + 5, rect[1] + 5))
-
-
 class Button:
     def __init__(self, x, y, image, scale, unit):
         self.image = image  # Store original image
@@ -228,15 +207,11 @@ class Button:
         self.width = int(self.image.get_width() * self.scale)
         self.height = int(self.image.get_height() * self.scale)
         self.image = pygame.transform.scale(self.image, (self.width, self.height))
-        # self.image = pygame.transform.scale(image, (int(width*scale), int(height*scale)))
         self.mask = pygame.mask.from_surface(self.image)
         self.unit = unit
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         self.clicked = False
-
-    #    def __str__(self):
-    #        return (f'BUTTONOBJ= x,y: {self.rect.topleft}, image:{self.image}, scale:{self.scale}, unit:{self.unit}')
 
     def set_player(self, player):
         self.player = player
@@ -252,14 +227,12 @@ class Button:
         mouse_pos = pygame.mouse.get_pos()
         if board1.grid is not None:
             if gamelogic.board[self.unit[0]][self.unit[1]] == 1:
-                # print(board1.grid)
                 board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
             elif gamelogic.board[self.unit[0]][self.unit[1]] == 2:
                 board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
 
-        # checking collision and clicked
+        # checking collision and clicked buttons (hitboxes)
         if self.rect.collidepoint(mouse_pos) and not game1.paused:
-            # print('hover:' + str(self.unit))
             # Checking if we are leftclicking a button that has not been clicked, then changing the image
 
             pygame.event.get()
@@ -267,20 +240,6 @@ class Button:
                 action = True
                 self.clicked = True
                 gamelogic.make_actual_move(self.unit)
-            # print("mulitplayer {}".format(gamelogic.multiplayer))
-            # print("client_no {}".format(gamelogic.client_no))
-            # print(gamelogic.player_no)
-            # print( gamelogic.client_no != gamelogic.player_no)
-            # if game1.get_turn() % 2 == 1 and board1.grid[self.unit[0]][self.unit[1]].get_player() == None:
-
-            # if game1.get_turn() % 2 == 1 and board1.grid[self.unit[0]][self.unit[1]].get_player() == None:
-            #     board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player1_img)
-            #     board1.grid[self.unit[0]][self.unit[1]].set_player(1)
-            #     game1.turn_count()
-            # if not (game1.get_turn() % 2 == 1) and board1.grid[self.unit[0]][self.unit[1]].get_player() == None:
-            #     board1.grid[self.unit[0]][self.unit[1]].set_image(hexagon_player2_img)
-            #     board1.grid[self.unit[0]][self.unit[1]].set_player(2)
-            #     game1.turn_count()
 
             if pygame.mouse.get_pressed()[0] == 0:
                 action = False
@@ -339,21 +298,14 @@ class Board:
     def make_grid(self):
         x_offset = self.hexagon.image.get_width() * self.hexagon.scale
         y_offset = self.hexagon.image.get_height() * self.hexagon.scale
-        x_extra_offset = (640-(self.size*44.2))*0.5
-        y_extra_offset = 95-(self.size*5)
+        x_extra_offset = (640 - (self.size * 44.2)) * 0.5
+        y_extra_offset = 95 - (self.size * 5)
         hex_grid = []
         for i in range(self.size):
             row = []
             for j in range(self.size):
-                # Offset for odd rows
-                distance_from_center_x = abs(j - (self.size - 1) / 2)
-                distance_from_center_y = abs(i - (self.size - 1) / 2)
                 hex_x = (j + i * 0.5) * x_offset + x_extra_offset
                 hex_y = i * y_offset * 0.74 + y_extra_offset
-                # if i == 0:
-                #     hexagon = Button(hex_x, hex_y, self.hexagon.image, self.hexagon.scale, (i, j))
-                #     hexagon.set_image(hexagon_player1_img)
-                # else:
                 hexagon = Button(hex_x, hex_y, self.hexagon.image, self.hexagon.scale, (i, j))
                 hexagon.draw(self.surface)
                 row.append(hexagon)
@@ -414,11 +366,6 @@ class Board:
                 hexagon.draw(self.surface)
 
 
-class EventHandler:
-    def __init__(self, event):
-        self.event = event
-
-
 class Game:
     def __init__(self, surface, board, turn):
         self.surface = surface
@@ -429,36 +376,6 @@ class Game:
         self.run = True
         self.paused = False
 
-    #    def menu(self):
-    #        height = game_surface.get_height()
-    #        width = game_surface.get_width()
-    #        game_surface.fill(WHITE)
-    #        start_button = Button(-300, -300, start_button_img, 0.5, (1, 1))
-    #        # start_button.set_image(start_button.get_image())
-    #
-    #        while self.game_menu:
-    #            start_button.draw_at_center(game_surface,(width/2, height/4))
-    #            pygame.display.flip()
-    #            print(start_button.clicked)
-    #            for event in pygame.event.get():
-    #               if event.type == pygame.QUIT:
-    #                    self.game_menu = False
-    #                    self.running = False
-    #                    self.run = False
-    #                if event.type == pygame.KEYDOWN:
-    #                    if event.key == pygame.K_ESCAPE:
-    #                        game_surface.fill(WHITE)
-    #                        self.game_menu = False
-    #            #if startbutton is pressed, makes new board which it gives to the play function
-    #            if start_button.clicked == True:
-    #                size = 3
-    #                custom_board = Board(hexagon1,size,self.surface)
-    #                self.game_menu = False
-    #                gamelogic.player_no = 0
-    #                custom_board.make_grid()
-    #                self.set_board(custom_board)
-    #
-
     def play(self):
         global new_pos, new_command
         global pos
@@ -468,17 +385,15 @@ class Game:
         global running_thread_server
         on_connect = True
         game_surface.blit(YELLOW, (0, 0))
-        game_surface.fill(WHITE) # COMMENT TO BRING BACK BACKGROUND
+        game_surface.fill(WHITE)  # COMMENT TO BRING BACK BACKGROUND
         self.board.make_grid()
         print("check")
 
         global user_text
-        # boardToDisplay = pygame.transform.scale_by(board_surface,0.7)
-        # game_surface.blit(boardToDisplay, (51.2, 30))
         while self.running:
 
             game_surface.blit(YELLOW, (0, 0))
-            game_surface.fill(WHITE) # COMMENT TO BRING BACK BACKGROUND
+            game_surface.fill(WHITE)  # COMMENT TO BRING BACK BACKGROUND
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit_game()
@@ -494,8 +409,10 @@ class Game:
                 if export_game_button.draw_menu(game_surface):
                     if is_board_legal(gamelogic.board):
                         print(np.array2string(gamelogic.board, separator=','))
+                        #we export the board as seen in the export file
                         export.export_board(gamelogic.board)
                         user_text = array_to_string(gamelogic.board)
+                        #we write the import string to the export file aswell
                         with open('export.txt', 'a') as f:
                             f.write("\n")
                             f.write(array_to_string(gamelogic.board))
@@ -509,42 +426,41 @@ class Game:
                 if exit_game_button.draw_menu(game_surface):
                     exit_game()
             if not self.paused:
-                # game_surface.fill(YELLOW)
                 if self.running and not gamelogic.has_any_won(gamelogic.board):
                     if ai_difficulty == 0:
-                        game_surface.blit(Player_1_man_img,(70,270))
-                        game_surface.blit(Player_2_man_img,(500,100))
+                        game_surface.blit(Player_1_man_img, (70, 270))
+                        game_surface.blit(Player_2_man_img, (500, 100))
                         print("Test")
                     if ai_difficulty == 1:
                         if gamelogic.default_starting_player == 1:
-                            game_surface.blit(Player_1_man_img,(70,270))
-                            game_surface.blit(Player_2_ai1_img,(500,100))
+                            game_surface.blit(Player_1_man_img, (70, 270))
+                            game_surface.blit(Player_2_ai1_img, (500, 100))
                         else:
-                            game_surface.blit(Player_1_ai1_img,(70,270))
-                            game_surface.blit(Player_2_man_img,(500,100))
+                            game_surface.blit(Player_1_ai1_img, (70, 270))
+                            game_surface.blit(Player_2_man_img, (500, 100))
                     if ai_difficulty == 2:
                         if gamelogic.default_starting_player == 1:
-                            game_surface.blit(Player_1_man_img,(70,270))
-                            game_surface.blit(Player_2_ai2_img,(500,100))
+                            game_surface.blit(Player_1_man_img, (70, 270))
+                            game_surface.blit(Player_2_ai2_img, (500, 100))
                         else:
-                            game_surface.blit(Player_1_ai2_img,(70,270))
-                            game_surface.blit(Player_2_man_img,(500,100))
+                            game_surface.blit(Player_1_ai2_img, (70, 270))
+                            game_surface.blit(Player_2_man_img, (500, 100))
 
                     if ai_difficulty == 3:
                         if gamelogic.default_starting_player == 1:
-                            game_surface.blit(Player_1_man_img,(70,270))
-                            game_surface.blit(Player_2_ai3_img,(500,100))
+                            game_surface.blit(Player_1_man_img, (70, 270))
+                            game_surface.blit(Player_2_ai3_img, (500, 100))
                         else:
-                            game_surface.blit(Player_1_ai3_img,(70,270))
-                            game_surface.blit(Player_2_man_img,(500,100))
+                            game_surface.blit(Player_1_ai3_img, (70, 270))
+                            game_surface.blit(Player_2_man_img, (500, 100))
                     if gamelogic.player_no == 1 and gamelogic.default_starting_player == 1:
-                        game_surface.blit(Player_1_Turn,(50,300))
+                        game_surface.blit(Player_1_Turn, (50, 300))
                     elif gamelogic.player_no == 2 and gamelogic.default_starting_player == 1:
-                        game_surface.blit(Player_2_Turn,(450,50))
+                        game_surface.blit(Player_2_Turn, (450, 50))
                     if gamelogic.player_no == 1 and gamelogic.default_starting_player == 2:
-                        game_surface.blit(Player_2_Turn,(450,50))
+                        game_surface.blit(Player_2_Turn, (450, 50))
                     elif gamelogic.player_no == 2 and gamelogic.default_starting_player == 2:
-                        game_surface.blit(Player_1_Turn,(50,300))
+                        game_surface.blit(Player_1_Turn, (50, 300))
                 if not gamelogic.has_any_won(gamelogic.board):
                     if pause_game_button.draw_menu(game_surface):
                         self.paused = True
@@ -559,8 +475,7 @@ class Game:
 
                 if gamelogic.update_board:
                     game1.board.draw_grid()
-                        
-                # print(gamelogic.has_any_won(gamelogic.board))
+
                 if gamelogic.player_no == gamelogic.cpu and not gamelogic.has_any_won(
                         gamelogic.board) and not gamelogic.multiplayer and ai_difficulty == 1:
                     self.unit = gamelogic.make_ai1_move()
@@ -574,14 +489,9 @@ class Game:
                     self.board.draw_grid()
                     if gamelogic.has_any_won(gamelogic.board):
                         if gamelogic.has_player_won(1, gamelogic.board):
-                            #text2 = font.render("Player 1 has won", True, BLACK)
-                            game_surface.blit(Player_1_Wins_Img,(180,200))
+                            game_surface.blit(Player_1_Wins_Img, (180, 200))
                         elif gamelogic.has_player_won(2, gamelogic.board):
-                            #text2 = font.render("Player 2 has won", True, BLACK)
-                            game_surface.blit(Player_2_Wins_Img,(180,200))
-                        #text_rect2 = text2.get_rect()
-                        #text_rect2.center = (100, 100)
-                        #game_surface.blit(text2, [195, 200])
+                            game_surface.blit(Player_2_Wins_Img, (180, 200))
                         if not gamelogic.multiplayer or gamelogic.client_no == 1:
 
                             if main_menu_button.draw_menu(game_surface):
@@ -597,8 +507,6 @@ class Game:
                                 restart_game()
                         else:
                             text3 = font.render("Waiting for host...", True, BLACK)
-                            # textRect3 = text2.get_rect()
-                            # textRect3.center = (100, 100)
                             game_surface.blit(text3, [300, 650])
 
                 if gamelogic.multiplayer:
@@ -613,7 +521,6 @@ class Game:
                             gamelogic.move_list.clear()
                             print("checkmove")
 
-                    # print(onlinelogic.clientsocket)
                     if gamelogic.client_no == 1 and onlinelogic.clientsocket is not None:
                         if on_connect:
                             game_surface.fill(WHITE)
@@ -631,7 +538,6 @@ class Game:
                             gamelogic.move_list.clear()
 
                     elif onlinelogic.clientsocket is None and gamelogic.client_no == 1:
-                        # print("checks")
                         text2 = font.render("Waiting for player...", True, BLACK)
                         text_rect2 = text2.get_rect()
                         text_rect2.center = (100, 100)
@@ -679,7 +585,6 @@ class Game:
 
 
 class MenuButton:
-
     def __init__(self, x, y, image, scale):
         width = image.get_width()
         height = image.get_height()
@@ -737,52 +642,37 @@ hexagon2 = Button(hexagon_neutral_img.get_width() * tile_scale, 0, hexagon_neutr
 hexagon_neutral_img_mask = pygame.mask.from_surface(hexagon_neutral_img)
 hexagon_player1 = Button(96, 0, hexagon_player1_img, tile_scale, (1, 1))
 
-# import -----------------------------------------------------------------------------------------
-clock = pygame.time.Clock()
-
-# better name may be needed TODO
-def import_game_setter(game_arr_str):
-    gamelogic.board = game_arr_str
-    print("board set")
-    print(gamelogic.board)
-    print(type(gamelogic.board))
-    return gamelogic.board
-
+# import ----------------------------------------------------------------------------------------- William
 
 def array_to_string(array):
-    # (this will be a list of integers sepperated by ' ')
+    #return a string with all the elements in the array sepperated by a " "
+    #input = an array
     return " ".join(str(elem) for elem in array.flat)
 
-
-# the line bellow makes it so that the array_to_string function is used when printing the array or getting string
-# version. Was used while testing np.set_string_function(array_to_string, repr=False)
-
-
-# TODO check size of array in this function maybe
 def string_to_square_numpy_array(input_string):
-    # Split the string into integers and convert them to a numpy array
+    #returns array by splitting the string into integers and convert them to a numpy array
+    #input an import string
     flat_array = np.array([int(elem) for elem in input_string.split()])
     print("flat array is")
     print(flat_array)
-    # assumes that the  array is square
-    # TODO if we are moving into none-square arrays another method will be needed
     array_size = int(np.sqrt(flat_array.size))
 
     # Reshape the flat array into a square array
     array = flat_array.reshape((array_size, array_size))
     print("new array is")
     print(array)
-    print(type(array))
     return array
 
 
 # Checking the elements in arr are either 0,1,2 and that ther is only a difference of 1 in the ammount of player
 # elements
 def is_board_legal(board):
+    #returns boolean value depending on the validity of the board
+    #in = the board array
+
     # for player tile checking
     values, counts = np.unique(board, return_counts=True)
     # we start by determining if the size is a perfect square
-    # TODO this is not working. a bad fix is hardcoding for the specific size we allow
     # check if other values than 0,1,2 is in the array
     if np.amax(board) > 2:
         print(" wrong values in array, entries cant be larger than 2")
@@ -813,7 +703,6 @@ def is_board_legal(board):
 
     elif len(values) < 3 and (1 in values and 2 in values):
         # this is a case where the board we are trying to import is full
-        # TODO maybe give a prompt to the user that player x has won
         print("player has won")
         return False
     # checking if the difference between player tiles is larger than 1
@@ -824,29 +713,6 @@ def is_board_legal(board):
     else:
         print("board is legal")
         return True
-
-
-def calculate_player_turn(board):
-    values = np.unique(board)
-    # absolute difference between player tiles (must not exceed 1)
-
-    # if there is only 1 element in values assuming the only element present is 0 #TODO
-    if len(values) < 2:
-        return 1
-    # if there are 2 elements present in our array and 1 of them is 1 assuming rest is 0 then it must be player 2's turn
-    elif len(values) < 3 and (1 in values):
-        return 2
-    elif len(values) < 3 and (2 in values):
-        return 1
-    elif values[1] <= values[2]:
-        return 1
-    elif values[2] < values[1]:
-        return 2
-    else:
-        print("calculate_player_turn ERROR")
-        return 0
-
-
 # import end -----------------------------------------------------------------------------------------
 
 # game loop
@@ -885,13 +751,10 @@ while run:
             gamelogic.local_multiplayer = True
             action = True
         if ai_1_button.draw_menu(game_surface) and not action:
-            # print(cpu)
             gamelogic.cpu = 2
             ai_difficulty = 1
-            # cpu = 2 #TODO this need to be no hard coded if the change player works
             game_running = True
             second_menu = False
-            # print(cpu)
             action = True
         if ai_2_button.draw_menu(game_surface) and not action:
             gamelogic.cpu = 2
@@ -918,8 +781,7 @@ while run:
 
     if online_menu:
         input_box = pygame.Rect(200, 210, 243, 32)
-        onlinelogic.ip_text = inputting.input_field(onlinelogic.ip_text,input_box,game_surface)
-        #draw_textbox(game_surface, input_box, onlinelogic.ip_text)
+        onlinelogic.ip_text = inputting.input_field(onlinelogic.ip_text, input_box, game_surface)
         if go_back_button.draw_menu(game_surface) and not action:
             second_menu = True
             online_menu = False
@@ -934,8 +796,6 @@ while run:
                 receive_thread_client.start()
                 gamelogic.client_no = 2
                 online_menu = False
-
-
             except:
                 print("Connection not made")
 
@@ -953,23 +813,14 @@ while run:
             second_menu = False
             action = True
 
-    if game_running == True:
-        # if imported:
-        #     #game1.play()
-        #     print("Game has been abrupted")
-        #     #game_running = False
-        #     print(gamelogic.player_no)
-        #     imported = False
-        #     if pause_game_button.draw_menu(game_surface):
-        #             game_paused = True
-        # else:
+    if game_running:
         board1 = Board(hexagon1, gamelogic.board_size, game_surface)
         game1 = Game(game_surface, board1, 1)
         game1.play()
         game_running = False
         print(gamelogic.player_no)
         if pause_game_button.draw_menu(game_surface):
-                game_paused = True
+            game_paused = True
 
         if game_paused:
             if export_game_button.draw_menu(game_surface):
@@ -995,34 +846,25 @@ while run:
                 board_size = len(board_size_list)
             gamelogic.board_size = board_size_list[board_size]
             gamelogic.board = np.zeros((board_size_list[board_size], board_size_list[board_size]), dtype=int)
-
+        
+        #import game
         if import_game_button.draw_menu(game_surface) and not action:
             input_rect = pygame.Rect(200, 110, 243, 32)
             user_text = ""
             import_game = True
         if import_game:
+            #We initialize the input field
             user_text = inputting.input_field(user_text, input_rect, game_surface, pygame.Color('black'))
             if inputting.entered:
                 user_text_size = user_text.split()
-                # print(len(user_text_size))
                 if len(user_text_size) not in full_board_size_list:
                     print("board size is not a perfect square or letters used")
                     print("please try again")
                     import_game = False
                     inputting.entered = False
-                # print(array_to_string(gamelogic.board))
-                # temporary fix for my dimension check #TODO remove this
-                # try:
-                #     placeholder_arr = string_to_square_numpy_array(user_text)
-
-                # except:
-                #     #TODO we need to prompt the user that the board was not successfully imported
-                #     placeholder_arr = gamelogic.board
-                #     print("wrong format, original board loaded")
-
                 # error handling
                 else:
-                    
+
                     placeholder_arr = string_to_square_numpy_array(user_text)
                     if is_board_legal(placeholder_arr):
                         try:
@@ -1032,7 +874,7 @@ while run:
                             gamelogic.board_size = root
                             gamelogic.board = string_to_square_numpy_array(user_text)
                             imported = True
-                            import_game = False 
+                            import_game = False
                             setting_menu = False
                             second_menu = True
                             inputting.entered = False
@@ -1076,7 +918,7 @@ while run:
 
     if pygame.mouse.get_pressed()[0] == 0:
         action = False
-    if online_menu == False:
+    if not online_menu:
         for event in pygame.event.get():
             # quit game
             if event.type == pygame.QUIT:
@@ -1092,16 +934,6 @@ while run:
                         print("board exported")
                     else:
                         print("board not legal")
-            #     elif event.key == pygame.K_b:
-            #         user_text = str(pyperclip.paste())
-            #     elif event.key == pygame.K_RETURN:
-            #         print(user_text)
-            #         user_text = ''
-
-            #     elif event.key == pygame.K_BACKSPACE:
-            #         user_text = user_text[:-1]
-            #     else:
-            #         user_text += event.unicode
 
     pygame.display.flip()
 

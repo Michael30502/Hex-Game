@@ -4,20 +4,17 @@
 import pygame
 import sys
 import pyperclip
-
-# pygame.init() will initialize all
-# imported module
 pygame.init()
-  
-# clock = pygame.time.Clock()
-  
-# it will display on screen
 base_font = pygame.font.Font(None, 32)
 
 entered = False
 
-# input_rect = pygame.Rect(200, 200, 140, 32)
 def input_field(text, input_rect, screen, color = pygame.Color('chartreuse4')):
+    #makes an interactive input field that displays what has been pressed on the keyboard and saves the final string in a variable that is returned
+    #text is the variable that holds the text, this is also displayed and dynamically changed while this code is running
+    #input_rect is the size and location of the rectangle where the users will be inputing the string
+    #screen is the surface we are updating this to
+    #color is optional to make it look better
     global entered
     initial_text = text
     input_active = True
@@ -37,8 +34,6 @@ def input_field(text, input_rect, screen, color = pygame.Color('chartreuse4')):
                     text = text[:-1]
                 else:
                     text += event.unicode
-        # The color the line below is where the color is set need to be of format pygame.Color('presetcolorname')
-        # this could be made prettyer
 
         pygame.draw.rect(screen, color, input_rect)
         text_surface = base_font.render(text, True, (255, 255, 255))
@@ -47,6 +42,3 @@ def input_field(text, input_rect, screen, color = pygame.Color('chartreuse4')):
         if initial_text != text:
             pygame.display.flip()
     return text
-
-
-# input_field(text, input_rect, game_surface)
