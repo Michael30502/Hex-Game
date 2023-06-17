@@ -997,10 +997,8 @@ while run:
             gamelogic.board = np.zeros((board_size_list[board_size], board_size_list[board_size]), dtype=int)
 
         if import_game_button.draw_menu(game_surface) and not action:
-            print("test")
-            input_rect = pygame.Rect(0, 110, WINDOWWIDTH, 32)
+            input_rect = pygame.Rect(200, 110, 243, 32)
             user_text = ""
-            print(user_text)
             import_game = True
         if import_game:
             user_text = inputting.input_field(user_text, input_rect, game_surface, pygame.Color('black'))
