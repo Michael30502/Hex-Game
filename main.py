@@ -161,8 +161,6 @@ def receive_wait(client_no):
 
 def restart_game():
     game_surface.fill(WHITE)
-    global ai_difficulty
-    ai_difficulty = 0
     gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
     gamelogic.player_won = False
     gamelogic.player_no = gamelogic.default_starting_player
