@@ -40,7 +40,7 @@ game_paused = False
 game_finished = False
 player_option = False
 online_menu = False
-imported = False  # TODO
+imported = False
 import_game = False
 
 # Surface/Screen size
@@ -49,7 +49,7 @@ game_surface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 pygame.display.set_caption("HEX")
 user_text = ""
 
-#Authored by Troels (s214915)
+# Authored by Troels (s214915)
 # load button images
 start_game_img = pygame.image.load('assets/Start_Game.png').convert_alpha()
 AI_1_img = pygame.image.load('assets/Drone_Bee.png').convert_alpha()
@@ -123,6 +123,7 @@ receive_thread_client = None
 receive_thread_server = None
 running_thread_server = None
 
+
 # Authored by Michael (s214954)
 def receive_wait(client_no):
     global pos, new_pos, new_command, command
@@ -159,6 +160,7 @@ def receive_wait(client_no):
                 print('pos received 1')
                 new_pos = True
 
+
 # Authored by Michael (s214954)
 def restart_game():
     game_surface.fill(WHITE)
@@ -166,6 +168,7 @@ def restart_game():
     gamelogic.player_won = False
     gamelogic.player_no = gamelogic.default_starting_player
     game1.board.make_grid()
+
 
 # Authored by Michael (s214954)
 def exit_game():
@@ -198,7 +201,8 @@ def exit_game():
     gamelogic.local_multiplayer = False
     gamelogic.cpu = 0
 
-#Authored by William (s184471)
+
+# Authored by William (s184471)
 class Button:
     def __init__(self, x, y, image, scale, unit):
         self.image = image  # Store original image
@@ -286,7 +290,7 @@ class Button:
         pass
 
 
-#Authored by William (s184471) and adjustments by Troels (s214915)
+# Authored by William (s184471) and adjustments by Troels (s214915)
 class Board:
     def __init__(self, hexagon, size, surface):
         self.hexagon = hexagon
@@ -368,7 +372,8 @@ class Board:
             for hexagon in row:
                 hexagon.draw(self.surface)
 
-#Authored by William (s184471)
+
+# Authored by William (s184471)
 class Game:
     def __init__(self, surface, board, turn):
         self.surface = surface
@@ -413,10 +418,10 @@ class Game:
                 if export_game_button.draw_menu(game_surface):
                     if importing.is_board_legal(gamelogic.board):
                         print(np.array2string(gamelogic.board, separator=','))
-                        #we export the board as seen in the export file
+                        # we export the board as seen in the export file
                         export.export_board(gamelogic.board)
                         user_text = importing.array_to_string(gamelogic.board)
-                        #we write the import string to the export file aswell
+                        # we write the import string to the export file aswell
                         with open('export.txt', 'a') as f:
                             f.write("\n")
                             f.write(importing.array_to_string(gamelogic.board))
@@ -584,14 +589,13 @@ class Game:
         return self.turn
 
     def set_board(self, board):
-
         self.board = board
 
     def turn_count(self):
         self.turn += 1
 
 
-#Authored by William (s184471)
+# Authored by William (s184471)
 class MenuButton:
     def __init__(self, x, y, image, scale):
         width = image.get_width()
@@ -621,7 +625,7 @@ class MenuButton:
         return action
 
 
-#Authored by Troels (s214915)
+# Authored by Troels (s214915)
 # create button instances
 exit_game_button = MenuButton(350, 50, Exit_Game_img, 1)
 play_again_button = MenuButton(343.4, 400, Play_Again_img, 1)
@@ -650,6 +654,7 @@ hexagon1 = Button(0, 0, hexagon_neutral_img, tile_scale, (0, 0))
 hexagon2 = Button(hexagon_neutral_img.get_width() * tile_scale, 0, hexagon_neutral_img, tile_scale, (0, 1))
 hexagon_neutral_img_mask = pygame.mask.from_surface(hexagon_neutral_img)
 hexagon_player1 = Button(96, 0, hexagon_player1_img, tile_scale, (1, 1))
+
 
 # game loop
 # Authored by Michael (s214954)
@@ -786,13 +791,13 @@ while run:
             gamelogic.board = np.zeros((board_size_list[board_size], board_size_list[board_size]), dtype=int)
 
         # Authored by William (s184471)
-        #import game
+        # import game
         if import_game_button.draw_menu(game_surface) and not action:
             input_rect = pygame.Rect(200, 110, 243, 32)
             user_text = ""
             import_game = True
         if import_game:
-            #We initialize the input field
+            # We initialize the input field
             user_text = inputting.input_field(user_text, input_rect, game_surface, pygame.Color('black'))
             if inputting.entered:
                 user_text_size = user_text.split()

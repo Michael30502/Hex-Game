@@ -1,21 +1,22 @@
 # import sys module
 # https://www.geeksforgeeks.org/how-to-create-a-text-input-box-with-pygame/
-#Authored by William (s184471), minor improvements Michael(s214954)
+# Authored by William (s184471), minor improvements Michael (s214954)
 
 import pygame
 import sys
 import pyperclip
+
 pygame.init()
 base_font = pygame.font.Font(None, 32)
 
 entered = False
 
-def input_field(text, input_rect, screen, color = pygame.Color('chartreuse4')):
-    #makes an interactive input field that displays what has been pressed on the keyboard and saves the final string in a variable that is returned
-    #text is the variable that holds the text, this is also displayed and dynamically changed while this code is running
-    #input_rect is the size and location of the rectangle where the users will be inputing the string
-    #screen is the surface we are updating this to
-    #color is optional to make it look better
+
+def input_field(text, input_rect, screen, color=pygame.Color('chartreuse4')):
+    # makes an interactive input field that displays what has been pressed on the keyboard and saves the final string
+    # in a variable that is returned text is the variable that holds the text, this is also displayed and dynamically
+    # changed while this code is running input_rect is the size and location of the rectangle where the users will be
+    # inputing the string screen is the surface we are updating this to color is optional to make it look better
     global entered
     initial_text = text
     input_active = True
@@ -38,8 +39,8 @@ def input_field(text, input_rect, screen, color = pygame.Color('chartreuse4')):
 
         pygame.draw.rect(screen, color, input_rect)
         text_surface = base_font.render(text, True, (255, 255, 255))
-        screen.blit(text_surface, (input_rect.x+5, input_rect.y+5))
-        input_rect.w = max(100, text_surface.get_width()+10)
+        screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
+        input_rect.w = max(100, text_surface.get_width() + 10)
         if initial_text != text:
             pygame.display.flip()
     return text

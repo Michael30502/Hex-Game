@@ -1,8 +1,12 @@
+# Authored by Freja (S204493)
+# update with compatablity with online logic by Michael (s214954)
+
+
 import random
 import numpy as np
 import ai
 import onlinelogic
-#Authored by Freja (S204493), update with compatablity with online logic by Michael (s214954)
+
 board_size = 3
 
 x_offset = 76.5
@@ -21,13 +25,10 @@ update_board = True
 move_list = list()
 
 
-
-
-
 def is_empty(pos, board_in):
     return board_in[pos] == 0
 
-#Authored
+
 def is_empty_default(pos):
     return board[pos] == 0
 

@@ -30,18 +30,18 @@ def result_state(state, action):
 # generate the list of relevant actions to consider, i.e. actions lying on the shortest path for both opponent and AI
 def actions_to_explore(board):
     # identify the actions available
-    moves_list = []
+    available_moves = set()
     for i in range(0, board.shape[0]):
         for j in range(0, board.shape[0]):
             if board[i, j] == 0:
-                moves_list.append((i, j))
+                available_moves.add((i, j))
 
     # find the actions on the shortest paths in both directions
     tiles_on_1_shortest_path = identify_tiles_on_path(board, 1)
     tiles_on_2_shortest_path = identify_tiles_on_path(board, 2)
     tiles_on_both_paths = tiles_on_1_shortest_path.intersection(tiles_on_2_shortest_path)
     # the moves to explore are those that are both on a shortest path as well as actually legal
-    return set(moves_list).intersection(tiles_on_both_paths)
+    return available_moves.intersection(tiles_on_both_paths)
 
 
 # small utility function for interpreting array elements as nodes with edges in a graph
@@ -126,7 +126,7 @@ def identify_tiles_on_path(board, player_no):
     return path_found
 
 
-# simple heuristic function to be used in the MiniMax algorithm with cut-off
+# simple heuristic function to be used in the minimax algorithm with cut-off
 def heuristic(state):
     min_for_player_1 = minimal_length_values(state.board_config, 2)
     min_for_player_2 = minimal_length_values(state.board_config, 2)
@@ -134,7 +134,8 @@ def heuristic(state):
 
 
 # maximises the AI's score in the minimax algorithm
-# based upon the algorithms presented in [[[[book reference]]]]
+# based upon the algorithms presented in Artificial Intelligece - A Modern Approach
+# by Russel and Norvig
 def max_value(state, depth, alpha, beta):
     if depth > min(cut_off_depth, state.board_config.shape[0] - 1) or state.is_terminal_state():
         return heuristic(state), None
@@ -155,7 +156,8 @@ def max_value(state, depth, alpha, beta):
 
 
 # minimises the AI's score in the minimax algorithm
-# based upon the algorithms presented in [[[[book reference]]]]
+# based upon the algorithms presented in Artificial Intelligece - A Modern Approach
+# by Russel and Norvig
 def min_value(state, depth, alpha, beta):
     if depth > min(cut_off_depth, state.board_config.shape[0] - 1) or state.is_terminal_state():
         return heuristic(state), None

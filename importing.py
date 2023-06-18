@@ -1,15 +1,16 @@
-#Authored by William (s184471)
+# Authored by William (s184471)
 import numpy as np
 
 
 def array_to_string(array):
-    #return a string with all the elements in the array sepperated by a " "
-    #input = an array
+    # return a string with all the elements in the array sepperated by a " "
+    # input = an array
     return " ".join(str(elem) for elem in array.flat)
 
+
 def string_to_square_numpy_array(input_string):
-    #returns array by splitting the string into integers and convert them to a numpy array
-    #input an import string
+    # returns array by splitting the string into integers and convert them to a numpy array
+    # input an import string
     flat_array = np.array([int(elem) for elem in input_string.split()])
     print("flat array is")
     print(flat_array)
@@ -25,8 +26,8 @@ def string_to_square_numpy_array(input_string):
 # Checking the elements in arr are either 0,1,2 and that ther is only a difference of 1 in the ammount of player
 # elements
 def is_board_legal(board):
-    #returns boolean value depending on the validity of the board
-    #in = the board array
+    # returns boolean value depending on the validity of the board
+    # in = the board array
 
     # for player tile checking
     values, counts = np.unique(board, return_counts=True)
@@ -72,9 +73,10 @@ def is_board_legal(board):
         print("board is legal")
         return True
 
+
 def calculate_player_turn(board):
-    #returns an integer to determine which players turn it is
-    #takes a board to calculate what player should play next by chekcing the ammount of 1 and 2 values on the board.
+    # returns an integer to determine which players turn it is
+    # takes a board to calculate what player should play next by chekcing the ammount of 1 and 2 values on the board.
     values = np.unique(board)
     # absolute difference between player tiles (must not exceed 1)
 
