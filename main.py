@@ -12,6 +12,7 @@ import inputting
 import gamelogic
 import onlinelogic
 import export
+import importing
 
 pygame.init()
 font = pygame.font.SysFont("Arial", 32)
@@ -385,7 +386,7 @@ class Game:
         global running_thread_server
         on_connect = True
         game_surface.blit(YELLOW, (0, 0))
-        game_surface.fill(WHITE)  # COMMENT TO BRING BACK BACKGROUND
+        # game_surface.fill(WHITE)  # COMMENT TO BRING BACK BACKGROUND
         self.board.make_grid()
         print("check")
 
@@ -393,7 +394,7 @@ class Game:
         while self.running:
 
             game_surface.blit(YELLOW, (0, 0))
-            game_surface.fill(WHITE)  # COMMENT TO BRING BACK BACKGROUND
+            # game_surface.fill(WHITE)  # COMMENT TO BRING BACK BACKGROUND
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit_game()
@@ -401,21 +402,21 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_c:
                         # exporting game as a string to load
-                        user_text = array_to_string(gamelogic.board)
+                        user_text = importing.array_to_string(gamelogic.board)
                     if event.key == pygame.K_ESCAPE:
                         self.game_menu = True
 
             if self.paused:
                 if export_game_button.draw_menu(game_surface):
-                    if is_board_legal(gamelogic.board):
+                    if importing.is_board_legal(gamelogic.board):
                         print(np.array2string(gamelogic.board, separator=','))
                         #we export the board as seen in the export file
                         export.export_board(gamelogic.board)
-                        user_text = array_to_string(gamelogic.board)
+                        user_text = importing.array_to_string(gamelogic.board)
                         #we write the import string to the export file aswell
                         with open('export.txt', 'a') as f:
                             f.write("\n")
-                            f.write(array_to_string(gamelogic.board))
+                            f.write(importing.array_to_string(gamelogic.board))
                         print("board exported")
                     else:
                         print("board is not legal and cant be exported ")
@@ -430,7 +431,7 @@ class Game:
                     if ai_difficulty == 0:
                         game_surface.blit(Player_1_man_img, (70, 270))
                         game_surface.blit(Player_2_man_img, (500, 100))
-                        print("Test")
+                        # print("Test")
                     if ai_difficulty == 1:
                         if gamelogic.default_starting_player == 1:
                             game_surface.blit(Player_1_man_img, (70, 270))
@@ -642,79 +643,6 @@ hexagon2 = Button(hexagon_neutral_img.get_width() * tile_scale, 0, hexagon_neutr
 hexagon_neutral_img_mask = pygame.mask.from_surface(hexagon_neutral_img)
 hexagon_player1 = Button(96, 0, hexagon_player1_img, tile_scale, (1, 1))
 
-# import ----------------------------------------------------------------------------------------- William
-
-def array_to_string(array):
-    #return a string with all the elements in the array sepperated by a " "
-    #input = an array
-    return " ".join(str(elem) for elem in array.flat)
-
-def string_to_square_numpy_array(input_string):
-    #returns array by splitting the string into integers and convert them to a numpy array
-    #input an import string
-    flat_array = np.array([int(elem) for elem in input_string.split()])
-    print("flat array is")
-    print(flat_array)
-    array_size = int(np.sqrt(flat_array.size))
-
-    # Reshape the flat array into a square array
-    array = flat_array.reshape((array_size, array_size))
-    print("new array is")
-    print(array)
-    return array
-
-
-# Checking the elements in arr are either 0,1,2 and that ther is only a difference of 1 in the ammount of player
-# elements
-def is_board_legal(board):
-    #returns boolean value depending on the validity of the board
-    #in = the board array
-
-    # for player tile checking
-    values, counts = np.unique(board, return_counts=True)
-    # we start by determining if the size is a perfect square
-    # check if other values than 0,1,2 is in the array
-    if np.amax(board) > 2:
-        print(" wrong values in array, entries cant be larger than 2")
-        return False
-    elif np.amin(board) < 0:
-        print(" wrong values in array, entries cant be smaller than 0")
-        return False
-    # checks if the boards only contains 0's
-    elif len(values) < 2:
-        print("board is empty but legal")
-        return True
-    # if player 1 has more or equal 2 tiles while player 2 has 0 board is illegal
-    elif len(values) < 3 and (0 in values and 1 in values):
-        if counts[1] >= 2:
-            print("player 1 has too many tiles")
-            return False
-        else:
-            # this is when the only move made is player 1
-            return True
-    # same with player 2 but this time since player 1 always starts the number cant exceed 1
-    elif len(values) < 3 and (0 in values and 2 in values):
-        if counts[1] >= 1:
-            print("player 2 has too many tiles")
-            return False
-        else:
-            print("this should not be possible to reach 2")
-            return True
-
-    elif len(values) < 3 and (1 in values and 2 in values):
-        # this is a case where the board we are trying to import is full
-        print("player has won")
-        return False
-    # checking if the difference between player tiles is larger than 1
-    elif abs(counts[1] - counts[2]) >= 2:
-        print("difference in player tiles is too big")
-        return False
-
-    else:
-        print("board is legal")
-        return True
-# import end -----------------------------------------------------------------------------------------
-
 # game loop
 def server_thread():
     global receive_thread_client
@@ -865,14 +793,14 @@ while run:
                 # error handling
                 else:
 
-                    placeholder_arr = string_to_square_numpy_array(user_text)
-                    if is_board_legal(placeholder_arr):
+                    placeholder_arr = importing.string_to_square_numpy_array(user_text)
+                    if importing.is_board_legal(placeholder_arr):
                         try:
                             root = int(math.sqrt(len(user_text_size)))
                             print("board has been imported")
                             board1 = Board(hexagon1, root, game_surface)
                             gamelogic.board_size = root
-                            gamelogic.board = string_to_square_numpy_array(user_text)
+                            gamelogic.board = importing.string_to_square_numpy_array(user_text)
                             imported = True
                             import_game = False
                             setting_menu = False
@@ -926,9 +854,9 @@ while run:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_c:
                     # exporting game as a string to load
-                    user_text = array_to_string(gamelogic.board)
+                    user_text = importing.array_to_string(gamelogic.board)
                 elif event.key == pygame.K_b:
-                    if is_board_legal(gamelogic.board):
+                    if importing.is_board_legal(gamelogic.board):
                         print(gamelogic.board)
                         export.export_board(gamelogic.board)
                         print("board exported")
