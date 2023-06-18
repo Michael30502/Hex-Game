@@ -180,6 +180,4 @@ def min_value(state, depth, alpha, beta):
 # starts the MiniMax search, returning the move to make
 def minimax_search(state):
     value, move = max_value(state, 0, float('-inf'), float('inf'))
-    if move is None:
-        print("minimax found no move. None returned")
     return move

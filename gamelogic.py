@@ -83,7 +83,6 @@ def make_ai1_move():
     greedy_moves = ai.identify_tiles_on_path(board, player_no)
     for move in greedy_moves:
         if board[move] == 0:
-            print("ai1 suggests move: " + str(move) + "as player " + str(player_no))
             make_actual_move(move)
             return
 
@@ -92,7 +91,6 @@ def make_ai1_move():
 def make_ai2_move():
     naive_moves = list(ai.actions_to_explore(board))
     move = random.choice(naive_moves)
-    print("ai2 suggests move: " + str(move) + "as player " + str(player_no))
     make_actual_move(move)
 
 
@@ -101,7 +99,6 @@ def make_ai3_move():
     global player_no
     # first move is hard coded as it is computationally way too heavy
     if board[board.shape[0] // 2, board.shape[0] // 2] == 0:
-        print("ai2 suggests move: " + str((board.shape[0] // 2, board.shape[0] // 2)) + "as player " + str(player_no))
         make_actual_move((board.shape[0] // 2, board.shape[0] // 2))
         return
 
@@ -109,12 +106,10 @@ def make_ai3_move():
 
     move = ai.minimax_search(state)
     if move is not None:
-        print("ai3 suggests move: " + str(move) + "as player " + str(player_no))
         make_actual_move(move)
     else:
         naive_moves = list(ai.actions_to_explore(board))
         move = random.choice(naive_moves)
-        print("ai3 suggests move: " + str(move) + "as player " + str(player_no))
         make_actual_move(move)
 
 
