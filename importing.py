@@ -71,4 +71,25 @@ def is_board_legal(board):
     else:
         print("board is legal")
         return True
-# import end -----------------------------------------------------------------------------------------
+
+def calculate_player_turn(board):
+    #returns an integer to determine which players turn it is
+    #takes a board to calculate what player should play next by chekcing the ammount of 1 and 2 values on the board.
+    values = np.unique(board)
+    # absolute difference between player tiles (must not exceed 1)
+
+    # if there is only 1 element in values assuming the only element present is 0 #TODO
+    if len(values) < 2:
+        return 1
+    # if there are 2 elements present in our array and 1 of them is 1 assuming rest is 0 then it must be player 2's turn
+    elif len(values) < 3 and (1 in values):
+        return 2
+    elif len(values) < 3 and (2 in values):
+        return 1
+    elif values[1] <= values[2]:
+        return 1
+    elif values[2] < values[1]:
+        return 2
+    else:
+        print("calculate_player_turn ERROR")
+        return 0

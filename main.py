@@ -799,6 +799,7 @@ while run:
                             board1 = Board(hexagon1, root, game_surface)
                             gamelogic.board_size = root
                             gamelogic.board = importing.string_to_square_numpy_array(user_text)
+                            gamelogic.player_no = importing.calculate_player_turn(gamelogic.board)
                             imported = True
                             import_game = False
                             setting_menu = False
