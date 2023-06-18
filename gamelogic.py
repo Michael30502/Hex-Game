@@ -1,16 +1,19 @@
+# Authored by Freja (S204493)
+# update with compatablity with online logic by Michael (s214954)
+
+
 import random
 import numpy as np
 import ai
 import onlinelogic
-#Authored by Freja (S204493), update with compatablity with online logic by Michael (s214954)
+
+# global variables for keeping track of the current placement of tiles
 board_size = 3
-
-x_offset = 76.5
-
 board = np.zeros((board_size, board_size), dtype=int)
 
 cpu = 0
 
+# flags to aid in interfacing with other components of the program, like onlinelogic and main
 player_no = 1
 default_starting_player = 1
 client_no = 0
@@ -21,13 +24,10 @@ update_board = True
 move_list = list()
 
 
-
-
-
 def is_empty(pos, board_in):
     return board_in[pos] == 0
 
-#Authored
+
 def is_empty_default(pos):
     return board[pos] == 0
 
@@ -53,6 +53,7 @@ def get_relative_player_no(player):
         return 2
 
 
+# checks if a move is legal and then updates the board accordingly
 def make_actual_move(pos, new_pos=False):
     global player_no
     global player_won
@@ -70,6 +71,7 @@ def make_actual_move(pos, new_pos=False):
         player_no = opponent(player_no)
 
 
+# returns what the input board would look like if a given move had been made
 def make_sim_move(pos, board_in, player):
     board_out = np.copy(board_in)
     if is_empty(pos, board_in):
@@ -77,30 +79,27 @@ def make_sim_move(pos, board_in, player):
     return board_out
 
 
-# picks the first move on the current shortest path
+# AI1 - picks the first move on the current shortest path
 def make_ai1_move():
     greedy_moves = ai.identify_tiles_on_path(board, player_no)
     for move in greedy_moves:
         if board[move] == 0:
-            print("ai1 suggests move: " + str(move) + "as player " + str(player_no))
             make_actual_move(move)
             return
 
 
-# considers moves that are both on own shortest path as well as blocking the opponent
+# AI2 - considers moves that are both on own shortest path as well as blocking the opponent
 def make_ai2_move():
     naive_moves = list(ai.actions_to_explore(board))
     move = random.choice(naive_moves)
-    print("ai2 suggests move: " + str(move) + "as player " + str(player_no))
     make_actual_move(move)
 
 
-# most difficult setting - actually thinks moves ahead
+# AI3 - most difficult setting - actually thinks moves ahead using the minimax algorithm in ai.py
 def make_ai3_move():
     global player_no
     # first move is hard coded as it is computationally way too heavy
     if board[board.shape[0] // 2, board.shape[0] // 2] == 0:
-        print("ai2 suggests move: " + str((board.shape[0] // 2, board.shape[0] // 2)) + "as player " + str(player_no))
         make_actual_move((board.shape[0] // 2, board.shape[0] // 2))
         return
 
@@ -108,12 +107,10 @@ def make_ai3_move():
 
     move = ai.minimax_search(state)
     if move is not None:
-        print("ai3 suggests move: " + str(move) + "as player " + str(player_no))
         make_actual_move(move)
     else:
         naive_moves = list(ai.actions_to_explore(board))
         move = random.choice(naive_moves)
-        print("ai3 suggests move: " + str(move) + "as player " + str(player_no))
         make_actual_move(move)
 
 
@@ -144,6 +141,7 @@ def find_neighbours(pos, board_in, value=-1, skipping=None):
     return nset
 
 
+# auxiliary function that checks if an unbroken path exists from one side to the other for the given player
 def has_player_won(playerno, board_in):
     # player cannot have won if there are too few tiles to form a path
 
