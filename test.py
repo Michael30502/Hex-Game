@@ -1,4 +1,4 @@
-#Written by Freja
+#Authored by Freja (S204493)
 
 import gamelogic
 import ai

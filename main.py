@@ -1,4 +1,4 @@
-# Written by everyone, specific sections marked
+# Authored by everyone, specific sections marked
 
 import socket
 import sys
@@ -49,6 +49,7 @@ game_surface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 pygame.display.set_caption("HEX")
 user_text = ""
 
+#Authored by Troels (s214915)
 # load button images
 start_game_img = pygame.image.load('assets/Start_Game.png').convert_alpha()
 AI_1_img = pygame.image.load('assets/Drone_Bee.png').convert_alpha()
@@ -122,7 +123,7 @@ receive_thread_client = None
 receive_thread_server = None
 running_thread_server = None
 
-
+# Authored by Michael (s214954)
 def receive_wait(client_no):
     global pos, new_pos, new_command, command
     pos = None
@@ -158,7 +159,7 @@ def receive_wait(client_no):
                 print('pos received 1')
                 new_pos = True
 
-
+# Authored by Michael (s214954)
 def restart_game():
     game_surface.fill(WHITE)
     gamelogic.board = np.zeros((gamelogic.board_size, gamelogic.board_size), dtype=int)
@@ -166,7 +167,7 @@ def restart_game():
     gamelogic.player_no = gamelogic.default_starting_player
     game1.board.make_grid()
 
-
+# Authored by Michael (s214954)
 def exit_game():
     global connection
     global ai_difficulty
@@ -197,7 +198,7 @@ def exit_game():
     gamelogic.local_multiplayer = False
     gamelogic.cpu = 0
 
-
+#Authored by William (s184471)
 class Button:
     def __init__(self, x, y, image, scale, unit):
         self.image = image  # Store original image
@@ -247,6 +248,7 @@ class Button:
         surface.blit(self.image, self.rect)
 
     # DRAW AT CENTER FUNCTION FOR THE MENU NOT HEXAGONS
+    # Authored by William (s184471)
     def draw_at_center(self, surface, dest):
         global action
 
@@ -284,6 +286,7 @@ class Button:
         pass
 
 
+#Authored by William (s184471) and adjustments by Troels (s214915)
 class Board:
     def __init__(self, hexagon, size, surface):
         self.hexagon = hexagon
@@ -318,6 +321,7 @@ class Board:
     def get_grid(self):
         return self.grid
 
+    # Authored by Troels (s214915)
     @staticmethod
     def draw_custom_line(surface, color, start_pos, end_pos, thickness, horizontal):
         if horizontal:
@@ -364,7 +368,7 @@ class Board:
             for hexagon in row:
                 hexagon.draw(self.surface)
 
-
+#Authored by William (s184471)
 class Game:
     def __init__(self, surface, board, turn):
         self.surface = surface
@@ -375,6 +379,7 @@ class Game:
         self.run = True
         self.paused = False
 
+    # Authored by William (s184471), Michael(s214954) and Troels(s214915)
     def play(self):
         global new_pos, new_command
         global pos
@@ -430,6 +435,7 @@ class Game:
                         game_surface.blit(Player_1_man_img, (70, 270))
                         game_surface.blit(Player_2_man_img, (500, 100))
                         # print("Test")
+                    # Authored by Troels (s214915)
                     if ai_difficulty == 1:
                         if gamelogic.default_starting_player == 1:
                             game_surface.blit(Player_1_man_img, (70, 270))
@@ -491,6 +497,7 @@ class Game:
                             game_surface.blit(Player_1_Wins_Img, (180, 200))
                         elif gamelogic.has_player_won(2, gamelogic.board):
                             game_surface.blit(Player_2_Wins_Img, (180, 200))
+                        # Authored by Michael (s214954)
                         if not gamelogic.multiplayer or gamelogic.client_no == 1:
 
                             if main_menu_button.draw_menu(game_surface):
@@ -572,6 +579,7 @@ class Game:
                         new_pos = False
             pygame.display.flip()
 
+    # Authored by William (s184471)
     def get_turn(self):
         return self.turn
 
@@ -583,6 +591,7 @@ class Game:
         self.turn += 1
 
 
+#Authored by William (s184471)
 class MenuButton:
     def __init__(self, x, y, image, scale):
         width = image.get_width()
@@ -612,6 +621,7 @@ class MenuButton:
         return action
 
 
+#Authored by Troels (s214915)
 # create button instances
 exit_game_button = MenuButton(350, 50, Exit_Game_img, 1)
 play_again_button = MenuButton(343.4, 400, Play_Again_img, 1)
@@ -642,6 +652,7 @@ hexagon_neutral_img_mask = pygame.mask.from_surface(hexagon_neutral_img)
 hexagon_player1 = Button(96, 0, hexagon_player1_img, tile_scale, (1, 1))
 
 # game loop
+# Authored by Michael (s214954)
 def server_thread():
     global receive_thread_client
     global receive_thread_server
@@ -652,7 +663,7 @@ def server_thread():
 
 while run:
     game_surface.fill((200, 200, 255))
-
+    # Authored by Troels(s214915) and Michael(s214954)
     if first_menu:
         if start_game_button.draw_menu(game_surface):
             print('first menu')
@@ -705,6 +716,7 @@ while run:
             second_menu = False
             action = True
 
+    # Authored by Michael (s214954)
     if online_menu:
         input_box = pygame.Rect(200, 210, 243, 32)
         onlinelogic.ip_text = inputting.input_field(onlinelogic.ip_text, input_box, game_surface)
@@ -738,7 +750,7 @@ while run:
             game_running = True
             second_menu = False
             action = True
-
+    # Authored by Michael (s214954), menu buttons by Troels (s214915)
     if game_running:
         board1 = Board(hexagon1, gamelogic.board_size, game_surface)
         game1 = Game(game_surface, board1, 1)
@@ -772,7 +784,8 @@ while run:
                 board_size = len(board_size_list)
             gamelogic.board_size = board_size_list[board_size]
             gamelogic.board = np.zeros((board_size_list[board_size], board_size_list[board_size]), dtype=int)
-        
+
+        # Authored by William (s184471)
         #import game
         if import_game_button.draw_menu(game_surface) and not action:
             input_rect = pygame.Rect(200, 110, 243, 32)
@@ -816,7 +829,7 @@ while run:
                         inputting.entered = False
                     else:
                         print("board is illegal")
-
+        # Authored by Michael (s214954) and Troels (s214915)
         if change_player_button.draw_menu(game_surface) and not action:
             setting_menu = False
             player_option = True
@@ -842,7 +855,7 @@ while run:
             player_option = False
             setting_menu = True
             action = True
-
+    # Authored by Troels(s214915) and William (s184471)
     if pygame.mouse.get_pressed()[0] == 0:
         action = False
     if not online_menu:

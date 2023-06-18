@@ -1,6 +1,6 @@
 # import sys module
 # https://www.geeksforgeeks.org/how-to-create-a-text-input-box-with-pygame/
-#Written by William, minor improvements Michael
+#Authored by William (s184471), minor improvements Michael(s214954)
 
 import pygame
 import sys

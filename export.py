@@ -1,4 +1,4 @@
-#Written by William
+#Authored by William (s184471)
 import numpy as np
 import string
 

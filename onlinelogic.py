@@ -1,5 +1,5 @@
 # https://docs.python.org/3/howto/sockets.html
-#Written by Michael
+#Authored by Michael(s214954)
 import socket
 import sys
 
@@ -8,7 +8,7 @@ import gamelogic
 clientsocket = None
 max_msg_len = 5
 shutdown = False
-ip_text = '192.168.0.113'
+ip_text = ''
 port_text = 7777
 
 #class that contains the functions for the client socket
