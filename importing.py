@@ -11,14 +11,14 @@ def string_to_square_numpy_array(input_string):
     #returns array by splitting the string into integers and convert them to a numpy array
     #input an import string
     flat_array = np.array([int(elem) for elem in input_string.split()])
-    print("flat array is")
-    print(flat_array)
+    # print("flat array is")
+    # print(flat_array)
     array_size = int(np.sqrt(flat_array.size))
 
     # Reshape the flat array into a square array
     array = flat_array.reshape((array_size, array_size))
-    print("new array is")
-    print(array)
+    # print("new array is")
+    # print(array)
     return array
 
 
