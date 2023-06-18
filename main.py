@@ -23,7 +23,7 @@ RED = (255, 0, 0)
 
 FPS = 60
 
-board_size_list = [3, 4, 5, 7, 9, 11, 12, 13, 99]
+board_size_list = [3, 4, 5, 7, 9, 11]
 full_board_size_list = []
 for elem in board_size_list:
     full_board_size_list.append(elem ** 2)
