@@ -804,6 +804,7 @@ while run:
                 if len(user_text_size) not in full_board_size_list:
                     print("board size is not a perfect square or letters used")
                     print("please try again")
+                    user_text = ""
                     import_game = False
                     inputting.entered = False
                 # error handling
